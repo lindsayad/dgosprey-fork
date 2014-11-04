@@ -1,0 +1,42 @@
+#include "DgospreyApp.h"
+#include "Moose.h"
+#include "AppFactory.h"
+
+template<>
+InputParameters validParams<DgospreyApp>()
+{
+  InputParameters params = validParams<MooseApp>();
+  return params;
+}
+
+DgospreyApp::DgospreyApp(const std::string & name, InputParameters parameters) :
+    MooseApp(name, parameters)
+{
+  srand(processor_id());
+
+  Moose::registerObjects(_factory);
+  DgospreyApp::registerObjects(_factory);
+
+  Moose::associateSyntax(_syntax, _action_factory);
+  DgospreyApp::associateSyntax(_syntax, _action_factory);
+}
+
+DgospreyApp::~DgospreyApp()
+{
+}
+
+void
+DgospreyApp::registerApps()
+{
+  registerApp(DgospreyApp);
+}
+
+void
+DgospreyApp::registerObjects(Factory & factory)
+{
+}
+
+void
+DgospreyApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
+{
+}
