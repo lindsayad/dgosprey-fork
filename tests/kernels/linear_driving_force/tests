@@ -1,0 +1,7 @@
+[Tests]
+  [./test]
+    type = 'Exodiff'
+    input = 'ldf_test.i'
+    exodiff = 'ldf_test_out.e'
+  [../]
+[]

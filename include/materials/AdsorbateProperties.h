@@ -1,0 +1,8 @@
+#include "Material.h"
+
+#ifndef ADSORBATEPROPERTIES_H
+#define ADSORBATEPROPERTIES_H
+
+
+
+#endif //ADSORBATEPROPERTIES_H
