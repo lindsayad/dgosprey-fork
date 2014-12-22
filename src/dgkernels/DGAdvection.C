@@ -4,7 +4,7 @@ template<>
 InputParameters validParams<DGAdvection>()
 {
 	InputParameters params = validParams<DGKernel>();
-	params.addRequiredParam<Real>("vx", "x-component of velocity vector");
+	params.addParam<Real>("vx",0,"x-component of velocity vector");
 	params.addParam<Real>("vy",0,"y-component of velocity vector");
 	params.addParam<Real>("vz",0,"z-component of velocity vector");
 	return params;

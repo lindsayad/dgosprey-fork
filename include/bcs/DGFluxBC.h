@@ -22,10 +22,15 @@ protected:
 	virtual Real computeQpJacobian();
 	
 	RealVectorValue _velocity;
+	RealTensorValue _Diffusion;
 private:
 	Real _vx;
 	Real _vy;
 	Real _vz;
+	
+	Real _Dxx, _Dxy, _Dxz;
+	Real _Dyx, _Dyy, _Dyz;
+	Real _Dzx, _Dzy, _Dzz;
 	
 	Real _u_input;
 	
