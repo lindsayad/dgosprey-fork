@@ -1,23 +1,19 @@
 [GlobalParams]
-	vx = 0.0 #R-direction (positive leaves outward, negative pushes inward)
-	vy = 2.0 #Z-direction (positive moves bottom to top, negative moves top to bottom)
+	vx = 2.0
+	vy = 0.0
 	vz = 0.0
 	u_input = 1.0
 []
  
-[Problem]
-	coord_type = RZ
-[]
-
 [Mesh]
 	type = GeneratedMesh
 	dim = 2
-	nx = 5
-	ny = 10
-	xmax = 0.5
+	nx = 10
+	ny = 3
+	xmax = 1.0
 	ymax = 1.0
 []
- 
+
 [Variables]
 
 	[./u]
@@ -82,13 +78,13 @@
  
 	[./u_exit]
 		type = SideAverageValue
-		boundary = 'top'
+		boundary = 'right'
 		variable = u
 	[../]
 
 	[./u_enter]
 		type = SideAverageValue
-		boundary = 'bottom'
+		boundary = 'left'
 		variable = u
 	[../]
  
