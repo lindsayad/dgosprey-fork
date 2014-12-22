@@ -38,6 +38,10 @@
 #include "DGMassOutFlowBC.h"
 #include "MassPenalty.h"
 
+#include "DGAdvection.h"
+#include "DGFluxBC.h"
+#include "GAdvection.h"
+
 
 template<>
 InputParameters validParams<DgospreyApp>()
@@ -107,6 +111,11 @@ DgospreyApp::registerObjects(Factory & factory)
   registerBoundaryCondition(DGCoupledMassBC);
   registerBoundaryCondition(DGMassOutFlowBC);
   registerKernel(MassPenalty);
+	
+	registerDGKernel(DGAdvection);
+	registerBoundaryCondition(DGFluxBC);
+	registerKernel(GAdvection);
+	
 }
 
 void
