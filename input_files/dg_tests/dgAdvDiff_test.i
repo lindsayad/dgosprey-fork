@@ -3,7 +3,7 @@
 	vy = 2.0 #Z-direction (positive moves bottom to top, negative moves top to bottom)
 	vz = 0.0 #Not used in RZ system
  
-	Dxx = 0.01 #Radial Diffusion in cylinder
+	Dxx = 0.1 #Radial Diffusion in cylinder
 	Dxy = 0.0
 	Dxz = 0.0
  
@@ -24,7 +24,7 @@
 [Mesh]
 	type = GeneratedMesh
 	dim = 2
-	nx = 5 #R-direction == x
+	nx = 10 #R-direction == x
 	ny = 10 #Z-direction == y
 	xmax = 0.5
 	ymax = 1.0
@@ -88,19 +88,19 @@
 
 [BCs]
 
-	[./u_bc_top_bot]
-		type = DGFluxBC
-		variable = u
-		boundary = 'top bottom'
-		u_input = 1.0
-	[../]
+[./u_bc_top_bot]
+type = DGFluxBC
+variable = u
+boundary = 'top bottom'
+u_input = 1.0
+[../]
  
-	[./u_bc_left_right]
-		type = DGFluxBC
-		variable = u
-		boundary = 'left right'
-		u_input = 1.0
-	[../]
+#[./u_bc_left_right]
+#type = DGFluxBC
+#variable = u
+#boundary = 'right'
+#u_input = 1.0
+#[../]
 
 []
 
@@ -184,7 +184,7 @@
 	[./console]
 		type = Console
 		perf_log = true
-		linear = true
+		output_on = 'timestep_end nonlinear linear failed initial'
 	[../]
 
 []

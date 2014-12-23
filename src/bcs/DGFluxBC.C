@@ -5,6 +5,8 @@ template<>
 InputParameters validParams<DGFluxBC>()
 {
 	InputParameters params = validParams<IntegratedBC>();
+	params.addParam<Real>("epsilon", 1.0, "epsilon");
+	params.addParam<Real>("sigma", 1.0, "sigma");
 	params.addParam<Real>("vx",0, "x-component of velocity vector");
 	params.addParam<Real>("vy",0,"y-component of velocity vector");
 	params.addParam<Real>("vz",0,"z-component of velocity vector");
@@ -23,6 +25,8 @@ InputParameters validParams<DGFluxBC>()
 
 DGFluxBC::DGFluxBC(const std::string & name, InputParameters parameters) :
 IntegratedBC(name, parameters),
+_epsilon(getParam<Real>("epsilon")),
+_sigma(getParam<Real>("sigma")),
 _vx(getParam<Real>("vx")),
 _vy(getParam<Real>("vy")),
 _vz(getParam<Real>("vz")),
@@ -57,27 +61,66 @@ _u_input(getParam<Real>("u_input"))
 Real
 DGFluxBC::computeQpResidual()
 {
+	Real r = 0;
+	
 	const unsigned int elem_b_order = static_cast<unsigned int> (_var.getOrder());
 	const double h_elem = _current_elem->volume()/_current_side_elem->volume() * 1./std::pow(elem_b_order, 2.);
 	
-	//std::cout << _Diffusion*_grad_u[_qp] << std::endl;
-	//std::cout << _Diffusion << std::endl;
-	//std::cout << _grad_u[_qp] << std::endl;
-	if ((_velocity - _Diffusion*_grad_u[_qp])*_normals[_qp] >= 0.0)
-		return _test[_i][_qp]*((_velocity - _Diffusion*_grad_u[_qp])*_normals[_qp])*_u[_qp];
+	//Output
+	if ((_velocity)*_normals[_qp] >= 0.0)
+	{
+		r += _test[_i][_qp]*(_velocity*_normals[_qp])*_u[_qp];
+	}
+	//Input
 	else
-		return _test[_i][_qp]*((_velocity - _Diffusion*_grad_u[_qp])*_normals[_qp])*_u_input;//Need to edit grad_u
+	{
+		r += _test[_i][_qp]*(_velocity*_normals[_qp])*_u_input;
+		r += _epsilon * (_u[_qp] - _u_input) * _Diffusion * _grad_test[_i][_qp] * _normals[_qp];
+		r += _sigma/h_elem * (_u[_qp] - _u_input) * _test[_i][_qp];
+	}
+	
+	r -= (_Diffusion * _grad_u[_qp] * _normals[_qp] * _test[_i][_qp]);
+	
+	//Diffusion Only Input (NOTE: May need to break this up into different files)
+	if ( (_velocity(0) == _velocity(1) == _velocity(2) == 0.0) )
+	{
+		r += _epsilon * (_u[_qp] - _u_input) * _Diffusion * _grad_test[_i][_qp] * _normals[_qp];
+		r += _sigma/h_elem * (_u[_qp] - _u_input) * _test[_i][_qp];
+	}
+	
+	return r;
 }
 
 Real
 DGFluxBC::computeQpJacobian()
 {
+	Real r = 0;
+	
 	const unsigned int elem_b_order = static_cast<unsigned int> (_var.getOrder());
 	const double h_elem = _current_elem->volume()/_current_side_elem->volume() * 1./std::pow(elem_b_order, 2.);
 	
-	if ((_velocity - _Diffusion*_grad_u[_qp])*_normals[_qp] >= 0.0)
-		return _test[_i][_qp]*((_velocity - _Diffusion*_grad_phi[_j][_qp])*_normals[_qp])*_phi[_j][_qp];
+	//Output
+	if ((_velocity)*_normals[_qp] >= 0.0)
+	{
+		r += _test[_i][_qp]*(_velocity*_normals[_qp])*_phi[_j][_qp];
+	}
+	//Input
 	else
-		return -_test[_i][_qp]*(_Diffusion*_grad_phi[_j][_qp]*_normals[_qp]);//Needs editing
+	{
+		r += 0.0;
+		r += _epsilon * (_u[_qp] - _u_input) * _Diffusion * _grad_test[_i][_qp] * _normals[_qp];
+		r += _sigma/h_elem * _phi[_j][_qp] * _test[_i][_qp];
+	}
+	
+	r -= (_Diffusion * _grad_phi[_j][_qp] * _normals[_qp] * _test[_i][_qp]);
+	
+	//Diffusion Only Input
+	if ( (_velocity(0) == _velocity(1) == _velocity(2) == 0.0) )
+	{
+		r += _epsilon * (_u[_qp] - _u_input) * _Diffusion * _grad_test[_i][_qp] * _normals[_qp];
+		r += _sigma/h_elem * _phi[_j][_qp] * _test[_i][_qp];
+	}
+	
+	return r;
 }
 

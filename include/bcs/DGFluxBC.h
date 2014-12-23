@@ -21,6 +21,8 @@ protected:
 	virtual Real computeQpResidual();
 	virtual Real computeQpJacobian();
 	
+	Real _epsilon;
+	Real _sigma;
 	RealVectorValue _velocity;
 	RealTensorValue _Diffusion;
 private:
