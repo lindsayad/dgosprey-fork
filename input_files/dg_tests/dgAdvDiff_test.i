@@ -26,7 +26,7 @@
 	dim = 2
 	nx = 10 #R-direction == x
 	ny = 10 #Z-direction == y
-	xmax = 0.5
+	xmax = 0.25
 	ymax = 1.0
 []
 
@@ -95,12 +95,12 @@ boundary = 'top bottom'
 u_input = 1.0
 [../]
  
-#[./u_bc_left_right]
-#type = DGFluxBC
-#variable = u
-#boundary = 'right'
-#u_input = 1.0
-#[../]
+[./u_bc_left_right]
+type = DGFluxBC
+variable = u
+boundary = 'right' #Note: RZ applies natural BC at left Boundary
+u_input = 1.0
+[../]
 
 []
 
@@ -127,13 +127,25 @@ u_input = 1.0
 		boundary = 'right'
 		variable = u
 	[../]
+ 
+	[./volume]
+		type = VolumePostprocessor
+		execute_on = 'timestep_begin initial'
+	[../]
+ 
+	[./u_total]
+		type = ElementIntegralVariablePostprocessor
+		variable = u
+	[../]
 
 []
 
 [Executioner]
 
 	type = Transient
-	scheme = bdf2
+scheme = bdf2
+#scheme = crank-nicolson
+#scheme = implicit-euler
 
 	nl_rel_tol = 1e-06
 	picard_abs_tol = 1e-6
@@ -141,6 +153,8 @@ u_input = 1.0
 	nl_rel_step_tol = 1e-6
 	picard_rel_tol = 1e-6
 	nl_abs_step_tol = 1e-6
+	l_tol = 0.01
+	l_max_its = 100
 
 	solve_type = PJFNK
 	start_time = 0.0
@@ -150,7 +164,8 @@ u_input = 1.0
 
 	[./TimeStepper]
 		type = ConstantDT
-		dt = 0.05
+#type = SolutionTimeAdaptiveDT #Too numerically dispersive
+		dt = 0.01
 	[../]
 
 []
