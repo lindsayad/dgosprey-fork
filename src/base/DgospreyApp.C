@@ -43,6 +43,8 @@
 #include "GAdvection.h"
 #include "DGAnisotropicDiffusion.h"
 #include "GAnisotropicDiffusion.h"
+#include "DGAdvectionPenalty.h"
+#include "DGFluxLimitedBC.h"
 
 
 template<>
@@ -119,6 +121,8 @@ DgospreyApp::registerObjects(Factory & factory)
 	registerKernel(GAdvection);
 	registerDGKernel(DGAnisotropicDiffusion);
 	registerKernel(GAnisotropicDiffusion);
+	registerDGKernel(DGAdvectionPenalty);
+	registerBoundaryCondition(DGFluxLimitedBC);
 }
 
 void

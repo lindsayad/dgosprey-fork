@@ -3,12 +3,12 @@
 	vy = 2.0 #Z-direction (positive moves bottom to top, negative moves top to bottom)
 	vz = 0.0 #Not used in RZ system
  
-	Dxx = 0.1 #Radial Diffusion in cylinder
+	Dxx = 0.0 #Radial Diffusion in cylinder
 	Dxy = 0.0
 	Dxz = 0.0
  
 	Dyx = 0.0
-	Dyy = 0.01 #Axial Diffusion in cylinder
+	Dyy = 0.0 #Axial Diffusion in cylinder
 	Dyz = 0.0
  
 	Dzx = 0.0
@@ -79,6 +79,11 @@
 		type = DGAnisotropicDiffusion
 		variable = u
 	[../]
+ 
+	[./u_advlimiter]
+		type = DGAdvectionPenalty
+		variable = u
+	[../]
 
 []
 
@@ -95,12 +100,12 @@ boundary = 'top bottom'
 u_input = 1.0
 [../]
  
-[./u_bc_left_right]
-type = DGFluxBC
-variable = u
-boundary = 'right' #Note: RZ applies natural BC at left Boundary
-u_input = 1.0
-[../]
+#[./u_bc_left_right]
+#type = DGFluxBC
+#variable = u
+#boundary = 'right' #Note: RZ applies natural BC at left Boundary
+#u_input = 1.0
+#[../]
 
 []
 
