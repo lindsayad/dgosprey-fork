@@ -1,14 +1,14 @@
 [GlobalParams]
 vx = 0.0 #R-direction (positive leaves outward, negative pushes inward)
-vy = 2.0 #Z-direction (positive moves bottom to top, negative moves top to bottom)
+vy = 992.2941164 #Z-direction (positive moves bottom to top, negative moves top to bottom)
 vz = 0.0 #Not used in RZ system
 
-Dxx = 0.1 #Radial Diffusion in cylinder
+Dxx = 0.546244074 #Radial Diffusion in cylinder
 Dxy = 0.0
 Dxz = 0.0
 
 Dyx = 0.0
-Dyy = 0.01 #Axial Diffusion in cylinder
+Dyy = 0.546244074 #Axial Diffusion in cylinder
 Dyz = 0.0
 
 Dzx = 0.0
@@ -24,10 +24,10 @@ coord_type = RZ
 [Mesh]
 type = GeneratedMesh
 dim = 2
-nx = 5 #R-direction == x
+nx = 1 #R-direction == x
 ny = 10 #Z-direction == y
-xmax = 0.25
-ymax = 1.0
+xmax = 0.025
+ymax = 0.127
 []
 
 [Variables]
@@ -53,7 +53,7 @@ initial_condition = 0.0
 [./u_dot]
 type = CoefTimeDerivative
 variable = u
-Coefficient = 1.0
+Coefficient = 285991.8319
 [../]
 
 [./u_gadv]
@@ -80,10 +80,10 @@ type = DGAnisotropicDiffusion
 variable = u
 [../]
 
-[./u_advlimiter]
-type = DGAdvectionPenalty
-variable = u
-[../]
+#[./u_advlimiter]
+#type = DGAdvectionPenalty #only use when problem only involves advection
+#variable = u
+#[../]
 
 []
 
@@ -99,6 +99,13 @@ variable = u
 boundary = 'top bottom'
 u_input = 1.0
 [../]
+ 
+#[./u_bc_top_bot]
+#type = DGFluxLimitedBC
+#variable = u
+#boundary = 'top bottom'
+#u_input = 1.0
+#[../]
 
 #[./u_bc_left_right]
 #type = DGFluxBC
@@ -163,14 +170,14 @@ l_max_its = 100
 
 solve_type = PJFNK
 start_time = 0.0
-end_time = 1.0
+end_time = 60.0
 petsc_options_iname = '-pc_type -pc_hypre_type'
 petsc_options_value = 'hypre boomeramg'
 
 [./TimeStepper]
 type = ConstantDT
 #type = SolutionTimeAdaptiveDT #Too numerically dispersive
-dt = 0.01
+dt = 0.1
 [../]
 
 []
