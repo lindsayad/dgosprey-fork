@@ -79,11 +79,6 @@
 		type = DGAnisotropicDiffusion
 		variable = u
 	[../]
- 
-	[./u_advlimiter]
-		type = DGAdvectionPenalty
-		variable = u
-	[../]
 
 []
 

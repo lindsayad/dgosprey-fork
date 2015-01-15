@@ -20,12 +20,13 @@ protected:
 	virtual Real computeQpJacobian(Moose::DGJacobianType type);
 	
 	RealVectorValue _velocity;	//Vector of velocity
-	
-private:
 	//Dimensional components of velocity vector
 	Real _vx;
 	Real _vy;
 	Real _vz;
+	
+private:
+	
 };
 
 #endif //DGADVECTION_H

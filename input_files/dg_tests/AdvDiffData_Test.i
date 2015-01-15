@@ -80,11 +80,6 @@ type = DGAnisotropicDiffusion
 variable = u
 [../]
 
-#[./u_advlimiter]
-#type = DGAdvectionPenalty #only use when problem only involves advection
-#variable = u
-#[../]
-
 []
 
 [AuxKernels]

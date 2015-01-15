@@ -21,5 +21,6 @@ _total_pressure(coupledValue("pressure"))
 Real ConcentrationIC::value(const Point & p)
 {
   //Note: we will not check to ensure the mole fraction is valid. This may cause error.
+	//std::cout << "size ============> " << _total_pressure.size() << std::endl;
   return (_total_pressure[_qp] * _y_IC) / (8.3144621 * _temperature[_qp]);
 }

@@ -23,13 +23,13 @@ _porosity(getMaterialProperty<Real>("porosity"))
 Real
 BedHeatAccumulation::computeQpResidual()
 {
-  Real _coeff = (_gas_heat_capacity[_qp]*_gas_density[_qp]) + ( (_pellet_heat_capacity[_qp]*_pellet_density[_qp]*(1.0-_porosity[_qp])) / _porosity[_qp]);
+  Real _coeff = (_gas_heat_capacity[_qp]*_gas_density[_qp]*_porosity[_qp]) + (_pellet_heat_capacity[_qp]*_pellet_density[_qp]*(1.0-_porosity[_qp]));
   return _coeff * TimeDerivative::computeQpResidual();
 }
 
 Real
 BedHeatAccumulation::computeQpJacobian()
 {
-  Real _coeff = (_gas_heat_capacity[_qp]*_gas_density[_qp]) + ( (_pellet_heat_capacity[_qp]*_pellet_density[_qp]*(1.0-_porosity[_qp])) / _porosity[_qp]);
+  Real _coeff = (_gas_heat_capacity[_qp]*_gas_density[_qp]*_porosity[_qp]) + (_pellet_heat_capacity[_qp]*_pellet_density[_qp]*(1.0-_porosity[_qp]));
   return _coeff * TimeDerivative::computeQpJacobian();
 }

@@ -21,6 +21,7 @@ protected:
   
 private:
   MaterialProperty<Real> & _conductivity;
+	MaterialProperty<Real> & _porosity;
 };
 
 #endif //HEATCONDUCTIVITY_H

@@ -67,7 +67,7 @@ DGFluxLimitedBC::computeQpResidual()
 	const double h_elem = _current_elem->volume()/_current_side_elem->volume() * 1./std::pow(elem_b_order, 2.);
 	
 	//Output
-	if ((_velocity)*_normals[_qp] >= 0.0)
+	if ((_velocity)*_normals[_qp] > 0.0)
 	{
 		r += _test[_i][_qp]*(_velocity*_normals[_qp])*_u[_qp];
 	}
@@ -96,7 +96,7 @@ DGFluxLimitedBC::computeQpJacobian()
 	const double h_elem = _current_elem->volume()/_current_side_elem->volume() * 1./std::pow(elem_b_order, 2.);
 	
 	//Output
-	if ((_velocity)*_normals[_qp] >= 0.0)
+	if ((_velocity)*_normals[_qp] > 0.0)
 	{
 		r += _test[_i][_qp]*(_velocity*_normals[_qp])*_phi[_j][_qp];
 	}

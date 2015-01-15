@@ -22,10 +22,12 @@ protected:
 	
 	RealVectorValue _velocity;
 	
-private:
 	Real _vx;
 	Real _vy;
 	Real _vz;
+	
+private:
+
 };
 
 #endif // GADVECTION_H

@@ -11,8 +11,10 @@ InputParameters validParams<FlowProperties>()
   params.addParam<std::vector<Real> >("comp_ref_viscosity","Reference viscosities for each gas phase component (g/cm/s)");
   params.addParam<std::vector<Real> >("comp_ref_temp","Reference temperature for each gas phase component (K)");
   params.addParam<std::vector<Real> >("comp_Sutherland_const","Sutherland's constant for each gas phase component (K)");
-  params.addParam<Real>("flow_rate","Volumetric flow rate in the system (cm^3/hr");
+  params.addParam<Real>("flow_rate","Volumetric flow rate in the system (cm^3/hr)");
+	params.addParam<Real>("column_length","Length of the column (cm)");
   params.addCoupledVar("temperature","Coupled variable for temperature");
+  params.addCoupledVar("total_pressure","Coupled variable for total pressure");
   params.addCoupledVar("coupled_gases", "Gas concentrations variables being coupled");
   
   return params;
@@ -28,6 +30,8 @@ _comp_ref_viscosity(getParam<std::vector<Real> >("comp_ref_viscosity")),
 _comp_ref_temp(getParam<std::vector<Real> >("comp_ref_temp")),
 _comp_Sutherland_const(getParam<std::vector<Real> >("comp_Sutherland_const")),
 _flow_rate(getParam<Real>("flow_rate")),
+_column_length(getParam<Real>("column_length")),
+
 _velocity(declareProperty<Real>("velocity")),
 _gas_density(declareProperty<Real>("gas_density")),
 _gas_viscosity(declareProperty<Real>("gas_viscosity")),
@@ -38,7 +42,8 @@ _porosity(getMaterialProperty<Real>("porosity")),
 _molecular_diffusion(declareProperty<std::vector<Real> >("molecular_diffusion")),
 _dispersion(declareProperty<std::vector<Real> >("dispersion")),
 _retardation(declareProperty<std::vector<Real> >("retardation")),
-_temperature(coupledValue("temperature"))
+_temperature(coupledValue("temperature")),
+_total_pressure(coupledValue("total_pressure"))
 
 {
 	unsigned int n = coupledComponents("coupled_gases");
@@ -62,29 +67,67 @@ _temperature(coupledValue("temperature"))
 void
 FlowProperties::computeQpProperties()
 {
-  _velocity[_qp] = (_flow_rate / (_porosity[_qp] * (M_PI/4.0) * _inner_dia[_qp] * _inner_dia[_qp]));
-  _gas_density[_qp] = 1.0;
-  _gas_viscosity[_qp] = 1.0; //change this
-  _gas_heat_capacity[_qp] = 1.0; //change this
-  _gas_molecular_wieght[_qp] = 1.0; //change this
-  
-  _molecular_diffusion[_qp].resize(_gas_conc.size());
-  _dispersion[_qp].resize(_gas_conc.size());
-  _retardation[_qp].resize(_gas_conc.size());
+  	_velocity[_qp] = _porosity[_qp] * (_flow_rate / (_porosity[_qp] * (M_PI/4.0) * _inner_dia[_qp] * _inner_dia[_qp]));
+		  
+  	_molecular_diffusion[_qp].resize(_gas_conc.size());
+  	_dispersion[_qp].resize(_gas_conc.size());
+  	_retardation[_qp].resize(_gas_conc.size());
+	
+	_gas_molecular_wieght[_qp] = 0.0;
+	_gas_viscosity[_qp] = 0.0;
+	_gas_heat_capacity[_qp] = 0.0;
   
   for (unsigned int i = 0; i<_gas_conc.size(); ++i)
   {
-    //Don't remember what this was for...
-    //(*_molecular_diffusion[i])[_qp] = 1.0;
-    //(*_dispersion[i])[_qp] = 1.0;
-    //(*_retardation[i])[_qp] = 1.0;
-    
-    _molecular_diffusion[_qp][i] = 1.0; //change all these
-    //_dispersion[_qp][i] = 6.292E-05; //maual override
-    _dispersion[_qp][i] = 0.04;        //used in tests
-    _retardation[_qp][i] = 1.0; //add adsorption here
-  }
-  //Manual override for H2O
-  //_retardation[_qp][2] = 288475.94; //manual override
+	  Real _yi = ( ((*_gas_conc[i])[_qp] * 8.3144621 * _temperature[_qp])/_total_pressure[_qp] );
+	  
+	  Real _sum_yj_over_Dij = 0.0, _sum_yi_over_Dij_prime = 0.0;
+	  
+	  Real _rho_i = (_total_pressure[_qp] * _molecular_wieght[i]) / (8.3144621 * _temperature[_qp]);
+	  
+	  Real _mu_i = _comp_ref_viscosity[i] * ( ( _comp_ref_temp[i] + _comp_Sutherland_const[i]) / ( _temperature[_qp] + _comp_Sutherland_const[i]) ) * std::pow(_temperature[_qp]/_comp_ref_temp[i],(3.0/2.0));
+	  
+	  Real _phi = 0.873143 + (0.000072375 * _temperature[_qp]);
+	  
+	  for (unsigned int j = 0; j<_gas_conc.size(); j++)
+	  {
+		  if ( j != i)
+		  {
+		  	Real _yj = ( ((*_gas_conc[j])[_qp] * 8.3144621 * _temperature[_qp])/_total_pressure[_qp] );
+			  
+		  	Real _rho_j = (_total_pressure[_qp] * _molecular_wieght[j]) / (8.3144621 * _temperature[_qp]);
+		  
+		  	Real _mu_j = _comp_ref_viscosity[j] * ( ( _comp_ref_temp[j] + _comp_Sutherland_const[j]) / ( _temperature[_qp] + _comp_Sutherland_const[j]) ) * std::pow(_temperature[_qp]/_comp_ref_temp[j],(3.0/2.0));
+		  
+		  	Real _Dij = ( (4.0/std::pow(2.0,0.5))*std::pow((1.0/_molecular_wieght[i])+(1.0/_molecular_wieght[j]),0.5) );
+		  	_Dij = _Dij / std::pow(std::pow((_rho_i*_rho_i)/(1.385*1.385*_mu_i*_mu_i*_molecular_wieght[i]),0.25)+std::pow((_rho_j*_rho_j)/(1.385*1.385*_mu_j*_mu_j*_molecular_wieght[j]),0.25),2.0);
+		  
+		  	Real _Dij_prime = (_total_pressure[_qp]*_Dij) / 100.0;
+			  
+			  _sum_yj_over_Dij = _sum_yj_over_Dij + (_yj/_Dij);
+			  _sum_yi_over_Dij_prime = _sum_yi_over_Dij_prime + (_yi/_Dij_prime);
+			  
+		  }
+		  
+	  } //jth Loop
+	  
+	  _molecular_diffusion[_qp][i] = (1.0 - _yi) / _sum_yj_over_Dij;
+	  
+	  _dispersion[_qp][i] = _porosity[_qp] * _molecular_diffusion[_qp][i] + (1e-6*_column_length*_velocity[_qp]);
+	  
+	  _retardation[_qp][i] = _porosity[_qp]; //add adsorption here
+	  
+	  _gas_viscosity[_qp] = _gas_viscosity[_qp] + (_mu_i / (1.0 + ( (113.65*_phi*_mu_i*_temperature[_qp])/(_yi*_molecular_wieght[i]) ) * _sum_yi_over_Dij_prime) );
+	  _gas_molecular_wieght[_qp] = _gas_molecular_wieght[_qp] + (_yi * _molecular_wieght[i]);
+	  _gas_heat_capacity[_qp] = _gas_heat_capacity[_qp] + (_yi * _comp_heat_capacity[i]);
+	  
+  } //ith Loop
+	
+	_gas_density[_qp] = (_total_pressure[_qp] * _gas_molecular_wieght[_qp]) / (8.3144621 * _temperature[_qp]);
+	
+	//Temporary Override of Retardation
+	_retardation[_qp][2] = 288475.94 * _porosity[_qp];
+	
+	
 
 }
