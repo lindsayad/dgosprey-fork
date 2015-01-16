@@ -113,7 +113,7 @@ FlowProperties::computeQpProperties()
 	  
 	  _molecular_diffusion[_qp][i] = (1.0 - _yi) / _sum_yj_over_Dij;
 	  
-	  _dispersion[_qp][i] = _porosity[_qp] * _molecular_diffusion[_qp][i] + (1e-6*_column_length*_velocity[_qp]);
+	  _dispersion[_qp][i] = (_porosity[_qp] * _molecular_diffusion[_qp][i] + (1e-6*_column_length*_velocity[_qp]));
 	  
 	  _retardation[_qp][i] = _porosity[_qp]; //add adsorption here
 	  

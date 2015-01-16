@@ -218,9 +218,9 @@
 [BCs]
 
  	[./N2_Flux]
- 		type = DGMassFluxBC
+ 		type = DGMassFluxLimitedBC
  		variable = N2
- 		boundary = 'top bottom left right'
+ 		boundary = 'top bottom'
  		input_temperature = 298.15
  		input_pressure = 101.35
  		input_molefraction = 0.78863
@@ -228,9 +228,9 @@
  	[../]
  
  	[./O2_Flux]
- 		type = DGMassFluxBC
+ 		type = DGMassFluxLimitedBC
  		variable = O2
- 		boundary = 'top bottom left right'
+ 		boundary = 'top bottom'
  		input_temperature = 298.15
  		input_pressure = 101.35
  		input_molefraction = 0.20974
@@ -238,9 +238,9 @@
  	[../]
  
  	[./H2O_Flux]
- 		type = DGMassFluxBC
+ 		type = DGMassFluxLimitedBC
  		variable = H2O
- 		boundary = 'top bottom left right'
+ 		boundary = 'top bottom'
  		input_temperature = 298.15
  		input_pressure = 101.35
  		input_molefraction = 0.00163
@@ -342,8 +342,8 @@
  
  	type = Transient
  	#type = Steady
- 	scheme = bdf2
- 	#scheme = implicit-euler
+ 	#scheme = bdf2
+ 	scheme = implicit-euler
 
  	nl_rel_tol = 1e-6
  	picard_abs_tol = 1e-6
