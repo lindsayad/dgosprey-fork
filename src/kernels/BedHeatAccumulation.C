@@ -24,6 +24,8 @@ Real
 BedHeatAccumulation::computeQpResidual()
 {
   Real _coeff = (_gas_heat_capacity[_qp]*_gas_density[_qp]*_porosity[_qp]) + (_pellet_heat_capacity[_qp]*_pellet_density[_qp]*(1.0-_porosity[_qp]));
+	
+	//NOTE: Will need to couple with adsorption
   return _coeff * TimeDerivative::computeQpResidual();
 }
 
