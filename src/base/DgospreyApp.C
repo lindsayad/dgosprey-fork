@@ -34,6 +34,15 @@
 #include "GColumnMassAdvection.h"
 #include "GColumnMassDispersion.h"
 
+#include "DGColumnHeatAdvection.h"
+#include "GColumnHeatAdvection.h"
+#include "DGColumnHeatDispersion.h"
+#include "GColumnHeatDispersion.h"
+#include "DGHeatFluxBC.h"
+#include "DGHeatFluxLimitedBC.h"
+#include "DGColumnWallHeatFluxBC.h"
+#include "DGColumnWallHeatFluxLimitedBC.h"
+
 
 template<>
 InputParameters validParams<DgospreyApp>()
@@ -101,6 +110,15 @@ DgospreyApp::registerObjects(Factory & factory)
 	registerBoundaryCondition(DGMassFluxLimitedBC);
 	registerKernel(GColumnMassAdvection);
 	registerKernel(GColumnMassDispersion);
+	
+	registerDGKernel(DGColumnHeatAdvection);
+	registerKernel(GColumnHeatAdvection);
+	registerDGKernel(DGColumnHeatDispersion);
+	registerKernel(GColumnHeatDispersion);
+	registerBoundaryCondition(DGHeatFluxBC);
+	registerBoundaryCondition(DGHeatFluxLimitedBC);
+	registerBoundaryCondition(DGColumnWallHeatFluxBC);
+	registerBoundaryCondition(DGColumnWallHeatFluxLimitedBC);
 }
 
 void

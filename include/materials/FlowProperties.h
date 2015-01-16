@@ -34,6 +34,11 @@ private:
   MaterialProperty<Real> & _gas_molecular_wieght;
   MaterialProperty<Real> & _inner_dia;
   MaterialProperty<Real> & _porosity;
+	
+	MaterialProperty<Real> & _pellet_density;
+	MaterialProperty<Real> & _pellet_heat_capacity;
+	MaterialProperty<Real> & _heat_retardation;
+	
   
   MaterialProperty<std::vector<Real> > & _molecular_diffusion;
   MaterialProperty<std::vector<Real> > & _dispersion;

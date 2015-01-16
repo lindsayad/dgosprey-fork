@@ -39,6 +39,9 @@ _gas_heat_capacity(declareProperty<Real>("gas_heat_capacity")),
 _gas_molecular_wieght(declareProperty<Real>("gas_molecular_wieght")),
 _inner_dia(getMaterialProperty<Real>("inner_dia")),
 _porosity(getMaterialProperty<Real>("porosity")),
+_pellet_density(getMaterialProperty<Real>("pellet_density")),
+_pellet_heat_capacity(getMaterialProperty<Real>("pellet_heat_capacity")),
+_heat_retardation(declareProperty<Real>("heat_retardation")),
 _molecular_diffusion(declareProperty<std::vector<Real> >("molecular_diffusion")),
 _dispersion(declareProperty<std::vector<Real> >("dispersion")),
 _retardation(declareProperty<std::vector<Real> >("retardation")),
@@ -76,6 +79,7 @@ FlowProperties::computeQpProperties()
 	_gas_molecular_wieght[_qp] = 0.0;
 	_gas_viscosity[_qp] = 0.0;
 	_gas_heat_capacity[_qp] = 0.0;
+	_heat_retardation[_qp] = 0.0;
   
   for (unsigned int i = 0; i<_gas_conc.size(); ++i)
   {
@@ -88,6 +92,12 @@ FlowProperties::computeQpProperties()
 	  Real _mu_i = _comp_ref_viscosity[i] * ( ( _comp_ref_temp[i] + _comp_Sutherland_const[i]) / ( _temperature[_qp] + _comp_Sutherland_const[i]) ) * std::pow(_temperature[_qp]/_comp_ref_temp[i],(3.0/2.0));
 	  
 	  Real _phi = 0.873143 + (0.000072375 * _temperature[_qp]);
+	  
+	  Real _adsorption_heat_i;
+	  if (i == 2)
+	  	_adsorption_heat_i = 0.0 * _pellet_density[_qp]*(1.0-_porosity[_qp]); //add adsorption heat here
+	  else
+		_adsorption_heat_i = 0.0 * _pellet_density[_qp]*(1.0-_porosity[_qp]); //add adsorption heat here
 	  
 	  for (unsigned int j = 0; j<_gas_conc.size(); j++)
 	  {
@@ -121,12 +131,16 @@ FlowProperties::computeQpProperties()
 	  _gas_molecular_wieght[_qp] = _gas_molecular_wieght[_qp] + (_yi * _molecular_wieght[i]);
 	  _gas_heat_capacity[_qp] = _gas_heat_capacity[_qp] + (_yi * _comp_heat_capacity[i]);
 	  
+	  _heat_retardation[_qp] = _heat_retardation[_qp] + _adsorption_heat_i;
+	  
   } //ith Loop
 	
 	_gas_density[_qp] = (_total_pressure[_qp] * _gas_molecular_wieght[_qp]) / (8.3144621 * _temperature[_qp]);
 	
 	//Temporary Override of Retardation
 	_retardation[_qp][2] = 288475.94 * _porosity[_qp];
+	
+	_heat_retardation[_qp] = -_heat_retardation[_qp] + (_gas_heat_capacity[_qp]*_gas_density[_qp]*_porosity[_qp]) + (_pellet_heat_capacity[_qp]*_pellet_density[_qp]*(1.0-_porosity[_qp]));
 	
 	
 

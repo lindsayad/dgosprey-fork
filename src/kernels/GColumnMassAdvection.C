@@ -21,11 +21,7 @@ GAdvection(name, parameters),
 _vel(getMaterialProperty<Real>("velocity"))
 
 {
-	/*
-	_velocity(0)=0.0;
-	_velocity(1)=_vel[_qp];
-	_velocity(2)=0.0;
-	 */
+
 }
 
 Real GColumnMassAdvection::computeQpResidual()

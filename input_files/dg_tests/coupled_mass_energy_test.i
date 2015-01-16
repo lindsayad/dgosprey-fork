@@ -98,11 +98,11 @@
 
 [Kernels]
 
- 	[./accumN2]
- 		type = RetardedTimeDerivative
- 		variable = N2
- 		index = 0
- 	[../]
+ 	#[./accumN2]
+ 		#type = RetardedTimeDerivative
+ 		#variable = N2
+ 		#index = 0
+ 	#[../]
  
 	[./diffN2]
 		type = GColumnMassDispersion
@@ -115,11 +115,11 @@
 		variable = N2
 	[../]
 
- 	[./accumO2]
- 		type = RetardedTimeDerivative
- 		variable = O2
- 		index = 1
- 	[../]
+ 	#[./accumO2]
+ 		#type = RetardedTimeDerivative
+ 		#variable = O2
+ 		#index = 1
+ 	#[../]
  
 	[./diffO2]
 		type = GColumnMassDispersion
@@ -132,11 +132,11 @@
 		variable = O2
 	[../]
 
- 	[./accumH2O]
- 		type = RetardedTimeDerivative
- 		variable = H2O
- 		index = 2
- 	[../]
+ 	#[./accumH2O]
+ 		#type = RetardedTimeDerivative
+ 		#variable = H2O
+ 		#index = 2
+ 	#[../]
  
 	[./diffH2O]
 		type = GColumnMassDispersion
@@ -149,10 +149,10 @@
 		variable = H2O
 	[../]
  
- 	[./wallAccum]
- 		type = WallHeatAccumulation
- 		variable = wall_temp
- 	[../]
+ 	#[./wallAccum]
+ 		#type = WallHeatAccumulation
+ 		#variable = wall_temp
+ 	#[../]
  	[./wall_bed_trans]
  		type = BedWallHeatTransfer
  		variable = wall_temp
@@ -164,10 +164,10 @@
  		coupled = ambient_temp
  	[../]
 	
-	[./columnAccum]
-		type = BedHeatAccumulation
-		variable = column_temp
-	[../]
+	#[./columnAccum]
+		#type = BedHeatAccumulation
+		#variable = column_temp
+	#[../]
 	[./columnConduction]
 		type = GColumnHeatDispersion
 		variable =column_temp
@@ -377,8 +377,8 @@
 
 [Executioner]
  
- 	type = Transient
- 	#type = Steady
+ 	#type = Transient
+ 	type = Steady
  	scheme = bdf2
  	#scheme = implicit-euler
 

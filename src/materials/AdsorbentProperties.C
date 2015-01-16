@@ -54,7 +54,6 @@ void
 AdsorbentProperties::computeQpProperties()
 {
   //For constant bed properties...
-  //std::cout << "here " << _qp << std::endl;
   _pellet_density[_qp] = _rhos;
   _pellet_heat_capacity[_qp] = _hs;
   //Note: some of these may vary with space or temperature or concentration, but for now we assume constant
