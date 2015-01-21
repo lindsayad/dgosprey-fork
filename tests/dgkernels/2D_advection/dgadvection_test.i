@@ -4,7 +4,7 @@
 	vz = 0.0
 	u_input = 1.0
 []
- 
+
 [Mesh]
 	type = GeneratedMesh
 	dim = 2
@@ -75,7 +75,7 @@
 []
 
 [Postprocessors]
- 
+
 	[./u_exit]
 		type = SideAverageValue
 		boundary = 'right'
@@ -87,7 +87,7 @@
 		boundary = 'left'
 		variable = u
 	[../]
- 
+
 []
 
 [Executioner]
@@ -107,16 +107,16 @@ start_time = 0.0
 end_time = 1.0
 petsc_options_iname = '-pc_type -pc_hypre_type'
 petsc_options_value = 'hypre boomeramg'
- 
+
 [./TimeStepper]
 	type = ConstantDT
 	dt = 0.05
 [../]
- 
+
 []
 
 [Adaptivity]
- 
+
 	marker = ef
 
 	[./Indicators]
@@ -126,26 +126,20 @@ petsc_options_value = 'hypre boomeramg'
 		[../]
 
 	[../]
- 
+
 	[./Markers]
 		[./ef]
 			type = ErrorFractionMarker
 			indicator = u_grad_error
 		[../]
 	[../]
- 
+
 []
 
 [Outputs]
 	output_initial = true
 	exodus = true
 	csv = true
- 
-	[./console]
-		type = Console
-		perf_log = true
-		linear = true
-	[../]
- 
+        print_linear_residuals = true
+        print_perf_log = true
 []
-

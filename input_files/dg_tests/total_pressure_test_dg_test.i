@@ -5,8 +5,8 @@
   xmax = 1.0
 []
 
-[Variables] #NOTE: ALL VARIABLES NEED CUSTOM ICs and BCs to handle coupling appropriately 
- 
+[Variables] #NOTE: ALL VARIABLES NEED CUSTOM ICs and BCs to handle coupling appropriately
+
   [./N2]
     order = FIRST
     family = L2_LAGRANGE
@@ -19,7 +19,7 @@
     order = FIRST
     family = L2_LAGRANGE
   [../]
- 
+
   [./wall_temp]
     order = FIRST
     family = L2_LAGRANGE
@@ -30,7 +30,7 @@
     family = L2_LAGRANGE
  		initial_condition = 298.15
   [../]
- 
+
 []
 
 [AuxVariables]
@@ -71,13 +71,13 @@
 []
 
 [Kernels]
- 
+
   [./accumN2]
     type = RetardedTimeDerivative
     variable = N2
     index = 0
   [../]
-  [./diffN2] 
+  [./diffN2]
     type = Dispersion
     variable = N2
     index = 0
@@ -87,7 +87,7 @@
     variable = N2
     dir = 0
   [../]
- 
+
   [./accumO2]
     type = RetardedTimeDerivative
     variable = O2
@@ -103,7 +103,7 @@
     variable = O2
     dir = 0
   [../]
- 
+
   [./accumH2O]
     type = RetardedTimeDerivative
     variable = H2O
@@ -124,7 +124,7 @@
     variable = H2O
     penalty = 1.0
   [../]
- 
+
   [./wallAccum]
     type = WallHeatAccumulation
     variable = wall_temp
@@ -139,7 +139,7 @@
     variable = wall_temp
     coupled = ambient_temp
   [../]
- 
+
   [./bedAccum]
     type = BedHeatAccumulation
     variable = column_temp
@@ -158,10 +158,10 @@
     variable = column_temp
     dir = 0
   [../]
- 
+
 []
- 
-[DGKernels] 
+
+[DGKernels]
 	[./dg_disp_N2]
 		type = DGDispersion
 		variable = N2
@@ -183,7 +183,7 @@
  		sigma = 1.0
  		index = 2
  	[../]
-  
+
   [./dg_adv_N2]
   	type = DGConservativeAdvection
     variable = N2
@@ -211,7 +211,7 @@
 []
 
 [BCs]
- 
+
   [./left_N2]
     type = DGCoupledMassBC
     variable = N2
@@ -263,7 +263,7 @@
     value = 0
     dir = 0
   [../]
- 
+
   [./left_temp]
     type = HeatCauchyBC
     variable = column_temp
@@ -378,14 +378,14 @@
  	#NOTE: For better results, we must forcably relax ALL residual tolerances
   type = Transient
   scheme = bdf2
- 
+
   nl_rel_tol = 1e-06
   picard_abs_tol = 1e-10
   nl_abs_tol = 1e-10
   nl_rel_step_tol = 1e-10
   picard_rel_tol = 1e-10
   nl_abs_step_tol = 1e-10
- 
+
   solve_type = PJFNK
   start_time = 0.0
   end_time = 1.0
@@ -445,10 +445,6 @@
   output_initial = true
   exodus = true
   csv = true
-  [./console]
-    type = Console
-    perf_log = true
-    linear_residuals = true
-  [../]
+  print_linear_residuals = true
+  print_perf_log = true
 []
-
