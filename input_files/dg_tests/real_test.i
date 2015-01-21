@@ -1,15 +1,15 @@
 [GlobalParams]
- 
+
  [] #END GlobalParams
- 
+
  [Problem]
- 
+
  	coord_type = RZ
- 
+
  [] #END Problem
 
 [Mesh]
- 
+
 	type = GeneratedMesh
 	dim = 2
 	nx = 3
@@ -18,7 +18,7 @@
 	xmax = 2.54
  	ymin = 0.0
  	ymax = 12.7
- 
+
  [] # END Mesh
 
 [Variables]
@@ -27,23 +27,23 @@
 		order = FIRST
 		family = L2_LAGRANGE
 	[../]
- 
+
 	[./O2]
 		order = FIRST
 		family = L2_LAGRANGE
 	[../]
- 
+
 	[./H2O]
 		order = FIRST
 		family = L2_LAGRANGE
 	[../]
- 
+
  	[./wall_temp]
  		order = FIRST
  		family = L2_LAGRANGE
  		initial_condition = 298.15
  	[../]
-	
+
 	[./column_temp]
  		order = FIRST
  		family = L2_LAGRANGE
@@ -59,17 +59,17 @@
 		family = L2_LAGRANGE
 		initial_condition = 101.35
 	[../]
- 
+
  	[./ambient_temp]
  		order = FIRST
  		family = L2_LAGRANGE
  		initial_condition = 298.15
  	[../]
- 
+
  [] #END AuxVariables
 
 [ICs]
- 
+
 	[./N2_IC]
 		type = DGConcentrationIC
 		variable = N2
@@ -77,7 +77,7 @@
 		initial_press = 101.35
 		initial_temp = 298.15
 	[../]
- 
+
 	[./O2_IC]
 		type = DGConcentrationIC
 		variable = O2
@@ -85,7 +85,7 @@
  		initial_press = 101.35
  		initial_temp = 298.15
 	[../]
- 
+
 	[./H2O_IC]
 		type = DGConcentrationIC
 		variable = H2O
@@ -93,7 +93,7 @@
  		initial_press = 101.35
  		initial_temp = 298.15
 	[../]
- 
+
  [] #END ICs
 
 [Kernels]
@@ -103,13 +103,13 @@
  		variable = N2
  		index = 0
  	[../]
- 
+
 	[./diffN2]
 		type = GColumnMassDispersion
 		variable = N2
 		index = 0
 	[../]
- 
+
 	[./advN2]
 		type = GColumnMassAdvection
 		variable = N2
@@ -120,13 +120,13 @@
  		variable = O2
  		index = 1
  	[../]
- 
+
 	[./diffO2]
 		type = GColumnMassDispersion
 		variable = O2
 		index = 1
 	[../]
- 
+
 	[./advO2]
 		type = GColumnMassAdvection
 		variable = O2
@@ -137,18 +137,18 @@
  		variable = H2O
  		index = 2
  	[../]
- 
+
 	[./diffH2O]
 		type = GColumnMassDispersion
 		variable = H2O
 		index = 2
 	[../]
- 
+
 	[./advH2O]
 		type = GColumnMassAdvection
 		variable = H2O
 	[../]
- 
+
  	[./wallAccum]
  		type = WallHeatAccumulation
  		variable = wall_temp
@@ -163,7 +163,7 @@
  		variable = wall_temp
  		coupled = ambient_temp
  	[../]
-	
+
 	[./columnAccum]
 		type = BedHeatAccumulation
 		variable = column_temp
@@ -181,29 +181,29 @@
  [] #END Kernels
 
 [DGKernels]
- 
+
 	[./dg_disp_N2]
 		type = DGColumnMassDispersion
 		variable = N2
 		index = 0
 	[../]
- 
+
  	[./dg_adv_N2]
 		type = DGColumnMassAdvection
 		variable = N2
 	[../]
- 
+
 	[./dg_disp_O2]
 		type = DGColumnMassDispersion
 		variable = O2
 		index = 1
 	[../]
- 
+
  	[./dg_adv_O2]
 		type = DGColumnMassAdvection
 		variable = O2
 	[../]
- 
+
 	[./dg_disp_H2O]
 		type = DGColumnMassDispersion
 		variable = H2O
@@ -214,7 +214,7 @@
 		type = DGColumnMassAdvection
 		variable = H2O
 	[../]
-	
+
 	[./dg_disp_heat]
 		type = DGColumnHeatDispersion
 		variable = column_temp
@@ -224,18 +224,18 @@
 		type = DGColumnHeatAdvection
 		variable = column_temp
 	[../]
- 
+
  [] #END DGKernels
 
 [AuxKernels]
- 
+
 	[./column_pressure]
 		type = TotalColumnPressure
 		variable = total_pressure
 		temperature = column_temp
 		coupled_gases = 'N2 O2 H2O'
 	[../]
- 
+
  [] #END AuxKernels
 
 [BCs]
@@ -249,7 +249,7 @@
  		input_molefraction = 0.78863
  		index = 0
  	[../]
- 
+
  	[./O2_Flux]
  		type = DGMassFluxLimitedBC
  		variable = O2
@@ -259,7 +259,7 @@
  		input_molefraction = 0.20974
  		index = 1
  	[../]
- 
+
  	[./H2O_Flux]
  		type = DGMassFluxLimitedBC
  		variable = H2O
@@ -269,29 +269,29 @@
  		input_molefraction = 0.00163
  		index = 2
  	[../]
-	
+
 	[./Heat_Gas_Flux]
  		type = DGHeatFluxLimitedBC
  		variable = column_temp
  		boundary = 'top bottom'
  		input_temperature = 298.15
  	[../]
-	
+
 	[./Heat_Wall_Flux]
  		type = DGColumnWallHeatFluxLimitedBC
  		variable = column_temp
  		boundary = 'right'
  		wall_temp = wall_temp
  	[../]
- 
+
  [] #END BCs
 
 [Materials]
- 
+
 	[./BedMaterials]
 		type = BedProperties
 		block = 0
-		length = 12.7 
+		length = 12.7
 		din = 2.54
 		dout = 3.54
 		eb = 0.421
@@ -303,7 +303,7 @@
 		temperature = column_temp
 		coupled_gases = 'N2 O2 H2O'
 	[../]
- 
+
 	[./FlowMaterials]
 		type = FlowProperties
 		block = 0
@@ -318,7 +318,7 @@
  		total_pressure = total_pressure
 		coupled_gases = 'N2 O2 H2O'
 	[../]
- 
+
 	[./AdsorbentMaterials]
 		type = AdsorbentProperties
 		block = 0
@@ -332,41 +332,41 @@
 		temperature = column_temp
 		coupled_gases = 'N2 O2 H2O'
 	[../]
- 
+
  [] #END Materials
 
 [Postprocessors]
- 
+
 	[./N2_exit]
 		type = SideAverageValue
 		boundary = 'top'
 		variable = N2
 	[../]
- 
+
 	[./O2_exit]
 		type = SideAverageValue
 		boundary = 'top'
 		variable = O2
 	[../]
- 
+
 	[./H2O_exit]
 		type = SideAverageValue
 		boundary = 'top'
 		variable = H2O
 	[../]
- 
+
 	[./temp_exit]
 		type = SideAverageValue
 		boundary = 'top'
 		variable = column_temp
 	[../]
- 
+
 	[./press_exit]
 		type = SideAverageValue
 		boundary = 'top'
 		variable = total_pressure
 	[../]
- 
+
  	[./wall_temp]
  		type = SideAverageValue
  		boundary = 'right'
@@ -376,7 +376,7 @@
  [] #END Postprocessors
 
 [Executioner]
- 
+
  	type = Transient
  	#type = Steady
  	scheme = bdf2
@@ -397,16 +397,16 @@
 	end_time = 60.0
 	petsc_options_iname = '-pc_type -pc_hypre_type'
 	petsc_options_value = 'hypre boomeramg'
- 
+
 	[./TimeStepper]
 		type = ConstantDT
 		dt = 0.1
 	[../]
- 
+
  [] #END Executioner
 
 [Adaptivity]
- 
+
  	[./Indicators]
  		[./error_mass_N2]
  			type = GradientJumpIndicator
@@ -425,8 +425,8 @@
  			variable = column_temp
  		[../]
  	[../]
- 
- 
+
+
  	[./Markers]
 		[./ef_mass_N2]
  			type = ErrorFractionMarker
@@ -449,15 +449,10 @@
  [] #END Adaptivity
 
 [Outputs]
- 
+
  output_initial = false
  exodus = true
  csv = true
- 
- 	[./console]
- 		type = Console
- 		perf_log = true
- 	[../]
- 
+ print_linear_residuals = true
+ print_perf_log = true
  [] #END Outputs
-
