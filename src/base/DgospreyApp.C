@@ -3,48 +3,45 @@
 #include "AppFactory.h"
 #include "ModulesApp.h"
 
-#include "VectorCauchyBC.h"
 #include "LinearDrivingForce.h"
 #include "BedProperties.h"
 #include "AdsorbentProperties.h"
 #include "FlowProperties.h"
 #include "RetardedTimeDerivative.h"
-#include "Advection.h"
 #include "Dispersion.h"
-#include "MassCauchyBC.h"
 #include "BedWallHeatTransfer.h"
 #include "WallAmbientHeatTransfer.h"
 #include "WallHeatAccumulation.h"
 #include "FluidHeatTransfer.h"
 #include "HeatConductivity.h"
-#include "HeatConvection.h"
 #include "BedHeatAccumulation.h"
-#include "HeatCauchyBC.h"
-#include "CFLDT.h"
-#include "WaveFront.h"
-#include "MinElementSize.h"
-#include "CFLConditionApproximation.h"
 #include "TotalColumnPressure.h"
 #include "TotalPressureIC.h"
 #include "ColumnTemperatureIC.h"
 #include "ConcentrationIC.h"
-#include "CoupledMassBC.h"
-#include "DGDispersion.h"
 #include "DGConcentrationIC.h"
-//#include "ElementVariablePostprocessor.h"
-#include "ConservativeAdvection.h"
-#include "DGConservativeAdvection.h"
-#include "DGCoupledMassBC.h"
-#include "DGMassOutFlowBC.h"
-#include "MassPenalty.h"
-
 #include "DGAdvection.h"
 #include "DGFluxBC.h"
 #include "GAdvection.h"
 #include "DGAnisotropicDiffusion.h"
 #include "GAnisotropicDiffusion.h"
-#include "DGAdvectionPenalty.h"
 #include "DGFluxLimitedBC.h"
+
+#include "DGColumnMassAdvection.h"
+#include "DGColumnMassDispersion.h"
+#include "DGMassFluxBC.h"
+#include "DGMassFluxLimitedBC.h"
+#include "GColumnMassAdvection.h"
+#include "GColumnMassDispersion.h"
+
+#include "DGColumnHeatAdvection.h"
+#include "GColumnHeatAdvection.h"
+#include "DGColumnHeatDispersion.h"
+#include "GColumnHeatDispersion.h"
+#include "DGHeatFluxBC.h"
+#include "DGHeatFluxLimitedBC.h"
+#include "DGColumnWallHeatFluxBC.h"
+#include "DGColumnWallHeatFluxLimitedBC.h"
 
 
 template<>
@@ -81,48 +78,47 @@ DgospreyApp::registerApps()
 void
 DgospreyApp::registerObjects(Factory & factory)
 {
-  registerBoundaryCondition(VectorCauchyBC);
 	registerKernel(LinearDrivingForce);
 	registerMaterial(BedProperties);
   registerMaterial(AdsorbentProperties);
   registerMaterial(FlowProperties);
   registerKernel(RetardedTimeDerivative);
-  registerKernel(Advection);
   registerKernel(Dispersion);
-  registerBoundaryCondition(MassCauchyBC);
   registerKernel(BedWallHeatTransfer);
   registerKernel(WallAmbientHeatTransfer);
   registerKernel(WallHeatAccumulation);
   registerKernel(FluidHeatTransfer);
   registerKernel(HeatConductivity);
-  registerKernel(HeatConvection);
   registerKernel(BedHeatAccumulation);
-  registerBoundaryCondition(HeatCauchyBC);
-  registerExecutioner(CFLDT);
-  registerPostprocessor(WaveFront);
-  registerPostprocessor(MinElementSize);
-  registerExecutioner(CFLConditionApproximation);
+
   registerAux(TotalColumnPressure);
   registerInitialCondition(TotalPressureIC);
   registerInitialCondition(ColumnTemperatureIC);
   registerInitialCondition(ConcentrationIC);
-  registerBoundaryCondition(CoupledMassBC);
-  registerDGKernel(DGDispersion);
   registerInitialCondition(DGConcentrationIC);
-  //registerPostprocessor(ElementVariablePostprocessor);
-  registerKernel(ConservativeAdvection);
-  registerDGKernel(DGConservativeAdvection);
-  registerBoundaryCondition(DGCoupledMassBC);
-  registerBoundaryCondition(DGMassOutFlowBC);
-  registerKernel(MassPenalty);
 	
 	registerDGKernel(DGAdvection);
 	registerBoundaryCondition(DGFluxBC);
 	registerKernel(GAdvection);
 	registerDGKernel(DGAnisotropicDiffusion);
 	registerKernel(GAnisotropicDiffusion);
-	registerDGKernel(DGAdvectionPenalty);
 	registerBoundaryCondition(DGFluxLimitedBC);
+	
+	registerDGKernel(DGColumnMassAdvection);
+	registerDGKernel(DGColumnMassDispersion);
+	registerBoundaryCondition(DGMassFluxBC);
+	registerBoundaryCondition(DGMassFluxLimitedBC);
+	registerKernel(GColumnMassAdvection);
+	registerKernel(GColumnMassDispersion);
+	
+	registerDGKernel(DGColumnHeatAdvection);
+	registerKernel(GColumnHeatAdvection);
+	registerDGKernel(DGColumnHeatDispersion);
+	registerKernel(GColumnHeatDispersion);
+	registerBoundaryCondition(DGHeatFluxBC);
+	registerBoundaryCondition(DGHeatFluxLimitedBC);
+	registerBoundaryCondition(DGColumnWallHeatFluxBC);
+	registerBoundaryCondition(DGColumnWallHeatFluxLimitedBC);
 }
 
 void

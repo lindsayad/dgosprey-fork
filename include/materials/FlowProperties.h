@@ -25,6 +25,7 @@ private:
   std::vector<Real> _comp_ref_temp;
   std::vector<Real> _comp_Sutherland_const;
   Real _flow_rate;
+	Real _column_length;
   
   MaterialProperty<Real> & _velocity;
   MaterialProperty<Real> & _gas_density;
@@ -33,16 +34,18 @@ private:
   MaterialProperty<Real> & _gas_molecular_wieght;
   MaterialProperty<Real> & _inner_dia;
   MaterialProperty<Real> & _porosity;
+	
+	MaterialProperty<Real> & _pellet_density;
+	MaterialProperty<Real> & _pellet_heat_capacity;
+	MaterialProperty<Real> & _heat_retardation;
+	
   
   MaterialProperty<std::vector<Real> > & _molecular_diffusion;
   MaterialProperty<std::vector<Real> > & _dispersion;
   MaterialProperty<std::vector<Real> > & _retardation;
-  
-  //std::vector<MaterialProperty<Real> *> _molecular_diffusion;
-  //std::vector<MaterialProperty<Real> *> _dispersion;
-  //std::vector<MaterialProperty<Real> *> _retardation;
-	
-  VariableValue & _temperature;
+  	
+  	VariableValue & _temperature;
+	VariableValue & _total_pressure;
 	std::vector<unsigned int> _index;
 	std::vector<VariableValue *> _gas_conc;
 	

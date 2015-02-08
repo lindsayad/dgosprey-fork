@@ -20,14 +20,14 @@ _wall_temp(coupledValue("coupled"))
 
 Real FluidHeatTransfer::computeQpResidual()
 {
-  Real _coef = (4.0 * _bed_wall_transfer_coeff[_qp]) / ( _inner_dia[_qp]*_porosity[_qp] );
+  Real _coef = (4.0 * _bed_wall_transfer_coeff[_qp]) / ( _inner_dia[_qp] );
 
   return -_test[_i][_qp] * _coef * (_wall_temp[_qp] - _u[_qp]);
 }
 
 Real FluidHeatTransfer::computeQpJacobian()
 {
-  Real _coef = (4.0 * _bed_wall_transfer_coeff[_qp]) / ( _inner_dia[_qp]*_porosity[_qp] );
+  Real _coef = (4.0 * _bed_wall_transfer_coeff[_qp]) / ( _inner_dia[_qp] );
   
   return _test[_i][_qp] * _coef * _phi[_j][_qp];
 }

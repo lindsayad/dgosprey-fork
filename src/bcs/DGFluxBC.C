@@ -67,7 +67,7 @@ DGFluxBC::computeQpResidual()
 	const double h_elem = _current_elem->volume()/_current_side_elem->volume() * 1./std::pow(elem_b_order, 2.);
 	
 	//Output
-	if ((_velocity)*_normals[_qp] >= 0.0)
+	if ((_velocity)*_normals[_qp] > 0.0)
 	{
 		r += _test[_i][_qp]*(_velocity*_normals[_qp])*_u[_qp];
 	}
@@ -75,22 +75,7 @@ DGFluxBC::computeQpResidual()
 	else
 	{
 		r += _test[_i][_qp]*(_velocity*_normals[_qp])*_u_input;
-		
-		//Diffusion Only - Dirichlet
-		//r += _epsilon * (_u[_qp] - _u_input) * _Diffusion * _grad_test[_i][_qp] * _normals[_qp];
-		//r += _sigma/h_elem * (_u[_qp] - _u_input) * _test[_i][_qp];
 	}
-	
-	r -= (_Diffusion * _grad_u[_qp] * _normals[_qp] * _test[_i][_qp]);
-	
-	//Diffusion Only Input - Dirichlet (NOTE: May need to break this up into different files)
-	/*
-	if ( (_velocity(0) == _velocity(1) == _velocity(2) == 0.0) )
-	{
-		r += _epsilon * (_u[_qp] - _u_input) * _Diffusion * _grad_test[_i][_qp] * _normals[_qp];
-		r += _sigma/h_elem * (_u[_qp] - _u_input) * _test[_i][_qp];
-	}
-	 */
 	
 	return r;
 }
@@ -104,7 +89,7 @@ DGFluxBC::computeQpJacobian()
 	const double h_elem = _current_elem->volume()/_current_side_elem->volume() * 1./std::pow(elem_b_order, 2.);
 	
 	//Output
-	if ((_velocity)*_normals[_qp] >= 0.0)
+	if ((_velocity)*_normals[_qp] > 0.0)
 	{
 		r += _test[_i][_qp]*(_velocity*_normals[_qp])*_phi[_j][_qp];
 	}
@@ -112,22 +97,7 @@ DGFluxBC::computeQpJacobian()
 	else
 	{
 		r += 0.0;
-		
-		//Diffusion Only - Dirichlet
-		//r += _epsilon * (_u[_qp] - _u_input) * _Diffusion * _grad_test[_i][_qp] * _normals[_qp];
-		//r += _sigma/h_elem * _phi[_j][_qp] * _test[_i][_qp];
 	}
-	
-	r -= (_Diffusion * _grad_phi[_j][_qp] * _normals[_qp] * _test[_i][_qp]);
-	
-	//Diffusion Only Input - Dirichlet
-	/*
-	if ( (_velocity(0) == _velocity(1) == _velocity(2) == 0.0) )
-	{
-		r += _epsilon * (_u[_qp] - _u_input) * _Diffusion * _grad_test[_i][_qp] * _normals[_qp];
-		r += _sigma/h_elem * _phi[_j][_qp] * _test[_i][_qp];
-	}
-	 */
 	
 	return r;
 }

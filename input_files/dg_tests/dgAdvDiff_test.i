@@ -2,19 +2,19 @@
 	vx = 0.0 #R-direction (positive leaves outward, negative pushes inward)
 	vy = 2.0 #Z-direction (positive moves bottom to top, negative moves top to bottom)
 	vz = 0.0 #Not used in RZ system
- 
+
 	Dxx = 0.0 #Radial Diffusion in cylinder
 	Dxy = 0.0
 	Dxz = 0.0
- 
+
 	Dyx = 0.0
 	Dyy = 0.0 #Axial Diffusion in cylinder
 	Dyz = 0.0
- 
+
 	Dzx = 0.0
 	Dzy = 0.0
 	Dzz = 0.0
- 
+
 []
 
 [Problem]
@@ -60,7 +60,7 @@
 		type = GAdvection
 		variable = u
 	[../]
- 
+
 	[./u_gdiff]
 		type = GAnisotropicDiffusion
 		variable = u
@@ -74,14 +74,9 @@
 		type = DGAdvection
 		variable = u
 	[../]
- 
+
 	[./u_dgdiff]
 		type = DGAnisotropicDiffusion
-		variable = u
-	[../]
- 
-	[./u_advlimiter]
-		type = DGAdvectionPenalty
 		variable = u
 	[../]
 
@@ -99,7 +94,7 @@ variable = u
 boundary = 'top bottom'
 u_input = 1.0
 [../]
- 
+
 #[./u_bc_left_right]
 #type = DGFluxBC
 #variable = u
@@ -126,18 +121,18 @@ u_input = 1.0
 		boundary = 'bottom'
 		variable = u
 	[../]
- 
+
 	[./u_right]
 		type = SideAverageValue
 		boundary = 'right'
 		variable = u
 	[../]
- 
+
 	[./volume]
 		type = VolumePostprocessor
 		execute_on = 'timestep_begin initial'
 	[../]
- 
+
 	[./u_total]
 		type = ElementIntegralVariablePostprocessor
 		variable = u
@@ -200,12 +195,6 @@ scheme = bdf2
 	output_initial = true
 	exodus = true
 	csv = true
-
-	[./console]
-		type = Console
-		perf_log = true
-		output_on = 'timestep_end nonlinear linear failed initial'
-	[../]
-
+        print_linear_residuals = true
+        print_perf_log = true
 []
-

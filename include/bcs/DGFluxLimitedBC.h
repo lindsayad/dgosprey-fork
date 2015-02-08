@@ -25,7 +25,7 @@ protected:
 	Real _sigma;
 	RealVectorValue _velocity;
 	RealTensorValue _Diffusion;
-private:
+
 	Real _vx;
 	Real _vy;
 	Real _vz;
@@ -35,6 +35,8 @@ private:
 	Real _Dzx, _Dzy, _Dzz;
 	
 	Real _u_input;
+	
+private:
 	
 };
 

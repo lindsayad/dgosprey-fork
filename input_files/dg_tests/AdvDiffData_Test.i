@@ -80,11 +80,6 @@ type = DGAnisotropicDiffusion
 variable = u
 [../]
 
-#[./u_advlimiter]
-#type = DGAdvectionPenalty #only use when problem only involves advection
-#variable = u
-#[../]
-
 []
 
 [AuxKernels]
@@ -99,7 +94,7 @@ variable = u
 boundary = 'top bottom'
 u_input = 1.0
 [../]
- 
+
 #[./u_bc_top_bot]
 #type = DGFluxLimitedBC
 #variable = u
@@ -207,12 +202,6 @@ indicator = u_grad_error
 output_initial = true
 exodus = true
 csv = true
-
-[./console]
-type = Console
-perf_log = true
-output_on = 'timestep_end nonlinear linear failed initial'
-[../]
-
+print_linear_residuals = true
+print_perf_log = true
 []
-

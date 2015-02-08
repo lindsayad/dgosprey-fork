@@ -23,10 +23,12 @@ protected:
 	Real _sigma;
 	RealTensorValue _Diffusion;
 	
-private:
 	Real _Dxx, _Dxy, _Dxz;
 	Real _Dyx, _Dyy, _Dyz;
 	Real _Dzx, _Dzy, _Dzz;
+	
+private:
+	
 };
 
 #endif //DGANISOTROPICDIFFUSION_H

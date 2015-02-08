@@ -21,11 +21,7 @@ protected:
   virtual Real computeQpJacobian();
   
 private:
-  MaterialProperty<Real> & _gas_density;
-  MaterialProperty<Real> & _gas_heat_capacity;
-  MaterialProperty<Real> & _pellet_density;
-  MaterialProperty<Real> & _pellet_heat_capacity;
-  MaterialProperty<Real> & _porosity;
+	MaterialProperty<Real> & _heat_retardation;
 };
 
 #endif // BEDHEATACCUMULATION_H

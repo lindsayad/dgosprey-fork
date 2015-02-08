@@ -21,10 +21,12 @@ protected:
 	
 	RealTensorValue _Diffusion;
 	
-private:
 	Real _Dxx, _Dxy, _Dxz;
 	Real _Dyx, _Dyy, _Dyz;
 	Real _Dzx, _Dzy, _Dzz;
+	
+private:
+	
 };
 
 #endif //GANISOTROPICDIFFUSION_H

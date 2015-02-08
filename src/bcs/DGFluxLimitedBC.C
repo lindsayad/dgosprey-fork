@@ -66,24 +66,21 @@ DGFluxLimitedBC::computeQpResidual()
 	const unsigned int elem_b_order = static_cast<unsigned int> (_var.getOrder());
 	const double h_elem = _current_elem->volume()/_current_side_elem->volume() * 1./std::pow(elem_b_order, 2.);
 	
-	//Output
-	if ((_velocity)*_normals[_qp] >= 0.0)
+	//Output (Standard Flux Out)
+	if ((_velocity)*_normals[_qp] > 0.0)
 	{
 		r += _test[_i][_qp]*(_velocity*_normals[_qp])*_u[_qp];
 	}
-	//Input
+	//Input (Dirichlet BC)
 	else
 	{
 		r += _test[_i][_qp]*(_velocity*_normals[_qp])*_u_input;
 		r -= _test[_i][_qp]*(_velocity*_normals[_qp])*(_u[_qp] - _u_input);
-		
-		//Diffusion Only - Dirichlet
 		r += _epsilon * (_u[_qp] - _u_input) * _Diffusion * _grad_test[_i][_qp] * _normals[_qp];
 		r += _sigma/h_elem * (_u[_qp] - _u_input) * _test[_i][_qp];
+		r -= (_Diffusion * _grad_u[_qp] * _normals[_qp] * _test[_i][_qp]);
 	}
-	
-	r -= (_Diffusion * _grad_u[_qp] * _normals[_qp] * _test[_i][_qp]);
-	
+		
 	return r;
 }
 
@@ -95,24 +92,21 @@ DGFluxLimitedBC::computeQpJacobian()
 	const unsigned int elem_b_order = static_cast<unsigned int> (_var.getOrder());
 	const double h_elem = _current_elem->volume()/_current_side_elem->volume() * 1./std::pow(elem_b_order, 2.);
 	
-	//Output
-	if ((_velocity)*_normals[_qp] >= 0.0)
+	//Output (Standard Flux Out)
+	if ((_velocity)*_normals[_qp] > 0.0)
 	{
 		r += _test[_i][_qp]*(_velocity*_normals[_qp])*_phi[_j][_qp];
 	}
-	//Input
+	//Input (Dirichlet BC)
 	else
 	{
 		r += 0.0;
 		r -= _test[_i][_qp]*(_velocity*_normals[_qp])*_phi[_j][_qp];
-		
-		//Diffusion Only - Dirichlet
 		r += _epsilon * (_u[_qp] - _u_input) * _Diffusion * _grad_test[_i][_qp] * _normals[_qp];
 		r += _sigma/h_elem * _phi[_j][_qp] * _test[_i][_qp];
+		r -= (_Diffusion * _grad_phi[_j][_qp] * _normals[_qp] * _test[_i][_qp]);
 	}
-	
-	r -= (_Diffusion * _grad_phi[_j][_qp] * _normals[_qp] * _test[_i][_qp]);
-	
+		
 	return r;
 }
 
