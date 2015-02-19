@@ -69,6 +69,7 @@ DgospreyApp::~DgospreyApp()
 {
 }
 
+extern "C" void DgospreyApp__registerApps() { DgospreyApp::registerApps(); }
 void
 DgospreyApp::registerApps()
 {
