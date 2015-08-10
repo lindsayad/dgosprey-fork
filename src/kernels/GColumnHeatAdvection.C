@@ -15,9 +15,8 @@ InputParameters validParams<GColumnHeatAdvection>()
 	return params;
 }
 
-GColumnHeatAdvection::GColumnHeatAdvection(const std::string & name,
-										   InputParameters parameters) :
-GAdvection(name, parameters),
+GColumnHeatAdvection::GColumnHeatAdvection(const InputParameters & parameters) :
+GAdvection(parameters),
 _vel(getMaterialProperty<Real>("velocity")),
 _gas_density(getMaterialProperty<Real>("gas_density")),
 _gas_heat_capacity(getMaterialProperty<Real>("gas_heat_capacity"))

@@ -10,8 +10,8 @@ InputParameters validParams<DGAdvection>()
 	return params;
 }
 
-DGAdvection::DGAdvection(const std::string & name, InputParameters parameters) :
-DGKernel(name, parameters),
+DGAdvection::DGAdvection(const InputParameters & parameters) :
+DGKernel(parameters),
 _vx(getParam<Real>("vx")),
 _vy(getParam<Real>("vy")),
 _vz(getParam<Real>("vz"))

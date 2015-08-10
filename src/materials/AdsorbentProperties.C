@@ -19,9 +19,8 @@ InputParameters validParams<AdsorbentProperties>()
   return params;
 }
 
-AdsorbentProperties::AdsorbentProperties(const std::string & name,
-                             InputParameters parameters)
-:Material(name, parameters),
+AdsorbentProperties::AdsorbentProperties(const InputParameters & parameters)
+:Material(parameters),
 
 _binder_fraction(getParam<Real>("binder_fraction")),
 _binder_porosity(getParam<Real>("binder_porosity")),

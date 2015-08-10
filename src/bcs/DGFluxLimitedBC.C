@@ -23,8 +23,8 @@ InputParameters validParams<DGFluxLimitedBC>()
 	return params;
 }
 
-DGFluxLimitedBC::DGFluxLimitedBC(const std::string & name, InputParameters parameters) :
-IntegratedBC(name, parameters),
+DGFluxLimitedBC::DGFluxLimitedBC(const InputParameters & parameters) :
+IntegratedBC(parameters),
 _epsilon(getParam<Real>("epsilon")),
 _sigma(getParam<Real>("sigma")),
 _vx(getParam<Real>("vx")),

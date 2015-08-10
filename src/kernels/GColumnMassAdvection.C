@@ -15,9 +15,8 @@ InputParameters validParams<GColumnMassAdvection>()
 	return params;
 }
 
-GColumnMassAdvection::GColumnMassAdvection(const std::string & name,
-					   InputParameters parameters) :
-GAdvection(name, parameters),
+GColumnMassAdvection::GColumnMassAdvection(const InputParameters & parameters) :
+GAdvection(parameters),
 _vel(getMaterialProperty<Real>("velocity"))
 
 {

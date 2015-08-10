@@ -7,8 +7,8 @@ InputParameters validParams<HeatConductivity>()
   return params;
 }
 
-HeatConductivity::HeatConductivity(const std::string & name, InputParameters parameters) :
-Kernel(name, parameters),
+HeatConductivity::HeatConductivity(const InputParameters & parameters) :
+Kernel(parameters),
 _conductivity(getMaterialProperty<Real>("conductivity")),
 _porosity(getMaterialProperty<Real>("porosity"))
 {

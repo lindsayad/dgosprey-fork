@@ -15,8 +15,8 @@ InputParameters validParams<DGColumnHeatAdvection>()
 	return params;
 }
 
-DGColumnHeatAdvection::DGColumnHeatAdvection(const std::string & name, InputParameters parameters) :
-DGAdvection(name, parameters),
+DGColumnHeatAdvection::DGColumnHeatAdvection(const InputParameters & parameters) :
+DGAdvection(parameters),
 _vel(getMaterialProperty<Real>("velocity")),
 _gas_density(getMaterialProperty<Real>("gas_density")),
 _gas_heat_capacity(getMaterialProperty<Real>("gas_heat_capacity"))

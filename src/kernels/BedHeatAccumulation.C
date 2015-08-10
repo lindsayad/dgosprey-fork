@@ -8,9 +8,8 @@ InputParameters validParams<BedHeatAccumulation>()
 }
 
 
-BedHeatAccumulation::BedHeatAccumulation(const std::string & name,
-                                           InputParameters parameters)
-:TimeDerivative(name,parameters),
+BedHeatAccumulation::BedHeatAccumulation(const InputParameters & parameters)
+:TimeDerivative(parameters),
 _heat_retardation(getMaterialProperty<Real>("heat_retardation"))
 {
   

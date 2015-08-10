@@ -16,8 +16,8 @@ InputParameters validParams<DGColumnMassDispersion>()
 	return params;
 }
 
-DGColumnMassDispersion::DGColumnMassDispersion(const std::string & name, InputParameters parameters) :
-DGAnisotropicDiffusion(name, parameters),
+DGColumnMassDispersion::DGColumnMassDispersion(const InputParameters & parameters) :
+DGAnisotropicDiffusion(parameters),
 _index(getParam<unsigned int>("index")),
 _dispersion(getMaterialProperty<std::vector<Real> >("dispersion")),
 _molecular_diffusion(getMaterialProperty<std::vector<Real> >("molecular_diffusion"))

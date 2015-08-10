@@ -21,8 +21,8 @@ InputParameters validParams<DGMassFluxBC>()
 	return params;
 }
 
-DGMassFluxBC::DGMassFluxBC(const std::string & name, InputParameters parameters) :
-DGFluxBC(name, parameters),
+DGMassFluxBC::DGMassFluxBC(const InputParameters & parameters) :
+DGFluxBC(parameters),
 _input_temperature(getParam<Real>("input_temperature")),
 _input_pressure(getParam<Real>("input_pressure")),
 _input_molefraction(getParam<Real>("input_molefraction")),

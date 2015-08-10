@@ -8,9 +8,8 @@ InputParameters validParams<WallHeatAccumulation>()
 }
 
 
-WallHeatAccumulation::WallHeatAccumulation(const std::string & name,
-                                               InputParameters parameters)
-:TimeDerivative(name,parameters),
+WallHeatAccumulation::WallHeatAccumulation(const InputParameters & parameters)
+:TimeDerivative(parameters),
 _wall_density(getMaterialProperty<Real>("wall_density")),
 _wall_heat_capacity(getMaterialProperty<Real>("wall_heat_capacity"))
 {

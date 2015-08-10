@@ -21,9 +21,8 @@ InputParameters validParams<BedProperties>()
 return params;
 }
 
-BedProperties::BedProperties(const std::string & name,
-                                 InputParameters parameters)
-  :Material(name, parameters),
+BedProperties::BedProperties(const InputParameters & parameters)
+  :Material(parameters),
    
    _length(getParam<Real>("length")),
    _din(getParam<Real>("din")),

@@ -8,8 +8,8 @@ InputParameters validParams<Dispersion>()
   return params;
 }
 
-Dispersion::Dispersion(const std::string & name, InputParameters parameters) :
-Kernel(name, parameters),
+Dispersion::Dispersion(const InputParameters & parameters) :
+Kernel(parameters),
 _index(getParam<int>("index")),
 _dispersion(getMaterialProperty<std::vector<Real> >("dispersion"))
 {

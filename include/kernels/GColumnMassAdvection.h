@@ -22,14 +22,14 @@ class GColumnMassAdvection : public GAdvection
 {
 public:
 	
-	GColumnMassAdvection(const std::string & name, InputParameters parameters);
+	GColumnMassAdvection(const InputParameters & parameters);
 	
 protected:
 	virtual Real computeQpResidual();
 	virtual Real computeQpJacobian();
 	
 private:
-	MaterialProperty<Real> & _vel;
+	const MaterialProperty<Real> & _vel;
 	
 };
 

@@ -13,7 +13,7 @@ InputParameters validParams<TotalColumnPressure>();
 class TotalColumnPressure : public AuxKernel
 {
 public:
-  TotalColumnPressure(const std::string & name, InputParameters parameters);
+  TotalColumnPressure(const InputParameters & parameters);
   
 protected:
   virtual Real computeValue();

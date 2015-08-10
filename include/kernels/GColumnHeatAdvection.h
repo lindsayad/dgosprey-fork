@@ -22,16 +22,16 @@ class GColumnHeatAdvection : public GAdvection
 {
 public:
 	
-	GColumnHeatAdvection(const std::string & name, InputParameters parameters);
+	GColumnHeatAdvection(const InputParameters & parameters);
 	
 protected:
 	virtual Real computeQpResidual();
 	virtual Real computeQpJacobian();
 	
 private:
-	MaterialProperty<Real> & _vel;
-	MaterialProperty<Real> & _gas_density;
-	MaterialProperty<Real> & _gas_heat_capacity;
+	const MaterialProperty<Real> & _vel;
+	const MaterialProperty<Real> & _gas_density;
+	const MaterialProperty<Real> & _gas_heat_capacity;
 	
 };
 

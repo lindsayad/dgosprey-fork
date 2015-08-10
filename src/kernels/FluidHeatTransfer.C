@@ -9,8 +9,8 @@ InputParameters validParams<FluidHeatTransfer>()
 }
 
 
-FluidHeatTransfer::FluidHeatTransfer(const std::string & name, InputParameters parameters)
-:Kernel(name,parameters),
+FluidHeatTransfer::FluidHeatTransfer(const InputParameters & parameters)
+:Kernel(parameters),
 _bed_wall_transfer_coeff(getMaterialProperty<Real>("bed_wall_transfer_coeff")),
 _inner_dia(getMaterialProperty<Real>("inner_dia")),
 _porosity(getMaterialProperty<Real>("porosity")),

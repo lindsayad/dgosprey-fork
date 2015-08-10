@@ -13,7 +13,7 @@ InputParameters validParams<DGAnisotropicDiffusion>();
 class DGAnisotropicDiffusion : public DGKernel
 {
 public:
-	DGAnisotropicDiffusion(const std::string & name, InputParameters parameters);
+	DGAnisotropicDiffusion(const InputParameters & parameters);
 	
 protected:
 	virtual Real computeQpResidual(Moose::DGResidualType type);

@@ -10,7 +10,7 @@ template<> InputParameters validParams<TotalPressureIC>();
 class TotalPressureIC : public InitialCondition
 {
 public:
-  TotalPressureIC(const std::string & name, InputParameters parameters);
+  TotalPressureIC(const InputParameters & parameters);
   virtual Real value(const Point & p);
   
 private:

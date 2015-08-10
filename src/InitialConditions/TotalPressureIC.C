@@ -7,8 +7,8 @@ template<> InputParameters validParams<TotalPressureIC>()
   return params;
 }
 
-TotalPressureIC::TotalPressureIC(const std::string & name, InputParameters parameters) :
-InitialCondition(name,parameters),
+TotalPressureIC::TotalPressureIC(const InputParameters & parameters) :
+InitialCondition(parameters),
 _PT_IC(getParam<Real>("initial_pressure"))
 {
   

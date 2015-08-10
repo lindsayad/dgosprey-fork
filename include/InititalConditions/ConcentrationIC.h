@@ -10,7 +10,7 @@ template<> InputParameters validParams<ConcentrationIC>();
 class ConcentrationIC : public InitialCondition
 {
 public:
-  ConcentrationIC(const std::string & name, InputParameters parameters);
+  ConcentrationIC(const InputParameters & parameters);
   virtual Real value(const Point & p);
   
 private:

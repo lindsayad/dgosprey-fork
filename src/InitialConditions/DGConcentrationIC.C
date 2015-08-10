@@ -9,8 +9,8 @@ template<> InputParameters validParams<DGConcentrationIC>()
   return params;
 }
 
-DGConcentrationIC::DGConcentrationIC(const std::string & name, InputParameters parameters) :
-InitialCondition(name,parameters),
+DGConcentrationIC::DGConcentrationIC(const InputParameters & parameters) :
+InitialCondition(parameters),
 _y_IC(getParam<Real>("initial_mole_frac")),
 _PT_IC(getParam<Real>("initial_press")),
 _T_IC(getParam<Real>("initial_temp"))

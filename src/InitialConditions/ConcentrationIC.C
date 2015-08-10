@@ -9,8 +9,8 @@ template<> InputParameters validParams<ConcentrationIC>()
   return params;
 }
 
-ConcentrationIC::ConcentrationIC(const std::string & name, InputParameters parameters) :
-InitialCondition(name,parameters),
+ConcentrationIC::ConcentrationIC(const InputParameters & parameters) :
+InitialCondition(parameters),
 _y_IC(getParam<Real>("initial_mole_frac")),
 _temperature(coupledValue("temperature")),
 _total_pressure(coupledValue("pressure"))

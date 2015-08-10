@@ -17,8 +17,8 @@ InputParameters validParams<DGHeatFluxBC>()
 	return params;
 }
 
-DGHeatFluxBC::DGHeatFluxBC(const std::string & name, InputParameters parameters) :
-DGFluxBC(name, parameters),
+DGHeatFluxBC::DGHeatFluxBC(const InputParameters & parameters) :
+DGFluxBC(parameters),
 _input_temperature(getParam<Real>("input_temperature")),
 _vel(getMaterialProperty<Real>("velocity")),
 _gas_density(getMaterialProperty<Real>("gas_density")),

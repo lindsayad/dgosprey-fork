@@ -9,9 +9,8 @@ InputParameters validParams<RetardedTimeDerivative>()
 }
 
 
-RetardedTimeDerivative::RetardedTimeDerivative(const std::string & name,
-                                       InputParameters parameters)
-:TimeDerivative(name,parameters),
+RetardedTimeDerivative::RetardedTimeDerivative(const InputParameters & parameters)
+:TimeDerivative(parameters),
 _index(getParam<int>("index")),
 _retardation(getMaterialProperty<std::vector<Real> >("retardation"))
 {

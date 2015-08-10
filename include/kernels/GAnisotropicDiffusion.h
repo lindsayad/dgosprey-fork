@@ -13,7 +13,7 @@ class GAnisotropicDiffusion : public Kernel
 {
 public:
 	
-	GAnisotropicDiffusion(const std::string & name, InputParameters parameters);
+	GAnisotropicDiffusion(const InputParameters & parameters);
 	
 protected:
 	virtual Real computeQpResidual();

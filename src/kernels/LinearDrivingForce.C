@@ -13,8 +13,8 @@ InputParameters validParams<LinearDrivingForce>()
 }
 
 
-LinearDrivingForce::LinearDrivingForce(const std::string & name, InputParameters parameters)
-  :Kernel(name,parameters),
+LinearDrivingForce::LinearDrivingForce(const InputParameters & parameters)
+  :Kernel(parameters),
    _gaining(getParam<bool>("gaining")),
    _coef(getParam<Real>("coefficient")),
    _driving_value(getParam<Real>("driving_value")),

@@ -9,8 +9,8 @@ InputParameters validParams<WallAmbientHeatTransfer>()
 }
 
 
-WallAmbientHeatTransfer::WallAmbientHeatTransfer(const std::string & name, InputParameters parameters)
-:Kernel(name,parameters),
+WallAmbientHeatTransfer::WallAmbientHeatTransfer(const InputParameters & parameters)
+:Kernel(parameters),
 _wall_exterior_transfer_coeff(getMaterialProperty<Real>("wall_exterior_transfer_coeff")),
 _inner_dia(getMaterialProperty<Real>("inner_dia")),
 _outer_dia(getMaterialProperty<Real>("outer_dia")),

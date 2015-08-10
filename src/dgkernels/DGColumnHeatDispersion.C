@@ -15,8 +15,8 @@ InputParameters validParams<DGColumnHeatDispersion>()
 	return params;
 }
 
-DGColumnHeatDispersion::DGColumnHeatDispersion(const std::string & name, InputParameters parameters) :
-DGAnisotropicDiffusion(name, parameters),
+DGColumnHeatDispersion::DGColumnHeatDispersion(const InputParameters & parameters) :
+DGAnisotropicDiffusion(parameters),
 _conductivity(getMaterialProperty<Real>("conductivity"))
 {
 	

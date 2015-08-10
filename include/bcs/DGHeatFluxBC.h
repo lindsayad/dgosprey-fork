@@ -20,7 +20,7 @@ InputParameters validParams<DGHeatFluxBC>();
 class DGHeatFluxBC : public DGFluxBC
 {
 public:
-	DGHeatFluxBC(const std::string & name, InputParameters parameters);
+	DGHeatFluxBC(const InputParameters & parameters);
 	
 protected:
 	virtual Real computeQpResidual();
@@ -29,10 +29,10 @@ protected:
 private:
 	Real _input_temperature;
 	
-	MaterialProperty<Real> & _vel;
-	MaterialProperty<Real> & _gas_density;
-	MaterialProperty<Real> & _gas_heat_capacity;
-	MaterialProperty<Real> & _conductivity;
+	const MaterialProperty<Real> & _vel;
+	const MaterialProperty<Real> & _gas_density;
+	const MaterialProperty<Real> & _gas_heat_capacity;
+	const MaterialProperty<Real> & _conductivity;
 	
 };
 

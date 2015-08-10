@@ -14,7 +14,7 @@ class GAdvection : public Kernel
 {
 public:
 	
-	GAdvection(const std::string & name, InputParameters parameters);
+	GAdvection(const InputParameters & parameters);
 	
 protected:
 	virtual Real computeQpResidual();

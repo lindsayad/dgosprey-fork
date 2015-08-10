@@ -19,14 +19,14 @@ InputParameters validParams<DGColumnMassAdvection>();
 class DGColumnMassAdvection : public DGAdvection
 {
 public:
-	DGColumnMassAdvection(const std::string & name, InputParameters parameters);
+	DGColumnMassAdvection(const InputParameters & parameters);
 	
 protected:
 	virtual Real computeQpResidual(Moose::DGResidualType type);
 	virtual Real computeQpJacobian(Moose::DGJacobianType type);
 	
 private:
-	MaterialProperty<Real> & _vel;
+	const MaterialProperty<Real> & _vel;
 };
 
 #endif

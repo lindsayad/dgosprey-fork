@@ -12,8 +12,7 @@ InputParameters validParams<BedProperties>();
 class BedProperties : public Material
 {
 public:
-  BedProperties(const std::string & name,
-                  InputParameters parameters);
+  BedProperties(const InputParameters & parameters);
 
 protected:
   virtual void computeQpProperties();

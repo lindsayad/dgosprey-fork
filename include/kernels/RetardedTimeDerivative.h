@@ -13,8 +13,7 @@ class RetardedTimeDerivative : public TimeDerivative
 {
 public:
   
-  RetardedTimeDerivative(const std::string & name,
-                     InputParameters parameters);
+  RetardedTimeDerivative(const InputParameters & parameters);
   
 protected:
   virtual Real computeQpResidual();
@@ -22,7 +21,7 @@ protected:
   
 private:
   int _index;
-  MaterialProperty<std::vector<Real> > & _retardation;
+  const MaterialProperty<std::vector<Real> > & _retardation;
 };
 
 #endif //RETARDEDTIMEDERIVATIVE_H

@@ -18,8 +18,8 @@ InputParameters validParams<DGAnisotropicDiffusion>()
 	return params;
 }
 
-DGAnisotropicDiffusion::DGAnisotropicDiffusion(const std::string & name, InputParameters parameters) :
-DGKernel(name, parameters),
+DGAnisotropicDiffusion::DGAnisotropicDiffusion(const InputParameters & parameters) :
+DGKernel(parameters),
 _epsilon(getParam<Real>("epsilon")),
 _sigma(getParam<Real>("sigma")),
 _Dxx(getParam<Real>("Dxx")),

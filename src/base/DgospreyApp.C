@@ -51,8 +51,8 @@ InputParameters validParams<DgospreyApp>()
   return params;
 }
 
-DgospreyApp::DgospreyApp(const std::string & name, InputParameters parameters) :
-    MooseApp(name, parameters)
+DgospreyApp::DgospreyApp(InputParameters parameters) :
+    MooseApp(parameters)
 {
   srand(processor_id());
 
@@ -69,33 +69,40 @@ DgospreyApp::~DgospreyApp()
 {
 }
 
+extern "C" void DgospreyApp__registerApps() { DgospreyApp::registerApps(); }
 void
 DgospreyApp::registerApps()
 {
-  registerApp(DgospreyApp);
+#undef registerApp
+#define registerApp(name) AppFactory::instance().reg<name>(#name)
+	registerApp(DgospreyApp);
+#undef registerApp
+#define registerApp(name) AppFactory::instance().regLegacy<name>(#name)
 }
 
 void
 DgospreyApp::registerObjects(Factory & factory)
 {
+#undef registerObject
+#define registerObject(name) factory.reg<name>(stringifyName(name))
 	registerKernel(LinearDrivingForce);
 	registerMaterial(BedProperties);
-  registerMaterial(AdsorbentProperties);
-  registerMaterial(FlowProperties);
-  registerKernel(RetardedTimeDerivative);
-  registerKernel(Dispersion);
-  registerKernel(BedWallHeatTransfer);
-  registerKernel(WallAmbientHeatTransfer);
-  registerKernel(WallHeatAccumulation);
-  registerKernel(FluidHeatTransfer);
-  registerKernel(HeatConductivity);
-  registerKernel(BedHeatAccumulation);
+	registerMaterial(AdsorbentProperties);
+	registerMaterial(FlowProperties);
+	registerKernel(RetardedTimeDerivative);
+	registerKernel(Dispersion);
+	registerKernel(BedWallHeatTransfer);
+	registerKernel(WallAmbientHeatTransfer);
+	registerKernel(WallHeatAccumulation);
+	registerKernel(FluidHeatTransfer);
+	registerKernel(HeatConductivity);
+	registerKernel(BedHeatAccumulation);
 
-  registerAux(TotalColumnPressure);
-  registerInitialCondition(TotalPressureIC);
-  registerInitialCondition(ColumnTemperatureIC);
-  registerInitialCondition(ConcentrationIC);
-  registerInitialCondition(DGConcentrationIC);
+	registerAux(TotalColumnPressure);
+	registerInitialCondition(TotalPressureIC);
+	registerInitialCondition(ColumnTemperatureIC);
+	registerInitialCondition(ConcentrationIC);
+	registerInitialCondition(DGConcentrationIC);
 	
 	registerDGKernel(DGAdvection);
 	registerBoundaryCondition(DGFluxBC);
@@ -119,9 +126,18 @@ DgospreyApp::registerObjects(Factory & factory)
 	registerBoundaryCondition(DGHeatFluxLimitedBC);
 	registerBoundaryCondition(DGColumnWallHeatFluxBC);
 	registerBoundaryCondition(DGColumnWallHeatFluxLimitedBC);
+#undef registerObject
+#define registerObject(name) factory.regLegacy<name>(stringifyName(name))
 }
 
 void
 DgospreyApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
+#undef registerAction
+#define registerAction(tplt, action) action_factory.reg<tplt>(stringifyName(tplt), action)
+	
+	//Register Actions Here
+	
+#undef registerAction
+#define registerAction(tplt, action) action_factory.regLegacy<tplt>(stringifyName(tplt), action)
 }

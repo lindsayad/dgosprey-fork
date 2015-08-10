@@ -20,7 +20,7 @@ InputParameters validParams<DGColumnWallHeatFluxBC>();
 class DGColumnWallHeatFluxBC : public DGFluxBC
 {
 public:
-	DGColumnWallHeatFluxBC(const std::string & name, InputParameters parameters);
+	DGColumnWallHeatFluxBC(const InputParameters & parameters);
 	
 protected:
 	virtual Real computeQpResidual();
@@ -29,8 +29,8 @@ protected:
 private:
   	VariableValue & _wall_temp;
 	
-	MaterialProperty<Real> & _bed_wall_transfer_coeff;
-	MaterialProperty<Real> & _conductivity;
+	const MaterialProperty<Real> & _bed_wall_transfer_coeff;
+	const MaterialProperty<Real> & _conductivity;
 	
 };
 

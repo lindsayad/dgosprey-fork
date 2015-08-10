@@ -23,8 +23,8 @@ InputParameters validParams<DGFluxBC>()
 	return params;
 }
 
-DGFluxBC::DGFluxBC(const std::string & name, InputParameters parameters) :
-IntegratedBC(name, parameters),
+DGFluxBC::DGFluxBC(const InputParameters & parameters) :
+IntegratedBC(parameters),
 _epsilon(getParam<Real>("epsilon")),
 _sigma(getParam<Real>("sigma")),
 _vx(getParam<Real>("vx")),

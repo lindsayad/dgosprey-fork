@@ -11,16 +11,16 @@ InputParameters validParams<WallAmbientHeatTransfer>();
 class WallAmbientHeatTransfer : public Kernel
 {
 public:
-  WallAmbientHeatTransfer(const std::string & name, InputParameters parameters);
+  WallAmbientHeatTransfer(const InputParameters & parameters);
   
 protected:
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
   
 private:
-	MaterialProperty<Real> & _wall_exterior_transfer_coeff;
-  MaterialProperty<Real> & _inner_dia;
-  MaterialProperty<Real> & _outer_dia;
+  const MaterialProperty<Real> & _wall_exterior_transfer_coeff;
+  const MaterialProperty<Real> & _inner_dia;
+  const MaterialProperty<Real> & _outer_dia;
   
   VariableValue & _ambient_temp;
   

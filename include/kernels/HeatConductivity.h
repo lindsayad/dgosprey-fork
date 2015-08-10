@@ -13,15 +13,15 @@ class HeatConductivity : public Kernel
 {
 public:
   
-  HeatConductivity(const std::string & name, InputParameters parameters);
+  HeatConductivity(const InputParameters & parameters);
   
 protected:
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
   
 private:
-  MaterialProperty<Real> & _conductivity;
-	MaterialProperty<Real> & _porosity;
+  const MaterialProperty<Real> & _conductivity;
+  const MaterialProperty<Real> & _porosity;
 };
 
 #endif //HEATCONDUCTIVITY_H

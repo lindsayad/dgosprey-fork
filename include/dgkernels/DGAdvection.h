@@ -13,7 +13,7 @@ InputParameters validParams<DGAdvection>();
 class DGAdvection : public DGKernel
 {
 public:
-	DGAdvection(const std::string & name, InputParameters parameters);
+	DGAdvection(const InputParameters & parameters);
 	
 protected:
 	virtual Real computeQpResidual(Moose::DGResidualType type);

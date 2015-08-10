@@ -15,8 +15,8 @@ InputParameters validParams<DGColumnMassAdvection>()
 	return params;
 }
 
-DGColumnMassAdvection::DGColumnMassAdvection(const std::string & name, InputParameters parameters) :
-DGAdvection(name, parameters),
+DGColumnMassAdvection::DGColumnMassAdvection(const InputParameters & parameters) :
+DGAdvection(parameters),
 _vel(getMaterialProperty<Real>("velocity"))
 {
 

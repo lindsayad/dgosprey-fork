@@ -15,8 +15,8 @@ InputParameters validParams<GColumnHeatDispersion>()
 	return params;
 }
 
-GColumnHeatDispersion::GColumnHeatDispersion(const std::string & name, InputParameters parameters) :
-GAnisotropicDiffusion(name, parameters),
+GColumnHeatDispersion::GColumnHeatDispersion(const InputParameters & parameters) :
+GAnisotropicDiffusion(parameters),
 _conductivity(getMaterialProperty<Real>("conductivity"))
 {
 	

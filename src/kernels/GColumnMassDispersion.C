@@ -16,8 +16,8 @@ InputParameters validParams<GColumnMassDispersion>()
 	return params;
 }
 
-GColumnMassDispersion::GColumnMassDispersion(const std::string & name, InputParameters parameters) :
-GAnisotropicDiffusion(name, parameters),
+GColumnMassDispersion::GColumnMassDispersion(const InputParameters & parameters) :
+GAnisotropicDiffusion(parameters),
 _index(getParam<unsigned int>("index")),
 _dispersion(getMaterialProperty<std::vector<Real> >("dispersion")),
 _molecular_diffusion(getMaterialProperty<std::vector<Real> >("molecular_diffusion"))

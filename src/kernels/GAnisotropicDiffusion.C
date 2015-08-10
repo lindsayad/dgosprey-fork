@@ -16,8 +16,8 @@ InputParameters validParams<GAnisotropicDiffusion>()
 	return params;
 }
 
-GAnisotropicDiffusion::GAnisotropicDiffusion(const std::string & name, InputParameters parameters) :
-Kernel(name, parameters),
+GAnisotropicDiffusion::GAnisotropicDiffusion(const InputParameters & parameters) :
+Kernel(parameters),
 _Dxx(getParam<Real>("Dxx")),
 _Dxy(getParam<Real>("Dxy")),
 _Dxz(getParam<Real>("Dxz")),

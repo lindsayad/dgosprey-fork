@@ -20,9 +20,8 @@ InputParameters validParams<FlowProperties>()
   return params;
 }
 
-FlowProperties::FlowProperties(const std::string & name,
-                             InputParameters parameters)
-:Material(name, parameters),
+FlowProperties::FlowProperties(const InputParameters & parameters)
+:Material(parameters),
 
 _molecular_wieght(getParam<std::vector<Real> >("molecular_wieght")),
 _comp_heat_capacity(getParam<std::vector<Real> >("comp_heat_capacity")),

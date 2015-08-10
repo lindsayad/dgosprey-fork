@@ -13,16 +13,15 @@ class WallHeatAccumulation : public TimeDerivative
 {
 public:
   
-  WallHeatAccumulation(const std::string & name,
-                         InputParameters parameters);
+  WallHeatAccumulation(const InputParameters & parameters);
   
 protected:
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
   
 private:
-  MaterialProperty<Real> & _wall_density;
-  MaterialProperty<Real> & _wall_heat_capacity;
+  const MaterialProperty<Real> & _wall_density;
+  const MaterialProperty<Real> & _wall_heat_capacity;
 };
 
 #endif //WALLHEATACCUMULATION_H

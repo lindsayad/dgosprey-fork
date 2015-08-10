@@ -20,14 +20,14 @@ InputParameters validParams<DGColumnHeatDispersion>();
 class DGColumnHeatDispersion : public DGAnisotropicDiffusion
 {
 public:
-	DGColumnHeatDispersion(const std::string & name, InputParameters parameters);
+	DGColumnHeatDispersion(const InputParameters & parameters);
 	
 protected:
 	virtual Real computeQpResidual(Moose::DGResidualType type);
 	virtual Real computeQpJacobian(Moose::DGJacobianType type);
 	
 private:
-	MaterialProperty<Real> & _conductivity;
+	const MaterialProperty<Real> & _conductivity;
 };
 
 #endif

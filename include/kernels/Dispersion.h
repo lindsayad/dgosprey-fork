@@ -13,7 +13,7 @@ class Dispersion : public Kernel
 {
 public:
   
-  Dispersion(const std::string & name, InputParameters parameters);
+  Dispersion(const InputParameters & parameters);
   
 protected:
   virtual Real computeQpResidual();
@@ -21,7 +21,7 @@ protected:
   
 private:
   int _index;
-  MaterialProperty<std::vector<Real> > & _dispersion;
+  const MaterialProperty<std::vector<Real> > & _dispersion;
 };
 
 #endif //DISPERSION_H

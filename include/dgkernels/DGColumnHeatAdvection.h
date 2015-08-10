@@ -20,16 +20,16 @@ InputParameters validParams<DGColumnHeatAdvection>();
 class DGColumnHeatAdvection : public DGAdvection
 {
 public:
-	DGColumnHeatAdvection(const std::string & name, InputParameters parameters);
+	DGColumnHeatAdvection(const InputParameters & parameters);
 	
 protected:
 	virtual Real computeQpResidual(Moose::DGResidualType type);
 	virtual Real computeQpJacobian(Moose::DGJacobianType type);
 	
 private:
-	MaterialProperty<Real> & _vel;
-	MaterialProperty<Real> & _gas_density;
-	MaterialProperty<Real> & _gas_heat_capacity;
+	const MaterialProperty<Real> & _vel;
+	const MaterialProperty<Real> & _gas_density;
+	const MaterialProperty<Real> & _gas_heat_capacity;
 };
 
 #endif

@@ -10,7 +10,7 @@ template<> InputParameters validParams<ColumnTemperatureIC>();
 class ColumnTemperatureIC : public InitialCondition
 {
 public:
-  ColumnTemperatureIC(const std::string & name, InputParameters parameters);
+  ColumnTemperatureIC(const InputParameters & parameters);
   virtual Real value(const Point & p);
   
 private:

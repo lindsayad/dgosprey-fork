@@ -13,15 +13,14 @@ class BedHeatAccumulation : public TimeDerivative
 {
 public:
   
-  BedHeatAccumulation(const std::string & name,
-                       InputParameters parameters);
+  BedHeatAccumulation(const InputParameters & parameters);
   
 protected:
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
   
 private:
-	MaterialProperty<Real> & _heat_retardation;
+	const MaterialProperty<Real> & _heat_retardation;
 };
 
 #endif // BEDHEATACCUMULATION_H

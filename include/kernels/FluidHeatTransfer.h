@@ -11,16 +11,16 @@ InputParameters validParams<FluidHeatTransfer>();
 class FluidHeatTransfer : public Kernel
 {
 public:
-  FluidHeatTransfer(const std::string & name, InputParameters parameters);
+  FluidHeatTransfer(const InputParameters & parameters);
   
 protected:
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
   
 private:
-	MaterialProperty<Real> & _bed_wall_transfer_coeff;
-  MaterialProperty<Real> & _inner_dia;
-  MaterialProperty<Real> & _porosity;
+  const MaterialProperty<Real> & _bed_wall_transfer_coeff;
+  const MaterialProperty<Real> & _inner_dia;
+  const MaterialProperty<Real> & _porosity;
   
   VariableValue & _wall_temp;
   

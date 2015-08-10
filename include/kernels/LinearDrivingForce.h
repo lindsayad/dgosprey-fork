@@ -11,7 +11,7 @@ InputParameters validParams<LinearDrivingForce>();
 class LinearDrivingForce : public Kernel
 {
 public:
-  LinearDrivingForce(const std::string & name, InputParameters parameters);
+  LinearDrivingForce(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual();

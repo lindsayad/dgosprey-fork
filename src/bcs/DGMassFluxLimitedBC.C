@@ -21,8 +21,8 @@ InputParameters validParams<DGMassFluxLimitedBC>()
 	return params;
 }
 
-DGMassFluxLimitedBC::DGMassFluxLimitedBC(const std::string & name, InputParameters parameters) :
-DGFluxLimitedBC(name, parameters),
+DGMassFluxLimitedBC::DGMassFluxLimitedBC(const InputParameters & parameters) :
+DGFluxLimitedBC(parameters),
 _input_temperature(getParam<Real>("input_temperature")),
 _input_pressure(getParam<Real>("input_pressure")),
 _input_molefraction(getParam<Real>("input_molefraction")),

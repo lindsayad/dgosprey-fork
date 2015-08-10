@@ -20,7 +20,7 @@ InputParameters validParams<DGMassFluxLimitedBC>();
 class DGMassFluxLimitedBC : public DGFluxLimitedBC
 {
 public:
-	DGMassFluxLimitedBC(const std::string & name, InputParameters parameters);
+	DGMassFluxLimitedBC(const InputParameters & parameters);
 	
 protected:
 	virtual Real computeQpResidual();
@@ -31,10 +31,10 @@ private:
 	Real _input_pressure;
 	Real _input_molefraction;
 	
-	MaterialProperty<Real> & _vel;
+	const MaterialProperty<Real> & _vel;
 	unsigned int _index;
-	MaterialProperty<std::vector<Real> > & _dispersion;
-	MaterialProperty<std::vector<Real> > & _molecular_diffusion;
+	const MaterialProperty<std::vector<Real> > & _dispersion;
+	const MaterialProperty<std::vector<Real> > & _molecular_diffusion;
 	
 };
 

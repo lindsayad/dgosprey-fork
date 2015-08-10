@@ -11,7 +11,7 @@ InputParameters validParams<DgospreyApp>();
 class DgospreyApp : public MooseApp
 {
 public:
-  DgospreyApp(const std::string & name, InputParameters parameters);
+  DgospreyApp(InputParameters parameters);
   virtual ~DgospreyApp();
 
   static void registerApps();

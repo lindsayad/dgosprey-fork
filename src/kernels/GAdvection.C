@@ -10,9 +10,8 @@ InputParameters validParams<GAdvection>()
 	return params;
 }
 
-GAdvection::GAdvection(const std::string & name,
-											 InputParameters parameters) :
-Kernel(name, parameters),
+GAdvection::GAdvection(const InputParameters & parameters) :
+Kernel(parameters),
 _vx(getParam<Real>("vx")),
 _vy(getParam<Real>("vy")),
 _vz(getParam<Real>("vz"))

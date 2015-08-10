@@ -12,8 +12,7 @@ InputParameters validParams<AdsorbentProperties>();
 class AdsorbentProperties : public Material
 {
 public:
-	AdsorbentProperties(const std::string & name,
-                 InputParameters parameters);
+	AdsorbentProperties(const InputParameters & parameters);
 	
 protected:
 	virtual void computeQpProperties();

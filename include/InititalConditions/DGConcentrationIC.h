@@ -10,7 +10,7 @@ template<> InputParameters validParams<DGConcentrationIC>();
 class DGConcentrationIC : public InitialCondition
 {
 public:
-  DGConcentrationIC(const std::string & name, InputParameters parameters);
+  DGConcentrationIC(const InputParameters & parameters);
   virtual Real value(const Point & p);
   
 private:

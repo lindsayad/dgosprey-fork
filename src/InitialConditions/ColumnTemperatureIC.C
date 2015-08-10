@@ -7,8 +7,8 @@ template<> InputParameters validParams<ColumnTemperatureIC>()
   return params;
 }
 
-ColumnTemperatureIC::ColumnTemperatureIC(const std::string & name, InputParameters parameters) :
-InitialCondition(name,parameters),
+ColumnTemperatureIC::ColumnTemperatureIC(const InputParameters & parameters) :
+InitialCondition(parameters),
 _TC_IC(getParam<Real>("initial_temperature"))
 {
   

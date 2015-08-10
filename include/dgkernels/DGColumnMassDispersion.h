@@ -19,7 +19,7 @@ InputParameters validParams<DGColumnMassDispersion>();
 class DGColumnMassDispersion : public DGAnisotropicDiffusion
 {
 public:
-	DGColumnMassDispersion(const std::string & name, InputParameters parameters);
+	DGColumnMassDispersion(const InputParameters & parameters);
 	
 protected:
 	virtual Real computeQpResidual(Moose::DGResidualType type);
@@ -27,8 +27,8 @@ protected:
 	
 private:
 	unsigned int _index;
-	MaterialProperty<std::vector<Real> > & _dispersion;
-	MaterialProperty<std::vector<Real> > & _molecular_diffusion;
+	const MaterialProperty<std::vector<Real> > & _dispersion;
+	const MaterialProperty<std::vector<Real> > & _molecular_diffusion;
 };
 
 #endif

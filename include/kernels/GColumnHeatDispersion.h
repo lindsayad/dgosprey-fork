@@ -21,14 +21,14 @@ class GColumnHeatDispersion : public GAnisotropicDiffusion
 {
 public:
 	
-	GColumnHeatDispersion(const std::string & name, InputParameters parameters);
+	GColumnHeatDispersion(const InputParameters & parameters);
 	
 protected:
 	virtual Real computeQpResidual();
 	virtual Real computeQpJacobian();
 	
 private:
-	MaterialProperty<Real> & _conductivity;
+	const MaterialProperty<Real> & _conductivity;
 };
 
 #endif //GCOLUMNHEATDISPERSION_H

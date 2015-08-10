@@ -15,7 +15,7 @@ InputParameters validParams<DGFluxBC>();
 class DGFluxBC : public IntegratedBC
 {
 public:
-	DGFluxBC(const std::string & name, InputParameters parameters);
+	DGFluxBC(const InputParameters & parameters);
 	
 protected:
 	virtual Real computeQpResidual();

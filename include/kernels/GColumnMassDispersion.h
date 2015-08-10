@@ -21,7 +21,7 @@ class GColumnMassDispersion : public GAnisotropicDiffusion
 {
 public:
 	
-	GColumnMassDispersion(const std::string & name, InputParameters parameters);
+	GColumnMassDispersion(const InputParameters & parameters);
 	
 protected:
 	virtual Real computeQpResidual();
@@ -29,8 +29,8 @@ protected:
 	
 private:
 	unsigned int _index;
-	MaterialProperty<std::vector<Real> > & _dispersion;
-	MaterialProperty<std::vector<Real> > & _molecular_diffusion;
+	const MaterialProperty<std::vector<Real> > & _dispersion;
+	const MaterialProperty<std::vector<Real> > & _molecular_diffusion;
 };
 
 #endif //GCOLUMNMASSDISPERSION_H

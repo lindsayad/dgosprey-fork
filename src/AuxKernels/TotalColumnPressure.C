@@ -9,8 +9,8 @@ InputParameters validParams<TotalColumnPressure>()
   return params;
 }
 
-TotalColumnPressure::TotalColumnPressure(const std::string & name, InputParameters parameters) :
-AuxKernel(name, parameters),
+TotalColumnPressure::TotalColumnPressure(const InputParameters & parameters) :
+AuxKernel(parameters),
 _temperature(coupledValue("temperature"))
 {
   unsigned int n = coupledComponents("coupled_gases");

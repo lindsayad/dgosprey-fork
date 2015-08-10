@@ -17,8 +17,8 @@ InputParameters validParams<DGColumnWallHeatFluxBC>()
 	return params;
 }
 
-DGColumnWallHeatFluxBC::DGColumnWallHeatFluxBC(const std::string & name, InputParameters parameters) :
-DGFluxBC(name, parameters),
+DGColumnWallHeatFluxBC::DGColumnWallHeatFluxBC(const InputParameters & parameters) :
+DGFluxBC(parameters),
 _wall_temp(coupledValue("wall_temp")),
 _bed_wall_transfer_coeff(getMaterialProperty<Real>("bed_wall_transfer_coeff")),
 _conductivity(getMaterialProperty<Real>("conductivity"))

@@ -17,8 +17,8 @@ InputParameters validParams<DGHeatFluxLimitedBC>()
 	return params;
 }
 
-DGHeatFluxLimitedBC::DGHeatFluxLimitedBC(const std::string & name, InputParameters parameters) :
-DGFluxLimitedBC(name, parameters),
+DGHeatFluxLimitedBC::DGHeatFluxLimitedBC(const InputParameters & parameters) :
+DGFluxLimitedBC(parameters),
 _input_temperature(getParam<Real>("input_temperature")),
 _vel(getMaterialProperty<Real>("velocity")),
 _gas_density(getMaterialProperty<Real>("gas_density")),
