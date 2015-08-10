@@ -1,4 +1,5 @@
 #include "Material.h"
+#include "flock.h"
 
 #ifndef FLOWPROPERTIES_H
 #define FLOWPROPERTIES_H
