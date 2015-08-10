@@ -337,6 +337,27 @@
 		temperature = column_temp
 		coupled_gases = 'N2 O2 H2O'
 	[../]
+	
+	[./AdsorbateMaterials]
+		type = AdsorbateProperties
+		block = 0
+		coupled_gases = 'N2 O2 H2O'
+		number_sites = '0 0 4'
+		maximum_capacity = '0 0 11.67'
+		enthalpy_site_1 = '0 0 -46597.5'
+		enthalpy_site_2 = '0 0 -125024'
+		enthalpy_site_3 = '0 0 -193619'
+		enthalpy_site_4 = '0 0 -272228'
+		enthalpy_site_5 = '0 0 0'
+		enthalpy_site_6 = '0 0 0'
+		
+		entropy_site_1 = '0 0 -53.6994'
+		entropy_site_2 = '0 0 -221.073'
+		entropy_site_3 = '0 0 -356.728'
+		entropy_site_4 = '0 0 -567.459'
+		entropy_site_5 = '0 0 0'
+		entropy_site_6 = '0 0 0'
+	[../]
 
  [] #END Materials
 

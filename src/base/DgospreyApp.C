@@ -6,6 +6,7 @@
 #include "LinearDrivingForce.h"
 #include "BedProperties.h"
 #include "AdsorbentProperties.h"
+#include "AdsorbateProperties.h"
 #include "FlowProperties.h"
 #include "RetardedTimeDerivative.h"
 #include "Dispersion.h"
@@ -89,6 +90,7 @@ DgospreyApp::registerObjects(Factory & factory)
 	registerMaterial(BedProperties);
 	registerMaterial(AdsorbentProperties);
 	registerMaterial(FlowProperties);
+	registerMaterial(AdsorbateProperties);
 	registerKernel(RetardedTimeDerivative);
 	registerKernel(Dispersion);
 	registerKernel(BedWallHeatTransfer);
