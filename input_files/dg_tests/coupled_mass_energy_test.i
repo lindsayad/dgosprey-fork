@@ -98,11 +98,11 @@
 
 [Kernels]
 
- 	#[./accumN2]
- 		#type = RetardedTimeDerivative
- 		#variable = N2
- 		#index = 0
- 	#[../]
+ 	[./accumN2]
+ 		type = RetardedTimeDerivative
+ 		variable = N2
+ 		index = 0
+ 	[../]
 
 	[./diffN2]
 		type = GColumnMassDispersion
@@ -115,11 +115,11 @@
 		variable = N2
 	[../]
 
- 	#[./accumO2]
- 		#type = RetardedTimeDerivative
- 		#variable = O2
- 		#index = 1
- 	#[../]
+ 	[./accumO2]
+ 		type = RetardedTimeDerivative
+ 		variable = O2
+ 		index = 1
+ 	[../]
 
 	[./diffO2]
 		type = GColumnMassDispersion
@@ -132,11 +132,11 @@
 		variable = O2
 	[../]
 
- 	#[./accumH2O]
- 		#type = RetardedTimeDerivative
- 		#variable = H2O
- 		#index = 2
- 	#[../]
+ 	[./accumH2O]
+ 		type = RetardedTimeDerivative
+ 		variable = H2O
+ 		index = 2
+ 	[../]
 
 	[./diffH2O]
 		type = GColumnMassDispersion
@@ -149,10 +149,10 @@
 		variable = H2O
 	[../]
 
- 	#[./wallAccum]
- 		#type = WallHeatAccumulation
- 		#variable = wall_temp
- 	#[../]
+ 	[./wallAccum]
+ 		type = WallHeatAccumulation
+ 		variable = wall_temp
+ 	[../]
  	[./wall_bed_trans]
  		type = BedWallHeatTransfer
  		variable = wall_temp
@@ -164,10 +164,10 @@
  		coupled = ambient_temp
  	[../]
 
-	#[./columnAccum]
-		#type = BedHeatAccumulation
-		#variable = column_temp
-	#[../]
+	[./columnAccum]
+		type = BedHeatAccumulation
+		variable = column_temp
+	[../]
 	[./columnConduction]
 		type = GColumnHeatDispersion
 		variable =column_temp
@@ -242,6 +242,7 @@
 
  	[./N2_Flux]
  		type = DGMassFluxLimitedBC
+		#type = DGMassFluxBC		#Note: This is much slower and does not improve accuracy much
  		variable = N2
  		boundary = 'top bottom'
  		input_temperature = 298.15
@@ -252,6 +253,7 @@
 
  	[./O2_Flux]
  		type = DGMassFluxLimitedBC
+		#type = DGMassFluxBC		#Note: This is much slower and does not improve accuracy much
  		variable = O2
  		boundary = 'top bottom'
  		input_temperature = 298.15
@@ -262,6 +264,7 @@
 
  	[./H2O_Flux]
  		type = DGMassFluxLimitedBC
+		#type = DGMassFluxBC		#Note: This is much slower and does not improve accuracy much
  		variable = H2O
  		boundary = 'top bottom'
  		input_temperature = 298.15
@@ -272,6 +275,7 @@
 
 	[./Heat_Gas_Flux]
  		type = DGHeatFluxLimitedBC
+		#type = DGHeatFluxBC		#Note: This is much slower and does not improve accuracy much
  		variable = column_temp
  		boundary = 'top bottom'
  		input_temperature = 298.15
@@ -279,6 +283,7 @@
 
 	[./Heat_Wall_Flux]
  		type = DGColumnWallHeatFluxLimitedBC
+		#type = DGColumnWallHeatFluxBC		#Note: This is much slower and does not improve accuracy much
  		variable = column_temp
  		boundary = 'right'
  		wall_temp = wall_temp
@@ -377,10 +382,9 @@
 
 [Executioner]
 
- 	#type = Transient
- 	type = Steady
- 	scheme = bdf2
+ 	type = Transient
  	#scheme = implicit-euler
+	scheme = bdf2
 
  	nl_rel_tol = 1e-6
  	picard_abs_tol = 1e-6
@@ -392,14 +396,14 @@
  	l_max_its = 100
 
  	solve_type = PJFNK
- 	#solve_type = JFNK
 	start_time = 0.0
 	end_time = 60.0
 	petsc_options_iname = '-pc_type -pc_hypre_type'
 	petsc_options_value = 'hypre boomeramg'
 
 	[./TimeStepper]
-		type = ConstantDT
+		#type = ConstantDT
+		type = SolutionTimeAdaptiveDT
 		dt = 0.1
 	[../]
 
