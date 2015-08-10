@@ -18,7 +18,7 @@ public:
 protected:
   virtual Real computeValue();
 private:
-  VariableValue & _temperature;
+	VariableValue & _temperature;
 	std::vector<unsigned int> _index;
 	std::vector<VariableValue *> _gas_conc;
   
