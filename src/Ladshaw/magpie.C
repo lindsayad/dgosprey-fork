@@ -153,7 +153,7 @@ double qo(double po, const void *data, int i)
 		bot = bot + (tempKo * pow( (po / Po) ,(n+1)));
 	}
 	qo = (dat->gsta_dat[i].qmax / dat->gsta_dat[i].m) * (top / bot);
-
+	
 	return qo;
 }
 

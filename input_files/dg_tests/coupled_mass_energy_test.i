@@ -383,43 +383,52 @@
 		type = SideAverageValue
 		boundary = 'top'
 		variable = N2
+		execute_on = timestep_end
 	[../]
 
 	[./O2_exit]
 		type = SideAverageValue
 		boundary = 'top'
 		variable = O2
+		execute_on = timestep_end
 	[../]
 
 	[./H2O_exit]
 		type = SideAverageValue
 		boundary = 'top'
 		variable = H2O
+		execute_on = timestep_end
 	[../]
 
 	[./temp_exit]
 		type = SideAverageValue
 		boundary = 'top'
 		variable = column_temp
+		execute_on = timestep_end
 	[../]
 
 	[./press_exit]
 		type = SideAverageValue
 		boundary = 'top'
 		variable = total_pressure
+		execute_on = timestep_end
 	[../]
 
  	[./wall_temp]
  		type = SideAverageValue
  		boundary = 'right'
  		variable = wall_temp
+		execute_on = timestep_end
  	[../]
  
 	[./H2O_avg_sorption]
 		#type = ElementAverageValue
 		type = SideAverageValue
+		#type = ElementExtremeValue
+		#value_type = max
 		variable = H2O_Adsorbed
 		boundary = 'top'
+		execute_on = timestep_end
 	[../]
 
  [] #END Postprocessors
@@ -427,8 +436,8 @@
 [Executioner]
 
  	type = Transient
- 	#scheme = implicit-euler
-	scheme = bdf2
+ 	scheme = implicit-euler
+	#scheme = bdf2
 
  	nl_rel_tol = 1e-6
  	picard_abs_tol = 1e-6
@@ -472,6 +481,10 @@
  			type = GradientJumpIndicator
  			variable = column_temp
  		[../]
+		[./error_ads_H2O]
+			type = GradientJumpIndicator
+			variable = H2O_Adsorbed
+		[../]
  	[../]
 
 
@@ -492,6 +505,10 @@
  			type = ErrorFractionMarker
  			indicator = error_energy
  		[../]
+		[./ef_ads_H2O]
+			type = ErrorFractionMarker
+			indicator = error_ads_H2O
+		[../]
  	[../]
 
  [] #END Adaptivity

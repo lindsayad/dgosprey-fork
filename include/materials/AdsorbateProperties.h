@@ -53,6 +53,8 @@ private:
 	
 	MaterialProperty< MAGPIE_DATA > & _magpie_dat;
 	
+	MaterialProperty< Real > & _temp_q;
+	
 };
 
 #endif //ADSORBATEPROPERTIES_H
