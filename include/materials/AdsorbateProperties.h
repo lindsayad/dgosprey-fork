@@ -6,6 +6,7 @@
 //----------------------------------------
 
 #include "Material.h"
+#include "flock.h"
 
 #ifndef ADSORBATEPROPERTIES_H
 #define ADSORBATEPROPERTIES_H
@@ -27,7 +28,11 @@ protected:
 private:
 	
 	std::vector<unsigned int> _index;
+	VariableValue & _temperature;
+	VariableValue & _total_pressure;
 	std::vector<VariableValue *> _gas_conc;
+	
+	int _adsorption_type;
 	std::vector<int> _num_sites;
 	std::vector<Real> _max_capacity;
 	std::vector<Real> _molar_volume;
@@ -45,6 +50,8 @@ private:
 	std::vector<Real> _entropy_4;
 	std::vector<Real> _entropy_5;
 	std::vector<Real> _entropy_6;
+	
+	MaterialProperty< MAGPIE_DATA > & _magpie_dat;
 	
 };
 

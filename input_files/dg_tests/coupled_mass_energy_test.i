@@ -65,6 +65,12 @@
  		family = L2_LAGRANGE
  		initial_condition = 298.15
  	[../]
+ 
+	[./H2O_Adsorbed]
+		order = FIRST
+		family = L2_LAGRANGE
+		initial_condition = 0.0
+	[../]
 
  [] #END AuxVariables
 
@@ -235,6 +241,12 @@
 		temperature = column_temp
 		coupled_gases = 'N2 O2 H2O'
 	[../]
+ 
+	[./water_adsorption]
+		type = MAGPIE_Adsorption
+		variable = H2O_Adsorbed
+		index = 2
+	[../]
 
  [] #END AuxKernels
 
@@ -341,9 +353,13 @@
 	[./AdsorbateMaterials]
 		type = AdsorbateProperties
 		block = 0
+		adsorption_type = 0
+		temperature = column_temp
+		total_pressure = total_pressure
 		coupled_gases = 'N2 O2 H2O'
 		number_sites = '0 0 4'
 		maximum_capacity = '0 0 11.67'
+		molar_volume = '0 0 13.91'
 		enthalpy_site_1 = '0 0 -46597.5'
 		enthalpy_site_2 = '0 0 -125024'
 		enthalpy_site_3 = '0 0 -193619'
@@ -398,6 +414,13 @@
  		boundary = 'right'
  		variable = wall_temp
  	[../]
+ 
+	[./H2O_avg_sorption]
+		#type = ElementAverageValue
+		type = SideAverageValue
+		variable = H2O_Adsorbed
+		boundary = 'top'
+	[../]
 
  [] #END Postprocessors
 
@@ -413,7 +436,7 @@
  	nl_rel_step_tol = 1e-6
  	picard_rel_tol = 1e-6
  	nl_abs_step_tol = 1e-6
- 	l_tol = 0.01
+ 	l_tol = 1e-4
  	l_max_its = 100
 
  	solve_type = PJFNK

@@ -13,8 +13,11 @@ InputParameters validParams<AdsorbateProperties>()
 {
 	InputParameters params = validParams<Material>();
 
+	params.addCoupledVar("temperature","Coupled variable for temperature");
+	params.addCoupledVar("total_pressure","Coupled variable for total pressure");
 	params.addCoupledVar("coupled_gases", "Gas concentrations variables being coupled");
 	
+	params.addParam<int>("adsorption_type",0,"The type of adsorption function to use (0 = Equilibria, 1 = Surface Diffusion, 2 = Pore and Surface Diffsuion");
 	params.addParam<std::vector<int> >("number_sites","The number of adsorption sites for each species in GSTA isotherm");
 	params.addParam<std::vector<Real> >("maximum_capacity","The adsorption capacity for each species in the GSTA isotherm (mol/kg)");
 	params.addParam<std::vector<Real> >("molar_volume","The van der Waals molar volume of each species (mol/cm^3)");
@@ -39,6 +42,9 @@ InputParameters validParams<AdsorbateProperties>()
 AdsorbateProperties::AdsorbateProperties(const InputParameters & parameters)
 :Material(parameters),
 
+_temperature(coupledValue("temperature")),
+_total_pressure(coupledValue("total_pressure")),
+_adsorption_type(getParam<int>("adsorption_type")),
 _num_sites(getParam<std::vector<int> >("number_sites")),
 _max_capacity(getParam<std::vector<Real> >("maximum_capacity")),
 _molar_volume(getParam<std::vector<Real> >("molar_volume")),
@@ -54,7 +60,9 @@ _entropy_2(getParam<std::vector<Real> >("entropy_site_2")),
 _entropy_3(getParam<std::vector<Real> >("entropy_site_3")),
 _entropy_4(getParam<std::vector<Real> >("entropy_site_4")),
 _entropy_5(getParam<std::vector<Real> >("entropy_site_5")),
-_entropy_6(getParam<std::vector<Real> >("entropy_site_6"))
+_entropy_6(getParam<std::vector<Real> >("entropy_site_6")),
+
+_magpie_dat(declareProperty< MAGPIE_DATA >("magpie_data"))
 
 {
 	unsigned int n = coupledComponents("coupled_gases");
@@ -63,18 +71,131 @@ _entropy_6(getParam<std::vector<Real> >("entropy_site_6"))
 	
 	for (unsigned int i = 0; i<_gas_conc.size(); ++i)
 	{
-		_index[i] = coupled("coupled_gases",i); //may only be useful for compute Jacobian Off Diagonal (see ~/projects/truck/moose/modules/chemical_reactions/ .../ CoupledConvectionReactionSub.C)
+		_index[i] = coupled("coupled_gases",i);
 		_gas_conc[i] = &coupledValue("coupled_gases",i);
 	}
-	/*
-	 Note: When using _gas_conc[i], it must be appropriately dereferenced as follows...
-	 (*_gas_conc[i])[_qp] = concentration of species i at node _qp
-	 */
 }
 
 void
 AdsorbateProperties::computeQpProperties()
-{
-	//Nothing to compute, we just use this object for storage and comunication with other files
+{	
+	//Only setup working space if this is the first run
+	//if (_t == 0.0)
+	//{
+		_magpie_dat[_qp].sys_dat.N = _gas_conc.size();
+		_magpie_dat[_qp].gpast_dat.resize(_magpie_dat[_qp].sys_dat.N);
+		_magpie_dat[_qp].gsta_dat.resize(_magpie_dat[_qp].sys_dat.N);
+		_magpie_dat[_qp].mspd_dat.resize(_magpie_dat[_qp].sys_dat.N);
+	
+		for (int i=0; i<_magpie_dat[_qp].sys_dat.N; i++)
+		{
+			_magpie_dat[_qp].mspd_dat[i].eta.resize(_magpie_dat[_qp].sys_dat.N);
+			_magpie_dat[_qp].gpast_dat[i].gama_inf.resize(_magpie_dat[_qp].sys_dat.N);
+			_magpie_dat[_qp].gpast_dat[i].po.resize(_magpie_dat[_qp].sys_dat.N);
+			
+			_magpie_dat[_qp].gsta_dat[i].qmax = _max_capacity[i];
+			
+			//This species is adsorbable
+			if (_magpie_dat[_qp].gsta_dat[i].qmax > 0.0)
+			{
+				_magpie_dat[_qp].mspd_dat[i].v = _molar_volume[i];
+				_magpie_dat[_qp].gsta_dat[i].m = _num_sites[i];
+				if (_magpie_dat[_qp].gsta_dat[i].m < 1)
+					_magpie_dat[_qp].gsta_dat[i].m = 1;
+				if (_magpie_dat[_qp].gsta_dat[i].m > 6)
+					_magpie_dat[_qp].gsta_dat[i].m = 6;
+				_magpie_dat[_qp].gsta_dat[i].dHo.resize(_magpie_dat[_qp].gsta_dat[i].m);
+				_magpie_dat[_qp].gsta_dat[i].dSo.resize(_magpie_dat[_qp].gsta_dat[i].m);
+				for (int n=0; n<_magpie_dat[_qp].gsta_dat[i].m; n++)
+				{
+					if (n == 0)
+					{
+						_magpie_dat[_qp].gsta_dat[i].dHo[n] = _enthalpy_1[i];
+						_magpie_dat[_qp].gsta_dat[i].dSo[n] = _entropy_1[i];
+					}
+					else if (n == 1)
+					{
+						_magpie_dat[_qp].gsta_dat[i].dHo[n] = _enthalpy_2[i];
+						_magpie_dat[_qp].gsta_dat[i].dSo[n] = _entropy_2[i];
+					}
+					else if (n == 2)
+					{
+						_magpie_dat[_qp].gsta_dat[i].dHo[n] = _enthalpy_3[i];
+						_magpie_dat[_qp].gsta_dat[i].dSo[n] = _entropy_3[i];
+					}
+					else if (n == 3)
+					{
+						_magpie_dat[_qp].gsta_dat[i].dHo[n] = _enthalpy_4[i];
+						_magpie_dat[_qp].gsta_dat[i].dSo[n] = _entropy_4[i];
+					}
+					else if (n == 4)
+					{
+						_magpie_dat[_qp].gsta_dat[i].dHo[n] = _enthalpy_5[i];
+						_magpie_dat[_qp].gsta_dat[i].dSo[n] = _entropy_5[i];
+					}
+					else if (n == 5)
+					{
+						_magpie_dat[_qp].gsta_dat[i].dHo[n] = _enthalpy_6[i];
+						_magpie_dat[_qp].gsta_dat[i].dSo[n] = _entropy_6[i];
+					}
+					else
+					{
+						_magpie_dat[_qp].gsta_dat[i].dHo[n] = 0.0;
+						_magpie_dat[_qp].gsta_dat[i].dSo[n] = 0.0;
+					}
+				}
+			}
+			//This species will not adsorb
+			else
+			{
+				_magpie_dat[_qp].gsta_dat[i].qmax = 0.0;
+				_magpie_dat[_qp].mspd_dat[i].v = 0;
+				_magpie_dat[_qp].gsta_dat[i].m = 1;
+				_magpie_dat[_qp].gsta_dat[i].dHo.resize(_magpie_dat[_qp].gsta_dat[i].m);
+				_magpie_dat[_qp].gsta_dat[i].dSo.resize(_magpie_dat[_qp].gsta_dat[i].m);
+				for (int n=0; n<_magpie_dat[_qp].gsta_dat[i].m; n++)
+				{
+					_magpie_dat[_qp].gsta_dat[i].dHo[n] = 0.0;
+					_magpie_dat[_qp].gsta_dat[i].dSo[n] = 0.0;
+				}
+			}
+		}
+	//}// END if _t == 0.0
+	
+	_magpie_dat[_qp].sys_dat.total_eval = 0;
+	_magpie_dat[_qp].sys_dat.avg_norm = 0;
+	_magpie_dat[_qp].sys_dat.max_norm = 0;
+	_magpie_dat[_qp].sys_dat.Recover = false;
+	_magpie_dat[_qp].sys_dat.Carrier = false;
+	_magpie_dat[_qp].sys_dat.Ideal = false;
+	_magpie_dat[_qp].sys_dat.Output = false;
+	
+	_magpie_dat[_qp].sys_dat.PT = _total_pressure[_qp];
+	_magpie_dat[_qp].sys_dat.T = _temperature[_qp];
+	
+	//Loop over all gas species
+	for (int i=0; i<_magpie_dat[_qp].sys_dat.N; i++)
+	{
+		double pi = (*_gas_conc[i])[_qp] * 8.3144621 * _temperature[_qp];
+		if (pi < 0.0)
+			pi = 0.0;
+		
+		if (_magpie_dat[_qp].gsta_dat[i].qmax == 0.0)
+		{
+			_magpie_dat[_qp].sys_dat.Carrier = true;
+			_magpie_dat[_qp].gpast_dat[i].y = 0.0;
+		}
+		else
+		{
+			_magpie_dat[_qp].gpast_dat[i].y = pi / _total_pressure[_qp];
+		}
+		
+	}
+	
+	int success = 0;
+	success = MAGPIE( (void *)&_magpie_dat[_qp] );
+	if (success < 0 || success > 3) {mError(simulation_fail);}
+	else success = 0;
+	
 }
 

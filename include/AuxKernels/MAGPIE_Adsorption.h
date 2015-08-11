@@ -24,11 +24,8 @@ public:
 protected:
 	virtual Real computeValue();
 private:
-	VariableValue & _temperature;
-	VariableValue & _total_pressure;
-	std::vector<unsigned int> _index;
-	std::vector<VariableValue *> _gas_conc;
-	MAGPIE_DATA magpie_dat;
+	unsigned int _index;
+	const MaterialProperty< MAGPIE_DATA > & _magpie_dat;
 	
 };
 

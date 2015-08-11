@@ -126,7 +126,11 @@ FlowProperties::computeQpProperties()
 	  
 	  _retardation[_qp][i] = _porosity[_qp]; //add adsorption here
 	  
-	  _gas_viscosity[_qp] = _gas_viscosity[_qp] + (_mu_i / (1.0 + ( (113.65*_phi*_mu_i*_temperature[_qp])/(_yi*_molecular_wieght[i]) ) * _sum_yi_over_Dij_prime) );
+	  if (_yi != 0.0)
+		  _gas_viscosity[_qp] = _gas_viscosity[_qp] + (_mu_i / (1.0 + ( (113.65*_phi*_mu_i*_temperature[_qp])/(_yi*_molecular_wieght[i]) ) * _sum_yi_over_Dij_prime) );
+	  else
+		  _gas_viscosity[_qp] = _gas_viscosity[_qp] + 0.0;
+	  
 	  _gas_molecular_wieght[_qp] = _gas_molecular_wieght[_qp] + (_yi * _molecular_wieght[i]);
 	  _gas_heat_capacity[_qp] = _gas_heat_capacity[_qp] + (_yi * _comp_heat_capacity[i]);
 	  

@@ -2730,11 +2730,11 @@ int backtrackLineSearch( int (*feval) (const Matrix& x, Matrix &F, const void *d
 			//Form new lambda
 			if (backtrack_dat->constRho == false)
 			{
-				a = (1.0 / (lambda - lambda_old)) * ( (backtrack_dat->normFkp1/std::pow(lambda,2.0)) - (normFk/std::pow(lambda,2.0)) - (slope/lambda) - (norm_old/std::pow(lambda_old,2.0)) + (normFk/std::pow(lambda_old,2.0)) + (slope/lambda_old) );
+				a = (1.0 / (lambda - lambda_old)) * ( (backtrack_dat->normFkp1/pow(lambda,2.0)) - (normFk/pow(lambda,2.0)) - (slope/lambda) - (norm_old/pow(lambda_old,2.0)) + (normFk/pow(lambda_old,2.0)) + (slope/lambda_old) );
 			
-				b = (1.0 / (lambda - lambda_old)) * ( -((backtrack_dat->normFkp1*lambda_old)/std::pow(lambda,2.0)) + ((normFk*lambda_old)/std::pow(lambda,2.0)) + ((slope*lambda_old)/lambda) + ((norm_old*lambda)/std::pow(lambda_old,2.0)) - ((normFk*lambda)/std::pow(lambda_old,2.0)) - ((slope*lambda)/lambda_old) );
+				b = (1.0 / (lambda - lambda_old)) * ( -((backtrack_dat->normFkp1*lambda_old)/pow(lambda,2.0)) + ((normFk*lambda_old)/pow(lambda,2.0)) + ((slope*lambda_old)/lambda) + ((norm_old*lambda)/pow(lambda_old,2.0)) - ((normFk*lambda)/pow(lambda_old,2.0)) - ((slope*lambda)/lambda_old) );
 			
-				disc = std::pow(b,2.0) - (3.0*a*slope);
+				disc = pow(b,2.0) - (3.0*a*slope);
 				if (disc < 0.0)
 				disc = 0.0;
 			

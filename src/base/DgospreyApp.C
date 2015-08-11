@@ -44,6 +44,8 @@
 #include "DGColumnWallHeatFluxBC.h"
 #include "DGColumnWallHeatFluxLimitedBC.h"
 
+#include "MAGPIE_Adsorption.h"
+
 
 template<>
 InputParameters validParams<DgospreyApp>()
@@ -101,6 +103,7 @@ DgospreyApp::registerObjects(Factory & factory)
 	registerKernel(BedHeatAccumulation);
 
 	registerAux(TotalColumnPressure);
+	registerAux(MAGPIE_Adsorption);
 	registerInitialCondition(TotalPressureIC);
 	registerInitialCondition(ColumnTemperatureIC);
 	registerInitialCondition(ConcentrationIC);
