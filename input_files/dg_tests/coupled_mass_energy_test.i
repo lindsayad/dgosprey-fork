@@ -12,8 +12,8 @@
 
 	type = GeneratedMesh
 	dim = 2
-	nx = 3
- 	ny = 5
+	nx = 10
+ 	ny = 40
  	xmin = 0.0
 	xmax = 2.54
  	ymin = 0.0
@@ -24,29 +24,29 @@
 [Variables]
 
 	[./N2]
-		order = FIRST
-		family = L2_LAGRANGE
+		order = CONSTANT
+		family = MONOMIAL
 	[../]
 
 	[./O2]
-		order = FIRST
-		family = L2_LAGRANGE
+		order = CONSTANT
+		family = MONOMIAL
 	[../]
 
 	[./H2O]
-		order = FIRST
-		family = L2_LAGRANGE
+		order = CONSTANT
+		family = MONOMIAL
 	[../]
 
  	[./wall_temp]
- 		order = FIRST
- 		family = L2_LAGRANGE
+ 		order = CONSTANT
+ 		family = MONOMIAL
  		initial_condition = 298.15
  	[../]
 
 	[./column_temp]
- 		order = FIRST
- 		family = L2_LAGRANGE
+ 		order = CONSTANT
+ 		family = MONOMIAL
  		initial_condition = 298.15
 	[../]
 
@@ -55,20 +55,20 @@
 [AuxVariables]
 
 	[./total_pressure]
-		order = FIRST
-		family = L2_LAGRANGE
+		order = CONSTANT
+		family = MONOMIAL
 		initial_condition = 101.35
 	[../]
 
  	[./ambient_temp]
- 		order = FIRST
- 		family = L2_LAGRANGE
+ 		order = CONSTANT
+ 		family = MONOMIAL
  		initial_condition = 298.15
  	[../]
  
 	[./H2O_Adsorbed]
-		order = FIRST
-		family = L2_LAGRANGE
+		order = CONSTANT
+		family = MONOMIAL
 		initial_condition = 0.0
 	[../]
 
@@ -254,7 +254,6 @@
 
  	[./N2_Flux]
  		type = DGMassFluxLimitedBC
-		#type = DGMassFluxBC		#Note: This is much slower and does not improve accuracy much
  		variable = N2
  		boundary = 'top bottom'
  		input_temperature = 298.15
@@ -265,7 +264,6 @@
 
  	[./O2_Flux]
  		type = DGMassFluxLimitedBC
-		#type = DGMassFluxBC		#Note: This is much slower and does not improve accuracy much
  		variable = O2
  		boundary = 'top bottom'
  		input_temperature = 298.15
@@ -276,7 +274,6 @@
 
  	[./H2O_Flux]
  		type = DGMassFluxLimitedBC
-		#type = DGMassFluxBC		#Note: This is much slower and does not improve accuracy much
  		variable = H2O
  		boundary = 'top bottom'
  		input_temperature = 298.15
@@ -287,7 +284,6 @@
 
 	[./Heat_Gas_Flux]
  		type = DGHeatFluxLimitedBC
-		#type = DGHeatFluxBC		#Note: This is much slower and does not improve accuracy much
  		variable = column_temp
  		boundary = 'top bottom'
  		input_temperature = 298.15
@@ -295,7 +291,6 @@
 
 	[./Heat_Wall_Flux]
  		type = DGColumnWallHeatFluxLimitedBC
-		#type = DGColumnWallHeatFluxBC		#Note: This is much slower and does not improve accuracy much
  		variable = column_temp
  		boundary = 'right'
  		wall_temp = wall_temp
@@ -422,12 +417,8 @@
  	[../]
  
 	[./H2O_avg_sorption]
-		#type = ElementAverageValue
-		type = SideAverageValue
-		#type = ElementExtremeValue
-		#value_type = max
+		type = ElementAverageValue
 		variable = H2O_Adsorbed
-		boundary = 'top'
 		execute_on = timestep_end
 	[../]
 
@@ -436,8 +427,7 @@
 [Executioner]
 
  	type = Transient
- 	scheme = implicit-euler
-	#scheme = bdf2
+	scheme = bdf2
 
  	nl_rel_tol = 1e-6
  	picard_abs_tol = 1e-6
@@ -455,63 +445,11 @@
 	petsc_options_value = 'hypre boomeramg'
 
 	[./TimeStepper]
-		#type = ConstantDT
 		type = SolutionTimeAdaptiveDT
 		dt = 0.1
 	[../]
 
  [] #END Executioner
-
-[Adaptivity]
-
- 	[./Indicators]
- 		[./error_mass_N2]
- 			type = GradientJumpIndicator
- 			variable = N2
- 		[../]
- 		[./error_mass_O2]
- 			type = GradientJumpIndicator
- 			variable = O2
- 		[../]
- 		[./error_mass_H2O]
- 			type = GradientJumpIndicator
- 			variable = H2O
- 		[../]
- 		[./error_energy]
- 			type = GradientJumpIndicator
- 			variable = column_temp
- 		[../]
-		[./error_ads_H2O]
-			type = GradientJumpIndicator
-			variable = H2O_Adsorbed
-		[../]
- 	[../]
-
-
- 	[./Markers]
-		[./ef_mass_N2]
- 			type = ErrorFractionMarker
- 			indicator = error_mass_N2
- 		[../]
- 		[./ef_mass_O2]
- 			type = ErrorFractionMarker
- 			indicator = error_mass_O2
- 		[../]
- 		[./ef_mass_H2O]
- 			type = ErrorFractionMarker
- 			indicator = error_mass_H2O
- 		[../]
- 		[./ef_energy]
- 			type = ErrorFractionMarker
- 			indicator = error_energy
- 		[../]
-		[./ef_ads_H2O]
-			type = ErrorFractionMarker
-			indicator = error_ads_H2O
-		[../]
- 	[../]
-
- [] #END Adaptivity
 
 [Outputs]
 

@@ -62,8 +62,7 @@ _entropy_4(getParam<std::vector<Real> >("entropy_site_4")),
 _entropy_5(getParam<std::vector<Real> >("entropy_site_5")),
 _entropy_6(getParam<std::vector<Real> >("entropy_site_6")),
 
-_magpie_dat(declareProperty< MAGPIE_DATA >("magpie_data")),
-_temp_q(declareProperty< Real >("temp_q"))
+_magpie_dat(declareProperty< MAGPIE_DATA >("magpie_data"))
 
 {
 	unsigned int n = coupledComponents("coupled_gases");
@@ -210,20 +209,6 @@ AdsorbateProperties::computeQpProperties()
 	success = MAGPIE( (void *)&_magpie_dat[_qp] );
 	if (success < 0 || success > 3) {mError(simulation_fail);}
 	else success = 0;
-	
-	
-	double pi = (*_gas_conc[2])[_qp] * 8.3144621 * _temperature[_qp];
-	if (pi < 0.0)
-		pi = 0.0;
-	
-	//This does not work for some reason
-	if ( (*_gas_conc[2])[_qp] > 0.0)
-		_temp_q[_qp] = (*_gas_conc[2])[_qp];
-	else
-	{
-		_temp_q[_qp] = 0;
-		//std::cout << "Found a zero...\n";
-	}
 	
 }
 

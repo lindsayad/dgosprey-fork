@@ -26,7 +26,6 @@ protected:
 private:
 	unsigned int _index;
 	const MaterialProperty< MAGPIE_DATA > & _magpie_dat;
-	const MaterialProperty< Real > & _temp_q;
 	
 };
 
