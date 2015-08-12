@@ -57,7 +57,6 @@ InputParameters validParams<DgospreyApp>()
 DgospreyApp::DgospreyApp(InputParameters parameters) :
     MooseApp(parameters)
 {
-  srand(processor_id());
 
   Moose::registerObjects(_factory);
   ModulesApp::registerObjects(_factory);
@@ -76,18 +75,12 @@ extern "C" void DgospreyApp__registerApps() { DgospreyApp::registerApps(); }
 void
 DgospreyApp::registerApps()
 {
-#undef registerApp
-#define registerApp(name) AppFactory::instance().reg<name>(#name)
 	registerApp(DgospreyApp);
-#undef registerApp
-#define registerApp(name) AppFactory::instance().regLegacy<name>(#name)
 }
 
 void
 DgospreyApp::registerObjects(Factory & factory)
 {
-#undef registerObject
-#define registerObject(name) factory.reg<name>(stringifyName(name))
 	registerKernel(LinearDrivingForce);
 	registerMaterial(BedProperties);
 	registerMaterial(AdsorbentProperties);
@@ -108,21 +101,21 @@ DgospreyApp::registerObjects(Factory & factory)
 	registerInitialCondition(ColumnTemperatureIC);
 	registerInitialCondition(ConcentrationIC);
 	registerInitialCondition(DGConcentrationIC);
-	
+
 	registerDGKernel(DGAdvection);
 	registerBoundaryCondition(DGFluxBC);
 	registerKernel(GAdvection);
 	registerDGKernel(DGAnisotropicDiffusion);
 	registerKernel(GAnisotropicDiffusion);
 	registerBoundaryCondition(DGFluxLimitedBC);
-	
+
 	registerDGKernel(DGColumnMassAdvection);
 	registerDGKernel(DGColumnMassDispersion);
 	registerBoundaryCondition(DGMassFluxBC);
 	registerBoundaryCondition(DGMassFluxLimitedBC);
 	registerKernel(GColumnMassAdvection);
 	registerKernel(GColumnMassDispersion);
-	
+
 	registerDGKernel(DGColumnHeatAdvection);
 	registerKernel(GColumnHeatAdvection);
 	registerDGKernel(DGColumnHeatDispersion);
@@ -131,18 +124,10 @@ DgospreyApp::registerObjects(Factory & factory)
 	registerBoundaryCondition(DGHeatFluxLimitedBC);
 	registerBoundaryCondition(DGColumnWallHeatFluxBC);
 	registerBoundaryCondition(DGColumnWallHeatFluxLimitedBC);
-#undef registerObject
-#define registerObject(name) factory.regLegacy<name>(stringifyName(name))
 }
 
 void
 DgospreyApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
-#undef registerAction
-#define registerAction(tplt, action) action_factory.reg<tplt>(stringifyName(tplt), action)
-	
 	//Register Actions Here
-	
-#undef registerAction
-#define registerAction(tplt, action) action_factory.regLegacy<tplt>(stringifyName(tplt), action)
 }
