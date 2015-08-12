@@ -139,9 +139,11 @@
 	[../]
 
  	[./accumH2O]
- 		type = RetardedTimeDerivative
+ 		#type = RetardedTimeDerivative
+		type = CoefTimeDerivative
  		variable = H2O
- 		index = 2
+		Coefficient = 121448.3707 #This is temporary as a surrogate for the adsorption strength = dq/dc * eb
+ 		#index = 2
  	[../]
 
 	[./diffH2O]
