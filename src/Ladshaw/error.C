@@ -116,6 +116,14 @@ void error(int flag)
 		std::cout << "\nError!\n\nKey does not exist in the hash table!" << std::endl;
 	else if (flag == 47)
 		std::cout << "\nError!\n\nAnchor Alias Pair does not exist!" << std::endl;
+	else if (flag == 48)
+		std::cout << "\nError!\n\nInitialization of object failed!" << std::endl;
+	else if (flag == 49)
+		std::cout << "\nError!\n\nUnexpected token type or improper input format!" << std::endl;
+	else if (flag == 50)
+		std::cout << "\nError!\n\nRead error has occured! Check input file and file location for mistakes." << std::endl;
+	else if (flag == 51)
+		std::cout << "\nError!\n\nInvalid input received!" << std::endl;
 	else
 		std::cout << "\nUndefined Error!!!" << std::endl;
 }

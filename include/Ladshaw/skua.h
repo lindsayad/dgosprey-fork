@@ -8,7 +8,7 @@
 #include "finch.h"				//FINCH handles the physics solver and discretization of the problem
 #include "magpie.h"				//MAGPIE handles the adsorption equilibria equations
 #include "egret.h"				//EGRET handles the parameter estimation for gas phase properties
-	
+
 #ifndef SKUA_HPP_
 #define SKUA_HPP_
 
@@ -74,7 +74,7 @@ typedef struct
 	MAGPIE_DATA magpie_dat;					//Data structure for adsorption equilibria
 	MIXED_GAS *gas_dat;						//Pointer to the MIXED_GAS data structure (may or may not be used)
 	std::vector<FINCH_DATA> finch_dat;		//Data structure for adsorption kinetics
-	std::vector<SKUA_PARAM> param_dat;		//Data structure for SKUA specific parameters 
+	std::vector<SKUA_PARAM> param_dat;		//Data structure for SKUA specific parameters
 }SKUA_DATA;
 
 void print2file_species_header(FILE *Output, SKUA_DATA *skua_dat, int i);
@@ -132,19 +132,5 @@ int SKUA_postprocesses(SKUA_DATA *skua_dat);
 int SKUA_reset(SKUA_DATA *skua_dat);
 
 int SKUA(SKUA_DATA *skua_dat);
-
-//-------- Running Specific Tests ------------
-int SKUA_CYCLE_TEST01(SKUA_DATA *skua_dat);
-
-int SKUA_CYCLE_TEST02(SKUA_DATA *skua_dat);
-
-int SKUA_LOW_TEST03(SKUA_DATA *skua_dat);
-
-int SKUA_MID_TEST04(SKUA_DATA *skua_dat);
-//--------------------------------------------
-
-int SKUA_SCENARIOS(const char *scene, const char *sorbent, const char *comp, const char *sorbate);
-
-int SKUA_TESTS();
 
 #endif

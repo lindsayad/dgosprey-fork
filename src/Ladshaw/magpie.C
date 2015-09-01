@@ -145,7 +145,7 @@ double qo(double po, const void *data, int i)
 {
 	double qo = 0, top = 0, bot = 1;
 	MAGPIE_DATA *dat = (MAGPIE_DATA *) data;
-
+	
 	for (int n=0; n<dat->gsta_dat[i].m; n++)
 	{
 		double tempKo = exp( lnKo(dat->gsta_dat[i].dHo[n], dat->gsta_dat[i].dSo[n], dat->sys_dat.T) );
@@ -173,7 +173,7 @@ double dq_dp(double p, const void *data, int i)
 		sum4 = sum4 + ( (n+1) * tempKo * pow( (p / Po) , (n) ) );
 	}
 	gradient = (dat->gsta_dat[i].qmax / dat->gsta_dat[i].m) *
-					( (sum1*sum2) - (sum3*sum4) ) / pow(sum2,2.0) / Po;
+	( (sum1*sum2) - (sum3*sum4) ) / pow(sum2,2.0) / Po;
 	
 	return gradient;
 }
@@ -203,14 +203,14 @@ double PI(double po, const void *data, int i)
 {
 	double PI = 0, bot = 1;
 	MAGPIE_DATA *dat = (MAGPIE_DATA *) data;
-
+	
 	for(int n=0; n<dat->gsta_dat[i].m; n++)
 	{
 		double tempKo = exp( lnKo(dat->gsta_dat[i].dHo[n], dat->gsta_dat[i].dSo[n], dat->sys_dat.T) );
 		bot = bot + (tempKo * pow( (po / Po) , (n+1) ));
 	}
 	PI = (dat->gsta_dat[i].qmax / dat->gsta_dat[i].m) * log(bot);
-
+	
 	return PI;
 }
 
@@ -219,7 +219,7 @@ double eMax(const void *data, int i)
 {
 	double mu = 0;
 	MAGPIE_DATA *dat = (MAGPIE_DATA *) data;
-
+	
 	if (dat->gsta_dat[i].m == 1)
 	{
 		mu = 1e-6;
@@ -227,8 +227,8 @@ double eMax(const void *data, int i)
 	else
 	{
 		mu = (2 * (-dat->gsta_dat[i].dHo[(dat->gsta_dat[i].m-1)] +
-				dat->gsta_dat[i].dHo[(dat->gsta_dat[i].m-2)] + dat->gsta_dat[i].dHo[0]) ) /
-						(Z * dat->mspd_dat[i].s);
+				   dat->gsta_dat[i].dHo[(dat->gsta_dat[i].m-2)] + dat->gsta_dat[i].dHo[0]) ) /
+		(Z * dat->mspd_dat[i].s);
 	}
 	return (2.0*mu);
 }
@@ -238,9 +238,9 @@ double Qst(double po, const void *data, int i)
 {
 	double Qst = 0, top = 0, bot = 0;
 	MAGPIE_DATA *dat = (MAGPIE_DATA *) data;
-
+	
 	double phi = qo(po, dat, i) / dat->gsta_dat[i].qmax;
-
+	
 	for(int n=0; n<dat->gsta_dat[i].m; n++)
 	{
 		double tempKo = exp( lnKo(dat->gsta_dat[i].dHo[n], dat->gsta_dat[i].dSo[n], dat->sys_dat.T) );
@@ -251,7 +251,7 @@ double Qst(double po, const void *data, int i)
 		Qst = -1*dat->gsta_dat[i].dHo[0];
 	else
 		Qst = top / bot;
-
+	
 	return Qst;
 }
 
@@ -276,7 +276,7 @@ double lnact_mSPD(const double *par, const void *data, int i, volatile double PI
 	double theta[N];
 	double T[N][N], e[N][N];
 	double alpha[N][N];
-
+	
 	//Forward: GPAST evaluations; Reverse: All Evaluations
 	if (par != NULL)
 	{
@@ -293,7 +293,7 @@ double lnact_mSPD(const double *par, const void *data, int i, volatile double PI
 				{
 					double po[1];
 					dat->sys_dat.J = j;
-
+					
 					if (dat->sys_dat.Recover == false)
 					{
 						po[0] = (dat->sys_dat.PT * dat->gpast_dat[j].y) / (fabs(par[(j+1)]) );
@@ -309,10 +309,10 @@ double lnact_mSPD(const double *par, const void *data, int i, volatile double PI
 					lmmin(1, po, 1, dat, eval_po_PI, &control, &status, lm_printout_std);
 					dat->sys_dat.total_eval = dat->sys_dat.total_eval + status.nfev;
 					if (status.info > 5)
-						{std::cout << "\nWarning! Non-convergent intermediate steps!" << std::endl; return 0.0;}
-
+					{std::cout << "\nWarning! Non-convergent intermediate steps!" << std::endl; return 0.0;}
+					
 					e[j][j] = (2 * (Qst(fabs(po[0]), dat, j) + dat->gsta_dat[j].dHo[0]) ) / (Z * dat->mspd_dat[j].s);
-
+					
 					T[j][j] = 1.0;
 				}
 			}
@@ -331,7 +331,7 @@ double lnact_mSPD(const double *par, const void *data, int i, volatile double PI
 				{
 					//Calculate the shift factor for geometric mean
 					double shift = sqrt( fabs(dat->mspd_dat[l].eMax * dat->mspd_dat[j].eMax) );
-
+					
 					if (dat->mspd_dat[j].eta[l] == 0 && dat->mspd_dat[l].eta[j] == 0)
 					{
 						alpha[l][j] = 0;
@@ -341,21 +341,21 @@ double lnact_mSPD(const double *par, const void *data, int i, volatile double PI
 						if (dat->sys_dat.Recover == false)
 						{
 							alpha[l][j] = ( dat->mspd_dat[j].eta[l] - dat->mspd_dat[l].eta[j]) *
-									( fabs(par[(l+1)]) /(fabs(par[(l+1)]) + fabs(par[(j+1)])) ) +
-										dat->mspd_dat[l].eta[j];
+							( fabs(par[(l+1)]) /(fabs(par[(l+1)]) + fabs(par[(j+1)])) ) +
+							dat->mspd_dat[l].eta[j];
 						}
 						else
 						{
 							alpha[l][j] = ( dat->mspd_dat[j].eta[l] - dat->mspd_dat[l].eta[j]) *
-									( dat->gpast_dat[l].x /(dat->gpast_dat[l].x + dat->gpast_dat[j].x) ) +
-										dat->mspd_dat[l].eta[j];
+							( dat->gpast_dat[l].x /(dat->gpast_dat[l].x + dat->gpast_dat[j].x) ) +
+							dat->mspd_dat[l].eta[j];
 						}
 					}
-
+					
 					e[l][j] =  sqrt( ( fabs(dat->mspd_dat[l].eMax) + e[l][l] ) * ( fabs(dat->mspd_dat[j].eMax) + e[j][j] ) ) - (shift * alpha[l][j] );
 					
 					e[j][l] = e[l][j];
-
+					
 					T[l][j] = exp(-(Z * (e[l][j] - e[j][j])) / (2 * R * dat->sys_dat.T));
 					T[j][l] = exp(-(Z * (e[j][l] - e[l][l])) / (2 * R * dat->sys_dat.T));
 				}
@@ -386,7 +386,7 @@ double lnact_mSPD(const double *par, const void *data, int i, volatile double PI
 						lmmin(1, po, 1, dat, eval_po_PI, &control, &status, lm_printout_std);
 						dat->sys_dat.total_eval = dat->sys_dat.total_eval + status.nfev;
 						if (status.info > 5)
-							{std::cout << "\nWarning! Gradient Estimation Failed!" << std::endl; return 0.0;}
+						{std::cout << "\nWarning! Gradient Estimation Failed!" << std::endl; return 0.0;}
 						e[j][j] = (2 * (Qst(fabs(po[0]), dat, j) + dat->gsta_dat[j].dHo[0]) ) / (Z * dat->mspd_dat[j].s);
 					}
 					else
@@ -408,7 +408,7 @@ double lnact_mSPD(const double *par, const void *data, int i, volatile double PI
 				{
 					//Calculate the shift factor for geometric mean
 					double shift = sqrt( fabs(dat->mspd_dat[l].eMax * dat->mspd_dat[j].eMax) );
-
+					
 					if (dat->mspd_dat[j].eta[l] == 0 && dat->mspd_dat[l].eta[j] == 0)
 					{
 						alpha[l][j] = 0;
@@ -416,14 +416,14 @@ double lnact_mSPD(const double *par, const void *data, int i, volatile double PI
 					else
 					{
 						alpha[l][j] = ( dat->mspd_dat[j].eta[l] - dat->mspd_dat[l].eta[j]) *
-									( dat->gpast_dat[l].x /(dat->gpast_dat[l].x  + dat->gpast_dat[j].x) ) +
-										dat->mspd_dat[l].eta[j];
+						( dat->gpast_dat[l].x /(dat->gpast_dat[l].x  + dat->gpast_dat[j].x) ) +
+						dat->mspd_dat[l].eta[j];
 					}
-
+					
 					e[l][j] =  sqrt( ( fabs(dat->mspd_dat[l].eMax) + e[l][l] ) * ( fabs(dat->mspd_dat[j].eMax) + e[j][j] ) ) - (shift * alpha[l][j] );
 					
 					e[j][l] = e[l][j];
-
+					
 					T[l][j] = exp(-(Z * (e[l][j] - e[j][j])) / (2 * R * dat->sys_dat.T));
 					T[j][l] = exp(-(Z * (e[j][l] - e[l][l])) / (2 * R * dat->sys_dat.T));
 				}
@@ -451,7 +451,7 @@ double grad_mSPD(const double *par, const void *data, int i)
 	MAGPIE_DATA *dat = (MAGPIE_DATA *) data;
 	volatile double h, xph, xmh, dx, lnact_ph, lnact_mh;
 	double grad=0;
-
+	
 	if (dat->sys_dat.Recover == false)
 	{
 		h = sqrt(DBL_EPSILON) * dat->sys_dat.PI;
@@ -468,7 +468,7 @@ double grad_mSPD(const double *par, const void *data, int i)
 		lnact_ph = lnact_mSPD(par, dat, i, xph);
 		lnact_mh = lnact_mSPD(par, dat, i, xmh);
 	}
-
+	
 	dx = xph - xmh;
 	grad = (lnact_ph - lnact_mh) / dx;
 	return grad;
@@ -532,7 +532,7 @@ void initialGuess_mSPD(double *par, const void *data)
 			}
 		}
 	}
-
+	
 	for(int i=0; i<dat->sys_dat.N; i++)
 	{
 		if (dat->sys_dat.Recover == false)
@@ -540,7 +540,7 @@ void initialGuess_mSPD(double *par, const void *data)
 		else
 		{
 			temp = (dat->sys_dat.PT * par[(i+1)]) / (dat->gpast_dat[i].x);
-
+			
 		}
 		sum = sum + PI( temp, dat, i );
 	}
@@ -595,7 +595,7 @@ void eval_eta(const double *par, int m_dat, const void *data, double *fvec, int 
 	int i = dat->sys_dat.I;
 	int j = dat->sys_dat.J;
 	double shift = sqrt( fabs(dat->mspd_dat[i].eMax * dat->mspd_dat[j].eMax) );
-
+	
 	//Infinite Dilution of i will be indexed 0
 	ejj[0] = ( 2 * (Qst(dat->gpast_dat[j].po[j], dat, j) - (-1*dat->gsta_dat[j].dHo[0]) ) ) / ( Z * dat->mspd_dat[j].s);
 	eii[0] = ( 2 * (Qst(dat->gpast_dat[i].po[j], dat, i) - (-1*dat->gsta_dat[i].dHo[0]) ) ) / ( Z * dat->mspd_dat[i].s);
@@ -604,7 +604,7 @@ void eval_eta(const double *par, int m_dat, const void *data, double *fvec, int 
 	Tij[0] = exp( - (Z * (eij[0]-ejj[0])) / (2*R*dat->sys_dat.T) );
 	Tji[0] = exp( - (Z * (eij[0]-eii[0])) / (2*R*dat->sys_dat.T) );
 	res[0] = dat->mspd_dat[i].s * (1 - log(Tji[0]) - Tij[0]);
-
+	
 	//Infinite Dilution of j will be indexed 1
 	ejj[1] = ( 2 * (Qst(dat->gpast_dat[j].po[i], dat, j) - (-1*dat->gsta_dat[j].dHo[0]) ) ) / ( Z * dat->mspd_dat[j].s);
 	eii[1] = ( 2 * (Qst(dat->gpast_dat[i].po[i], dat, i) - (-1*dat->gsta_dat[i].dHo[0]) ) ) / ( Z * dat->mspd_dat[i].s);
@@ -613,7 +613,7 @@ void eval_eta(const double *par, int m_dat, const void *data, double *fvec, int 
 	Tij[1] = exp( - (Z * (eij[1]-ejj[1])) / (2*R*dat->sys_dat.T) );
 	Tji[1] = exp( - (Z * (eij[1]-eii[1])) / (2*R*dat->sys_dat.T) );
 	res[1] = dat->mspd_dat[j].s * (1 - log(Tij[1]) - Tji[1]);
-
+	
 	//Residual Evaluations for each infinite dilution
 	fvec[0] = log(dat->gpast_dat[i].gama_inf[j]) - res[0];
 	fvec[1] = log(dat->gpast_dat[j].gama_inf[i]) - res[1];
@@ -632,7 +632,7 @@ void eval_GPAST(const double *par, int m_dat, const void *data, double *fvec, in
 	 * First attempt is to replicate IAST results using activity evaluations of unity
 	 */
 	MAGPIE_DATA *dat = (MAGPIE_DATA *) data;
-
+	
 	if (dat->sys_dat.Recover == false)
 	{
 		double sum1[dat->sys_dat.N], sum2 = 0;
@@ -651,7 +651,7 @@ void eval_GPAST(const double *par, int m_dat, const void *data, double *fvec, in
 			{
 				double tempKo = exp( lnKo(dat->gsta_dat[i].dHo[n], dat->gsta_dat[i].dSo[n], dat->sys_dat.T) );
 				sum1[i] = sum1[i] + (tempKo * pow( ( ( dat->sys_dat.PT * dat->gpast_dat[i].y ) /
-						((fabs(par[(i+1)])) * act[i] * Po) ), (n+1) ) );
+													((fabs(par[(i+1)])) * act[i] * Po) ), (n+1) ) );
 			}
 			fvec[(i+1)] =  fabs(par[0]) - ( (dat->gsta_dat[i].qmax * log(sum1[i])) / (dat->gsta_dat[i].m) );
 		}
@@ -691,7 +691,7 @@ int MAGPIE(const void *data)
 	status.nfev = 0;
 	lm_control_struct control = lm_control_double;
 	control.printflags = 0;
-
+	
 	//STEP 0: Check and correct for components whose mole fractions are zero at this sample point
 	std::vector<double> qmax0;
 	std::vector<int> m0;
@@ -701,29 +701,29 @@ int MAGPIE(const void *data)
 	std::vector<double> xy0;
 	std::vector<double> present0;
 	int N0 = dat->sys_dat.N;
-
+	
 	//Temp objects to hold solutions
 	std::vector<double> xy1;
 	std::vector<double> q1;
 	std::vector<double> gama1;
-
+	
 	//Copy all static info and locate index of non-existent species
 	qmax0.resize(N0);
 	m0.resize(N0);
 	v0.resize(N0);
 	present0.resize(N0);
 	xy0.resize(N0);
-
+	
 	//Copy the necessary information into Temp working space
 	for (int i=0; i<N0; i++)
 	{
 		dHo0.push_back(std::vector<double> ());
 		dSo0.push_back(std::vector<double> ());
-
+		
 		qmax0[i] = dat->gsta_dat[i].qmax;
 		m0[i] = dat->gsta_dat[i].m;
 		v0[i] = dat->mspd_dat[i].v;
-
+		
 		if (dat->sys_dat.Recover == false)
 		{
 			xy0[i] = dat->gpast_dat[i].y;
@@ -736,7 +736,7 @@ int MAGPIE(const void *data)
 			if (dat->sys_dat.qT == 0.0)
 				xy0[i] = 0.0;
 		}
-
+		
 		if (xy0[i] == 0.0)
 		{
 			dat->gpast_dat[i].present = false;
@@ -748,14 +748,14 @@ int MAGPIE(const void *data)
 			dat->gpast_dat[i].present = true;
 			present0[i] = true;
 		}
-
+		
 		for (int n=0; n<m0[i]; n++)
 		{
 			dHo0[i].push_back(dat->gsta_dat[i].dHo[n]);
 			dSo0[i].push_back(dat->gsta_dat[i].dSo[n]);
 		}
 	}//END Copy
-
+	
 	//STEP 0.5: Reallocation of working space
 	int k = 0;
 	if (N0 > dat->sys_dat.N)
@@ -763,14 +763,14 @@ int MAGPIE(const void *data)
 		//Reallocation
 		if (dat->sys_dat.Output == true)
 			std::cout << "\nNot all components present. Reallocating working space.\n" << std::endl;
-
+		
 		dat->gsta_dat.resize(dat->sys_dat.N);
 		dat->gpast_dat.resize(dat->sys_dat.N);
 		dat->mspd_dat.resize(dat->sys_dat.N);
 		xy1.resize(dat->sys_dat.N);
 		q1.resize(dat->sys_dat.N);
 		gama1.resize(dat->sys_dat.N);
-
+		
 		for (int i=0; i<N0; i++)
 		{
 			if (dat->gpast_dat[i].present == true)
@@ -781,7 +781,7 @@ int MAGPIE(const void *data)
 				dat->gpast_dat[k].po.resize( dat->sys_dat.N );
 				dat->gsta_dat[k].dHo.resize( m0[i]);
 				dat->gsta_dat[k].dSo.resize( m0[i]);
-
+				
 				//Initializations
 				dat->gsta_dat[k].qmax = qmax0[i];
 				dat->gsta_dat[k].m = m0[i];
@@ -807,11 +807,11 @@ int MAGPIE(const void *data)
 	{
 		//Do nothing
 	}//END Reallocation
-
+	
 	//Check the number of components
 	if (dat->sys_dat.N > 1)
 	{
-
+		
 		//Step 1: Calculate Henry's Coeffs., Ref.Capacities, Spreading Pressures, Shape Factors, and Maximum Energies
 		for (int i=0; i<dat->sys_dat.N; i++)
 		{
@@ -820,7 +820,7 @@ int MAGPIE(const void *data)
 			dat->gpast_dat[i].He = He(dat->gsta_dat[i].qmax,tempKo,dat->gsta_dat[i].m);
 			dat->mspd_dat[i].s = shapeFactor( dat->mspd_dat[i].v );
 			dat->mspd_dat[i].eMax = eMax(dat,i);
-
+			
 			//Forward
 			if (dat->sys_dat.Recover == false)
 			{
@@ -834,7 +834,7 @@ int MAGPIE(const void *data)
 				dat->gpast_dat[i].PIo = PI((dat->sys_dat.PT),dat,i);
 			}
 		}
-
+		
 		//Step 2: Evaluate the Reference state pressures and infinite dilution activities
 		for (int i=0; i<dat->sys_dat.N; i++)
 		{
@@ -872,7 +872,7 @@ int MAGPIE(const void *data)
 				}
 			}
 		}
-
+		
 		//Step 2.5: Check for ideality
 		for (int i=0; i<dat->sys_dat.N; i++)
 		{
@@ -886,13 +886,13 @@ int MAGPIE(const void *data)
 				dat->sys_dat.Ideal = true;
 			}
 			else
-				{mError(indexing_error); return -1;}
+			{mError(indexing_error); return -1;}
 		}
-
+		
 		if (dat->sys_dat.Ideal == true)
 			if (dat->sys_dat.Output == true)
 				std::cout << "\nBased on single component isotherms, system is expected to behave ideally..." << std::endl;
-
+		
 		//Step 3: Evaluate the eta's using the infinite dilution activities
 		for (int i=0; i<dat->sys_dat.N; i++)
 		{
@@ -906,7 +906,7 @@ int MAGPIE(const void *data)
 				{
 					//Must be solved for using iterative method
 					dat->sys_dat.I = i; dat->sys_dat.J = j;
-
+					
 					//Check to see if solutions will behave ideally
 					if (dat->gsta_dat[i].m == 1 && dat->gsta_dat[j].m == 1)
 					{
@@ -942,7 +942,7 @@ int MAGPIE(const void *data)
 				}
 			}
 		}
-
+		
 		//Step 4: Solve the resulting GPAST system of equations using all the information now gathered
 		/*
 		 * Parameter Convention: Forward
@@ -956,22 +956,22 @@ int MAGPIE(const void *data)
 		 *
 		 */
 		int n_par, m_dat;
-
+		
 		if (dat->sys_dat.Carrier == false)
 			n_par = 1+dat->sys_dat.N;
 		else
 			n_par = 2+dat->sys_dat.N;
-
+		
 		if (dat->sys_dat.Recover == false)
 			m_dat = 1+dat->sys_dat.N;
 		else
 			m_dat = 2+dat->sys_dat.N;
-
+		
 		if (dat->sys_dat.Output == true)
 			std::cout << "\nAttemping the GPAST solution of the system..." << std::endl;
 		double par_gpast[n_par];
 		initialGuess_mSPD(par_gpast,dat);
-
+		
 		lmmin(n_par,par_gpast,m_dat,dat,eval_GPAST,&control,&status,lm_printout_std);
 		dat->sys_dat.total_eval = dat->sys_dat.total_eval + status.nfev;
 		dat->sys_dat.avg_norm = dat->sys_dat.avg_norm + status.fnorm;
@@ -984,7 +984,7 @@ int MAGPIE(const void *data)
 		}
 		if (status.info > 5) {mError(simulation_fail); return status.info;}
 		success = status.info;
-
+		
 		dat->sys_dat.PI = fabs(par_gpast[0]);
 		xy1.resize(dat->sys_dat.N);
 		gama1.resize(dat->sys_dat.N);
@@ -1019,7 +1019,7 @@ int MAGPIE(const void *data)
 			dat->gpast_dat[i].q = dat->sys_dat.qT * dat->gpast_dat[i].x;
 			q1[i] = dat->gpast_dat[i].q;
 		}
-
+		
 		//Restore original data
 		k = 0;
 		if (N0 >= dat->sys_dat.N)
@@ -1029,17 +1029,17 @@ int MAGPIE(const void *data)
 			dat->gsta_dat.resize(N0);
 			dat->gpast_dat.resize(N0);
 			dat->mspd_dat.resize(N0);
-
+			
 			for (int i=0; i<N0; i++)
 			{
 				//Allocations
 				dat->mspd_dat[i].eta.resize( N0 );
 				dat->gpast_dat[i].gama_inf.resize( N0 );
 				dat->gpast_dat[i].po.resize( N0 );
-
+				
 				dat->gsta_dat[i].dHo.resize( m0[i]);
 				dat->gsta_dat[i].dSo.resize( m0[i]);
-
+				
 				//Restore original information
 				dat->gsta_dat[i].qmax = qmax0[i];
 				dat->gsta_dat[i].m = m0[i];
@@ -1049,7 +1049,7 @@ int MAGPIE(const void *data)
 					dat->gsta_dat[i].dHo[n] = dHo0[i][n];
 					dat->gsta_dat[i].dSo[n] = dSo0[i][n];
 				}
-
+				
 				//Restore Answers
 				if (present0[i] == false)
 				{
@@ -1079,7 +1079,7 @@ int MAGPIE(const void *data)
 						dat->gpast_dat[i].q = q1[k];
 						dat->mspd_dat[i].gama = gama1[k];
 						dat->gpast_dat[i].poi = (dat->sys_dat.PT * dat->gpast_dat[i].y) /
-												(dat->gpast_dat[i].x * dat->mspd_dat[i].gama);
+						(dat->gpast_dat[i].x * dat->mspd_dat[i].gama);
 					}
 					else
 					{
@@ -1088,7 +1088,7 @@ int MAGPIE(const void *data)
 						dat->gpast_dat[i].q = q1[k];
 						dat->mspd_dat[i].gama = gama1[k];
 						dat->gpast_dat[i].poi = (dat->sys_dat.PT * dat->gpast_dat[i].y) /
-												(dat->gpast_dat[i].x * dat->mspd_dat[i].gama);
+						(dat->gpast_dat[i].x * dat->mspd_dat[i].gama);
 					}
 					k++;
 				}
@@ -1098,9 +1098,9 @@ int MAGPIE(const void *data)
 		{
 			mError(simulation_fail); success = -1;
 		}//END Restoration
-
+		
 	}//End Evaluation for multiple components
-
+	
 	//Perform evaluation for single component system
 	else if (dat->sys_dat.N == 1)
 	{
@@ -1121,12 +1121,12 @@ int MAGPIE(const void *data)
 			dat->sys_dat.PI = PI(dat->gpast_dat[0].poi,dat,0);
 			dat->sys_dat.total_eval++;
 			success = 1;
-
+			
 			//Store Temp Ans
 			xy1[0] = dat->gpast_dat[0].x;
 			q1[0] = dat->gpast_dat[0].q;
 			gama1[0] = dat->mspd_dat[0].gama;
-
+			
 		}
 		else
 		{
@@ -1136,7 +1136,7 @@ int MAGPIE(const void *data)
 			dat->gpast_dat[0].q = dat->sys_dat.qT;
 			dat->gpast_dat[0].x = 1.0;
 			dat->mspd_dat[0].gama = 1.0;
-
+			
 			double par_po0[1];
 			par_po0[0] = dat->sys_dat.PT;
 			lmmin(1,par_po0,1,dat,eval_po_qo,&control,&status,lm_printout_std);
@@ -1162,7 +1162,7 @@ int MAGPIE(const void *data)
 			if (status.info > 5) {mError(simulation_fail); return status.info;}
 			success = status.info;
 		}
-
+		
 		//Restore original data
 		k = 0;
 		if (N0 >= dat->sys_dat.N)
@@ -1172,17 +1172,17 @@ int MAGPIE(const void *data)
 			dat->gsta_dat.resize(N0);
 			dat->gpast_dat.resize(N0);
 			dat->mspd_dat.resize(N0);
-
+			
 			for (int i=0; i<N0; i++)
 			{
 				//Allocations
 				dat->mspd_dat[i].eta.resize( N0 );
 				dat->gpast_dat[i].gama_inf.resize( N0 );
 				dat->gpast_dat[i].po.resize( N0 );
-
+				
 				dat->gsta_dat[i].dHo.resize( m0[i]);
 				dat->gsta_dat[i].dSo.resize( m0[i]);
-
+				
 				//Restore original information
 				dat->gsta_dat[i].qmax = qmax0[i];
 				dat->gsta_dat[i].m = m0[i];
@@ -1192,7 +1192,7 @@ int MAGPIE(const void *data)
 					dat->gsta_dat[i].dHo[n] = dHo0[i][n];
 					dat->gsta_dat[i].dSo[n] = dSo0[i][n];
 				}
-
+				
 				//Restore Answers
 				if (present0[i] == false)
 				{
@@ -1222,7 +1222,7 @@ int MAGPIE(const void *data)
 						dat->gpast_dat[i].q = q1[k];
 						dat->mspd_dat[i].gama = gama1[k];
 						dat->gpast_dat[i].poi = (dat->sys_dat.PT * dat->gpast_dat[i].y) /
-												(dat->gpast_dat[i].x * dat->mspd_dat[i].gama);
+						(dat->gpast_dat[i].x * dat->mspd_dat[i].gama);
 					}
 					else
 					{
@@ -1231,7 +1231,7 @@ int MAGPIE(const void *data)
 						dat->gpast_dat[i].q = q1[k];
 						dat->mspd_dat[i].gama = gama1[k];
 						dat->gpast_dat[i].poi = (dat->sys_dat.PT * dat->gpast_dat[i].y) /
-												(dat->gpast_dat[i].x * dat->mspd_dat[i].gama);
+						(dat->gpast_dat[i].x * dat->mspd_dat[i].gama);
 					}
 					k++;
 				}
@@ -1242,14 +1242,14 @@ int MAGPIE(const void *data)
 			mError(simulation_fail); return -1;
 		}//END Restoration
 	}
-
+	
 	else if (dat->sys_dat.N == 0)
 	{
 		//Loop for the original number of components
 		dat->sys_dat.PI = 0.0;
 		dat->sys_dat.qT = 0.0;
 		success = 1;
-
+		
 		//Restore original data
 		k = 0;
 		if (N0 > dat->sys_dat.N)
@@ -1259,7 +1259,7 @@ int MAGPIE(const void *data)
 			dat->gsta_dat.resize(N0);
 			dat->gpast_dat.resize(N0);
 			dat->mspd_dat.resize(N0);
-
+			
 			for (int i=0; i<N0; i++)
 			{
 				//Allocations
@@ -1268,7 +1268,7 @@ int MAGPIE(const void *data)
 				dat->gpast_dat[i].po.resize( N0 );
 				dat->gsta_dat[i].dHo.resize( m0[i]);
 				dat->gsta_dat[i].dSo.resize( m0[i]);
-
+				
 				//Initializations
 				dat->gsta_dat[i].qmax = qmax0[i];
 				dat->gsta_dat[i].m = m0[i];
@@ -1278,10 +1278,10 @@ int MAGPIE(const void *data)
 					dat->gsta_dat[i].dHo[n] = dHo0[i][n];
 					dat->gsta_dat[i].dSo[n] = dSo0[i][n];
 				}
-
+				
 				dat->gpast_dat[i].y = 0.0;
 				dat->gpast_dat[i].x = 0.0;
-
+				
 				dat->gpast_dat[i].q = 0.0;
 				dat->mspd_dat[i].gama = 1.0;
 				dat->gpast_dat[i].qo = 0.0;
@@ -1298,7 +1298,7 @@ int MAGPIE(const void *data)
 	{
 		mError(simulation_fail); success = -1;
 	}
-
+	
 	//Clear out temporary memory
 	qmax0.clear();
 	m0.clear();
@@ -1309,213 +1309,6 @@ int MAGPIE(const void *data)
 	q1.clear();
 	gama1.clear();
 	dat->sys_dat.N = N0;
-
-	return success;
-}
-
-int MAGPIE_SCENARIOS(const char *inputFileName, const char *sceneFileName)
-{
-	int success = 0;
-	std::string inputName, sceneName;
-	//Check to see if files are given
-	if (inputFileName == NULL || sceneFileName == NULL)
-	{
-		std::cout << "Enter the name of the input file: ";
-		std::cin >> inputName;
-		std::cout << "Enter the name of the scenario file: ";
-		std::cin >> sceneName;
-		std::cout << "\n";
-
-		inputFileName = inputName.c_str();
-		sceneFileName = sceneName.c_str();
-	}
-	std::ifstream inputFile( inputFileName );
-	std::ifstream sceneFile( sceneFileName );
-
-	//Check to see if files exist
-	if (inputFile.good()==false || sceneFile.good()==false)
-	{
-		mError(file_dne);
-		return -1;
-	}
-
-
-	//Declarations
-	MAGPIE_DATA dat;
-	double d_read;
-	int i_read;
-	double time;
-	int num_scene;
-	int solnFlag = 0;
-	FILE *sceneResults;
-
-	//Initializations
-	time = clock();
-	dat.sys_dat.total_eval = 0;
-	dat.sys_dat.avg_norm = 0;
-	dat.sys_dat.max_norm = 0;
-	dat.sys_dat.Recover = false;
-	dat.sys_dat.Carrier = false;
-	dat.sys_dat.Ideal = false;
-	dat.sys_dat.Output = true;
-
-	//Check to see if file exists
-    if (inputFile.good()==false || sceneFile.good()==false)
-	{
-		mError(file_dne);
-		std::cout << "Check file names, then re-run program..." << std::endl;
-		return -1;
-	}
-	sceneResults = fopen("Scenario_Results.txt","w+");
-
-	//Read in data from Input File
-	inputFile >> i_read; dat.sys_dat.N = i_read;
-	if (dat.sys_dat.N < 0) {mError(invalid_components); return -1;}
-	//resize working space for data structures
-	dat.gsta_dat.resize( dat.sys_dat.N );
-	dat.gpast_dat.resize( dat.sys_dat.N );
-	dat.mspd_dat.resize( dat.sys_dat.N );
-	for (int i=0; i<dat.sys_dat.N; i++)
-	{
-		//resize working space for parameters
-		dat.mspd_dat[i].eta.resize( dat.sys_dat.N );
-		dat.gpast_dat[i].gama_inf.resize( dat.sys_dat.N );
-		dat.gpast_dat[i].po.resize( dat.sys_dat.N );
-		inputFile >> d_read; dat.mspd_dat[i].v = d_read;
-		inputFile >> d_read; dat.gsta_dat[i].qmax = d_read;
-		inputFile >> i_read; dat.gsta_dat[i].m = i_read;
-		dat.gsta_dat[i].dHo.resize( dat.gsta_dat[i].m );
-		dat.gsta_dat[i].dSo.resize( dat.gsta_dat[i].m );
-		for (int n=0; n<dat.gsta_dat[i].m; n++)
-		{
-			inputFile >> d_read; dat.gsta_dat[i].dHo[n] = d_read;
-			inputFile >> d_read; dat.gsta_dat[i].dSo[n] = d_read;
-		}
-	}
-	//END of Input Read
-	inputFile.close();
-
-	//Read in Scenario file and run all scenarios
-	sceneFile >> i_read;
-	if (i_read == 0)
-	{
-		dat.sys_dat.Recover = false;
-		dat.sys_dat.Carrier = false;
-	}
-	else if (i_read == 1)
-		dat.sys_dat.Recover = true;
-	else
-		{mError(invalid_boolean); return -1;}
-
-	//Create a Header for the output file
-	fprintf(sceneResults, "T(K)\tPT(kPa)\t");
-	for (int i=0; i<dat.sys_dat.N; i++)
-		fprintf(sceneResults, "y[%i]\t", (i+1));
-	fprintf(sceneResults, "qT[mol/kg]\t");
-	for (int i=0; i<dat.sys_dat.N; i++)
-		fprintf(sceneResults, "x[%i]\t", (i+1));
-	fprintf(sceneResults, "PI[mol/kg]\n");
-
-	//Continue Reading in Scenario file
-	sceneFile >> i_read; num_scene = i_read;
-	dat.sys_dat.Par = (dat.sys_dat.N * (dat.sys_dat.N - 1));
-	dat.sys_dat.Sys = dat.sys_dat.Par / 2;
-	std::cout << "Total Number of Components: " << dat.sys_dat.N << std::endl;
-	std::cout << "Total Number of Scenarios: " << num_scene << std::endl;
-	std::cout << "Number of Interaction Parameters: " << dat.sys_dat.Par << " per Scenario" << std::endl;
-	std::cout << "Total Number of Systems to Solve: " << (dat.sys_dat.Sys * num_scene) << std::endl;
-	std::cout << "--------------------------------------------------\n" << std::endl;
-	int sceneCount = 0;
-	do
-	{
-		sceneFile >> d_read; dat.sys_dat.PT = d_read;
-		sceneFile >> d_read; dat.sys_dat.T = d_read;
-
-		//Start Simulation Run
-		std::cout << "Scenario #" << (sceneCount+1) << std::endl;
-		std::cout << "PT(kPa): " << dat.sys_dat.PT << "\tT(K): " << dat.sys_dat.T;
-		if (dat.sys_dat.Recover == true)
-		{
-			sceneFile >> d_read; dat.sys_dat.qT = d_read;
-			std::cout << "\tqT[M/M]: " << dat.sys_dat.qT << std::endl;
-			sceneFile >> i_read;
-			if (i_read == 0)
-				dat.sys_dat.Carrier = false;
-			else if (i_read == 1)
-				dat.sys_dat.Carrier = true;
-			else
-				{mError(invalid_boolean); return -1;}
-		}
-		else
-			std::cout << std::endl;
-
-		//Read in the Gas or Solid Mole Fractions
-		double y_check = 0;
-		double xsum = 0;
-		for (int i=0; i<dat.sys_dat.N; i++)
-		{
-			sceneFile >> d_read;
-			if (dat.sys_dat.Recover == false)
-			{
-				dat.gpast_dat[i].y = d_read;
-				if (dat.gpast_dat[i].y > 1.0 || dat.gpast_dat[i].y < 0.0)
-					{mError(invalid_molefraction); return -1;}
-				y_check = y_check + dat.gpast_dat[i].y;
-				xsum = 1.0;
-			}
-			else
-			{
-				dat.gpast_dat[i].x = d_read;
-				if (dat.gpast_dat[i].x > 1.0 || dat.gpast_dat[i].x < 0.0)
-					{mError(invalid_molefraction); return -1;}
-				xsum = xsum + dat.gpast_dat[i].x;
-			}
-		}
-		if (y_check > (1.0 + 1e-06))
-			{mError(invalid_gas_sum); return -1;}
-		if ((xsum > (1.0 + 1e-06) || xsum < (1.0 - 1e-06)) && dat.sys_dat.qT != 0.0)
-			{mError(invalid_solid_sum); return -1;}
-
-		//All Reads and initializations are now complete: Call MAGPIE Routine
-		solnFlag = MAGPIE((void *)&dat);
-		if (solnFlag < 4) {std::cout << "\nScenario simulation successful!\n" << std::endl;}
-		else {mError(scenario_fail);}
-
-		//Retrieve data from MAGPIE simulation for file output
-		fprintf(sceneResults,"%.6g\t",dat.sys_dat.T);
-		fprintf(sceneResults,"%.6g\t",dat.sys_dat.PT);
-		for (int i=0; i<dat.sys_dat.N; i++)
-			fprintf(sceneResults,"%.6g\t",dat.gpast_dat[i].y);
-		fprintf(sceneResults,"%.6g\t",dat.sys_dat.qT);
-		for (int i=0; i<dat.sys_dat.N; i++)
-			fprintf(sceneResults,"%.6g\t",dat.gpast_dat[i].x);
-		fprintf(sceneResults,"%.6g\n",dat.sys_dat.PI);
-
-		num_scene--;
-		sceneCount++;
-		std::cout << "--------------------------------------------------\n" << std::endl;
-	} while(num_scene>0);
-	//END of Scenario Simulations
-	sceneFile.close();
-
-	//END of Program
-	fclose(sceneResults);
-
-	//Clean Memory
-	dat.gsta_dat.clear();
-	dat.gpast_dat.clear();
-	dat.mspd_dat.clear();
-
-	//Display Stats
-	time = clock() - time;
-	if (dat.sys_dat.total_eval > 0)
-	{
-		std::cout << "\nTotal Non-Linear Evaluations: " << dat.sys_dat.total_eval << std::endl;
-		std::cout << "\nMaximum E. Norm Calculated: " << dat.sys_dat.max_norm << std::endl;
-		std::cout << "\nAverage Euclidean Norm: " <<
-				(dat.sys_dat.avg_norm / dat.sys_dat.total_eval) << std::endl;
-	}
-	std::cout << "\nTotal Runtime: " << (time/ CLOCKS_PER_SEC) << " seconds" << std::endl;
-
+	
 	return success;
 }

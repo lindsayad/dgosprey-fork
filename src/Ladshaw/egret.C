@@ -14,7 +14,7 @@
  *		that the higher level programs operate more efficiently and cleanly. Calculations made
  *		here are based on kinetic theory of gases, ideal gas law, and some emperical models that
  *		were developed to account for changes in density and viscosity with changes in temperature
- *		between standard temperatures and up to 1000 K. 
+ *		between standard temperatures and up to 1000 K.
  */
 
 #include "egret.h"
@@ -100,7 +100,7 @@ int calculate_properties(MIXED_GAS *gas_dat)
 		{
 			gas_dat->species_dat[i].density = CE3(gas_dat->total_pressure*gas_dat->species_dat[i].molecular_weight,gas_dat->gas_temperature);
 			gas_dat->species_dat[i].dynamic_viscosity = Mu(gas_dat->species_dat[i].Sutherland_Viscosity, gas_dat->species_dat[i].Sutherland_Temp, gas_dat->species_dat[i].Sutherland_Const, gas_dat->gas_temperature);
-		
+			
 			//Inner Loop for Binary Diffusion Tensor
 			for (int j=0; j<=i; j++)
 			{
@@ -111,22 +111,22 @@ int calculate_properties(MIXED_GAS *gas_dat)
 				{
 					//Calculate upper triangular portion
 					gas_dat->binary_diffusion.edit(i, j, D_ij(gas_dat->species_dat[i].molecular_weight, gas_dat->species_dat[j].molecular_weight, gas_dat->species_dat[i].density, gas_dat->species_dat[j].density, gas_dat->species_dat[i].dynamic_viscosity, gas_dat->species_dat[j].dynamic_viscosity));
-				
+					
 					//Enforce symmetry of the matrix
 					gas_dat->binary_diffusion.edit(j, i, gas_dat->binary_diffusion(i,j));
-				
+					
 				}
 			}
-		
+			
 			//Additive Properties
 			gas_dat->total_molecular_weight = gas_dat->total_molecular_weight + (gas_dat->molefraction[i]*gas_dat->species_dat[i].molecular_weight);
 			gas_dat->total_specific_heat = gas_dat->total_specific_heat + (gas_dat->molefraction[i]*gas_dat->species_dat[i].specific_heat);
-
+			
 		}
-	
+		
 		//Calculate total density
 		gas_dat->total_density = CE3(gas_dat->total_pressure*gas_dat->total_molecular_weight, gas_dat->gas_temperature);
-	
+		
 		//Secondary loop to evaluate the total dynamic viscosity and molecular diffusion
 		for (int i=0; i<gas_dat->N; i++)
 		{
@@ -148,7 +148,7 @@ int calculate_properties(MIXED_GAS *gas_dat)
 			if (gas_dat->molefraction[i] != 0.0)
 				gas_dat->total_dyn_vis = gas_dat->total_dyn_vis + (gas_dat->species_dat[i].dynamic_viscosity/(1.0+((113.65*PSI(gas_dat->gas_temperature)*gas_dat->species_dat[i].dynamic_viscosity*gas_dat->gas_temperature)/(gas_dat->molefraction[i]*gas_dat->species_dat[i].molecular_weight))*muT_sum));
 		}
-	
+		
 		//Calculate remaining properties
 		gas_dat->kinematic_viscosity = Nu(gas_dat->total_dyn_vis,gas_dat->total_density);
 		gas_dat->Reynolds = ReNum(gas_dat->velocity, gas_dat->char_length, gas_dat->kinematic_viscosity);
@@ -169,11 +169,11 @@ int EGRET_TESTS()
 	if (success != 0) {mError(simulation_fail); return -1;}
 	
 	/*
-	 		species 0 = N2
-	 		species 1 = O2
-	 		species 2 = Ar
-	 		species 3 = CO2
-	 		species 4 = H2O
+	 species 0 = N2
+	 species 1 = O2
+	 species 2 = Ar
+	 species 3 = CO2
+	 species 4 = H2O
 	 */
 	
 	//Set the Constants
@@ -248,6 +248,6 @@ int EGRET_TESTS()
 	std::cout << "-------------------------------------------\n";
 	time = clock() - time;
 	std::cout << "Simulation Runtime: " << (time / CLOCKS_PER_SEC) << " seconds\n";
-
+	
 	return success;
 }

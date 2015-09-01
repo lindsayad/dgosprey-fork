@@ -9,7 +9,7 @@
  *		FINCH = Flux-limiting Implicit Non-oscillatory Conservative High-resolution
  *
  *			This is a conservative finite differences scheme based on the Kurganov and Tadmoor (2000)
- *		MUSCL scheme for non-linear conservation laws. 
+ *		MUSCL scheme for non-linear conservation laws.
  *
  *      v1.0.0
  *
@@ -76,7 +76,7 @@ int uTotal(FINCH_DATA *dat)
 {
   	int success = 0;
   	double total = 0.0;
-  
+	
   	for (int l=0; l<dat->LN; l++)
   	{
     	if (l == 0)
@@ -105,7 +105,7 @@ int uTotal(FINCH_DATA *dat)
     	}
   	}
   	dat->uT = pow(dat->dz,(double)dat->d+1)*total;
-  
+	
   	if (dat->d == 0)
     	dat->uT = dat->uT * dat->s;
   	else if (dat->d == 1)
@@ -113,7 +113,7 @@ int uTotal(FINCH_DATA *dat)
   	else if (dat->d == 2)
     	dat->uT = (4.0/3.0) * M_PI * dat->uT;
   	else {mError(invalid_boolean); return -1;}
-  
+	
   	return success;
 }
 
@@ -121,7 +121,7 @@ int uTotal(FINCH_DATA *dat)
 int uAverage(FINCH_DATA *dat)
 {
   	int success = 0;
-  
+	
   	if (dat->d == 0)
   	{
     	dat->uAvg = dat->uT / (dat->L * dat->s);
@@ -135,7 +135,7 @@ int uAverage(FINCH_DATA *dat)
     	dat->uAvg = dat->uT / ( (4.0/3.0) * M_PI * pow(dat->L,3.0) );
   	}
   	else {mError(invalid_boolean); return -1;}
-  
+	
   	return success;
 }
 
@@ -156,19 +156,19 @@ int check_Mass(FINCH_DATA *dat)
 		{
       		//Error Reporting is temporarilly disabled disabled
 			/*
-			mError(negative_mass);
-			std::cout << "u_star at node " << l << ": " << dat->u_star(l,0) << std::endl;
-			std::cout << "unp1 at node " << l << ": " << dat->unp1(l,0) << std::endl;
-			std::cout << "un at node " << l << ": " << dat->u_star(l,0) << std::endl;
-			std::cout << "unm1 at node " << l << ": " << dat->u_star(l,0) << std::endl;
-			return -1;
-       		*/
-			 
+			 mError(negative_mass);
+			 std::cout << "u_star at node " << l << ": " << dat->u_star(l,0) << std::endl;
+			 std::cout << "unp1 at node " << l << ": " << dat->unp1(l,0) << std::endl;
+			 std::cout << "un at node " << l << ": " << dat->u_star(l,0) << std::endl;
+			 std::cout << "unm1 at node " << l << ": " << dat->u_star(l,0) << std::endl;
+			 return -1;
+			 */
+			
 			dat->unp1.edit(l,0,dat->un(l,0));
 			dat->u_star.edit(l,0,dat->un(l,0));
       		dat->unm1.edit(l,0,0.0);
       		dat->un.edit(l,0,0.0);
-      
+			
 		}
 		if (dat->u_star(l,0) >= -1.0e-4 && dat->u_star(l,0) < 0.0)
 		{
@@ -188,7 +188,7 @@ int check_Mass(FINCH_DATA *dat)
 		}
 		else {/*No Action*/}
 	}
-
+	
 	return success;
 }
 
@@ -228,12 +228,12 @@ int l_direct(FINCH_DATA *dat)
 	//Solve the system in one step
 	success = (*dat->evalprecon) (dat->res,dat->unp1,dat);
 	if (success != 0) {mError(simulation_fail); return -1;}
-
+	
 	return success;
 }
 
 //Function to evaluate the Picard Step x = G(x) (Used by LARK for Method Testing)
-int lark_picard_step(const Matrix &x, Matrix &G, const void *data)
+int lark_picard_step(const Matrix<double> &x, Matrix<double> &G, const void *data)
 {
 	int success = 0;
 	FINCH_DATA *dat = (FINCH_DATA *) data;
@@ -258,7 +258,7 @@ int nl_picard(FINCH_DATA *dat)
 {
   	int success = 0;
   	double rel_res_base, res_norm, res_old, bestres;
-  
+	
 	//Set up System for First Iterate
 	dat->unp1 = dat->un;
 	
@@ -320,8 +320,8 @@ int nl_picard(FINCH_DATA *dat)
 		}
 		
 		res_old = res_norm;
-  }
-  
+	}
+	
   	if (k >= dat->max_iter)
   	{
 		if (dat->NormTrack == true)
@@ -341,7 +341,7 @@ int nl_picard(FINCH_DATA *dat)
 		dat->unp1 = dat->ubest;
 		success = 0;
 	}
-  
+	
   	return success;
 }
 
@@ -354,8 +354,8 @@ int setup_FINCH_DATA( int (*user_callroutine) (const void *user_data),
 					 int (*user_setparams) (const void *user_data),
 					 int (*user_discretize) (const void *user_data),
 					 int (*user_bcs) (const void *user_data),
-					 int (*user_res) (const Matrix&x, Matrix& res, const void *user_data),
-					 int (*user_precon) (const Matrix&b, Matrix& p, const void *user_data),
+					 int (*user_res) (const Matrix<double>&x, Matrix<double>& res, const void *user_data),
+					 int (*user_precon) (const Matrix<double>&b, Matrix<double>& p, const void *user_data),
 					 int (*user_postprocess) (const void *user_data),
 					 int (*user_reset) (const void *user_data),
 					 FINCH_DATA *dat, const void *param_data)
@@ -596,7 +596,7 @@ int default_execution(const void *user_data)
 {
 	int success = 0;
 	FINCH_DATA *dat = (FINCH_DATA *) user_data;
-		
+	
 	//Perform Preprocess Actions
 	success = (*dat->setpreprocess) (dat);
 	if (success != 0) {mError(simulation_fail); return -1;}
@@ -1525,7 +1525,7 @@ int minmod_discretization(const void *user_data)
 	}
 	
 	return success;
-
+	
 }
 
 //Function to perform discretization using a smooth van Albada Slope Limiter function
@@ -3615,7 +3615,7 @@ int default_bcs(const void *user_data)
 }
 
 //Function to evalute the residual (res) of the current iterate (x) using user data
-int default_res(const Matrix &x, Matrix &res, const void *user_data)
+int default_res(const Matrix<double> &x, Matrix<double> &res, const void *user_data)
 {
 	int success = 0;
 	FINCH_DATA *dat = (FINCH_DATA *) user_data;
@@ -3652,8 +3652,8 @@ int default_res(const Matrix &x, Matrix &res, const void *user_data)
 	return success;
 }
 
-//Function to solve the Tridiagonal Matrix Directly (Can be used as preconditioner)
-int default_precon(const Matrix &b, Matrix &p, const void *user_data)
+//Function to solve the Tridiagonal Matrix<double> Directly (Can be used as preconditioner)
+int default_precon(const Matrix<double> &b, Matrix<double> &p, const void *user_data)
 {
 	int success = 0;
 	FINCH_DATA *dat = (FINCH_DATA *) user_data;
@@ -3915,193 +3915,14 @@ int burgers_bcs(const void *user_data)
 	}
 	
 	/*
-		NOTE: This demonstrate how one would handle a Periodic BC in FINCH. For this
-			  case, the Dirichlet BC would be used and we specify that the value at 
-	 		  the input node is equal to the value at the output node. However, the 
-	 		  input node is not expilictly solved for, whereas the output node is. Thus,
-	 		  we solve for the output node in the mesh and use it's value as the input
-			  node. Best to use an iterative method for this type of BC. 
+	 NOTE: This demonstrate how one would handle a Periodic BC in FINCH. For this
+	 case, the Dirichlet BC would be used and we specify that the value at
+	 the input node is equal to the value at the output node. However, the
+	 input node is not expilictly solved for, whereas the output node is. Thus,
+	 we solve for the output node in the mesh and use it's value as the input
+	 node. Best to use an iterative method for this type of BC.
 	 */
 	
 	
-	return success;
-}
-
-//Function runs the FINCH tests for convergence, accuracy, and stability when tasked
-int FINCH_TESTS()
-{
-	int success = 0;
-	
-	/* 					Testing of the scheme				*/
-	
-	//Declarations
-	FINCH_DATA dat;
-	double time;
-	FILE *Output;
-  	double exponent = 0.0;
-  	double truncErr;
-  	int time_steps = 0;
-	
-	//Initializations
-	time = clock();
-	Output = fopen("FINCH_TEST_Output.txt","w+");
-	
-  	//Change Parameters for Testing
-	dat.uIC = 0.0;
-	//dat.uIC = 1.0;
-  	dat.uo = 1.0;
-  	//dat.uo = 0.0;
-	//dat.vIC = 992.2941164;
-	//dat.vo = 992.2941164;
-  	dat.vIC = 2.0;
-	dat.vo = 2.0;
-  	//dat.vIC = 1.0;
-	//dat.vo = 1.0;
-	//dat.DIC = 0.546244074;
-	//dat.Do = 0.546244074;
-  	dat.DIC = 0.01;
-	dat.Do = 0.01;
-  	//dat.DIC = 0.0;
-	//dat.Do = 0.0;
-  	//dat.kIC = 0.0;
-  	//dat.ko = 0.0;
-  	dat.kIC = 5.0;
-  	dat.ko = 5.0;
-  	dat.RIC = 1.0;
-  	dat.Ro = 1.0;
-  	//dat.RIC = 285991.8319;
-  	//dat.Ro = 285991.8319;
-  	dat.kfn = 0.0;
-  	dat.kfnp1 = 0.0;
-	//dat.L = 0.127;
-  	dat.L = 1.0;
-	//dat.L = 2.0*M_PI;
-  	dat.s = 1.0;
-	dat.T = 0.2;
-	//dat.T = 60.0;
-	dat.LN = 40;
-	dat.t_old = 0.0;
-	dat.dt_old = 0.0;
-  	dat.d = 0;
-	
-  	//Boolean Statments
-	dat.Dirichlet = true;
-  	dat.CheckMass = false;
-  	dat.Iterative = true;
-  	dat.SteadyState = true;
-  	dat.NormTrack = true;
-	
-  	//Iterative Methods
-	dat.nl_method = LARK_PJFNK; //0 = FINCH_Picard, 1 = LARK_Picard, 2 = LARK_PJFNK
-	dat.pjfnk_dat.nl_tol_rel = 1e-6;
-	dat.pjfnk_dat.nl_tol_abs = 1e-6;
-	dat.pjfnk_dat.linear_solver = GMRESR;
-	//dat.pjfnk_dat.L_Output = true;
-	//dat.pjfnk_dat.lin_tol = 1e-10;
-	dat.pjfnk_dat.LineSearch = true;
-	dat.pjfnk_dat.Bounce = true;
-
-	/*
-	 	After extensive testing, we can show that our Picard iteration is the most 
-		efficient solution method. However, PJFNK is still good and will be useful
-	 	for solving more complex, non-linear systems. 
-	 */
-	
-	//Used in determining truncation error
-  	if (dat.CN == true)
-    	exponent = exponent + 1.0;
-  	else
-    	exponent = exponent + 0.5;
-  	if (dat.ExplicitFlux == false)
-    	exponent = exponent + 1.0;
-  	else
-    	exponent = exponent + 0.5;
-	
-	//Set up the FINCH_DATA
-	
-	//Buckley-Leverett Non-Linear Tests with Default Dirichlet BCs
-	success = setup_FINCH_DATA(default_execution,buckley_leverett_ic,default_timestep,default_preprocess,default_solve,buckley_leverett_params,vanAlbada_discretization,default_bcs,default_res,default_precon,default_postprocess,default_reset,&dat,(void *)&dat);
-	
-	//Inviscous Burger's Non-Linear Tests with Periodic BCs
-	//success = setup_FINCH_DATA(default_execution,burgers_ic,default_timestep,default_preprocess,default_solve,burgers_params,minmod_discretization,burgers_bcs,default_res,default_precon,default_postprocess,default_reset,&dat,(void *)&dat);
-	
-	//Below uses minmod discretization (least dispersive, least oscillatory, worst convergence)
-	//success = setup_FINCH_DATA(default_execution,default_ic,default_timestep,default_preprocess,default_solve,default_params,minmod_discretization,default_bcs,default_res,default_precon,default_postprocess,default_reset,&dat,(void *)&dat);
-	
-	//Below uses Ospre discretization (less dispersive, less oscillatory, better convergence)
-	//success = setup_FINCH_DATA(default_execution,default_ic,default_timestep,default_preprocess,default_solve,default_params,ospre_discretization,default_bcs,default_res,default_precon,default_postprocess,default_reset,&dat,(void *)&dat);
-	
-	//Below uses van Albada discretization (most dispersive, most oscillations, best convergence)
-	//success = setup_FINCH_DATA(default_execution,default_ic,default_timestep,default_preprocess,default_solve,default_params,vanAlbada_discretization,default_bcs,default_res,default_precon,default_postprocess,default_reset,&dat,(void *)&dat);
-	
-	if (success != 0) {mError(simulation_fail); return -1;}
-	
-	//Make header file for output
-	print2file_dim_header(Output, &dat);
-	print2file_newline(Output, &dat);
-	print2file_time_header(Output, &dat);
-	print2file_newline(Output, &dat);
-	
-	//Set Initial Conditions
-	success = (*dat.setic) (&dat);
-	if (success != 0) {mError(simulation_fail); return -1;}
-	
-	//Print out ICs
-	print2file_result_old(Output, &dat);
-	print2file_newline(Output, &dat);
-	
-	//Loop to solve for each time step in simulation
-	do
-	{
-		//Check to see if system needs updating
-		if (dat.Update == true)
-		{
-			success = (*dat.resettime) ((void *)&dat);
-			if (success != 0) {mError(simulation_fail); return -1;}
-		}
-		
-		//Step size based of off CFL condition
-		success = (*dat.settime) ((void *)&dat);
-		if (success != 0) {mError(simulation_fail); return -1;}
-		//dat.dt = 0.1;
-		if (dat.SteadyState == false)
-			dat.t = dat.t_old + dat.dt;
-		else
-			dat.t = INFINITY;
-		
-		//Call the routine
-		std::cout << "Evaluating Time: " << dat.t << std::endl;
-		success = (*dat.callroutine) ((void *)&dat);
-		if (success == 0)
-		{
-			std::cout << "Simulation Successful!\n" << std::endl;
-			dat.Update = true; //Be sure to set update = true if simulation successful!
-		}
-		else {mError(simulation_fail); dat.Update = false; return -1;}
-		
-		//Print out simulation results
-		print2file_result_new(Output, &dat);
-		print2file_newline(Output, &dat);
-		
-		time_steps++;
-		
-	} while (dat.t < (dat.T) && dat.SteadyState == false);
-	
-	//END PROGRAM
-	fclose(Output);
-	time = clock() - time;
-  
-  	if (dat.SteadyState == false)
-    	truncErr = pow(dat.dz,2.0) + pow(dat.dt,exponent);
-  	else
-    	truncErr = pow(dat.dz,2.0);
-	
-  	//Display performance metrics for tests
-	std::cout << "Runtime Time (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-	std::cout << "Truncation Error:\t" << truncErr << std::endl;
-  	std::cout << "Total Iterations:\t" << dat.total_iter << std::endl;
-  	std::cout << "Total Time Steps:\t" << time_steps+1 << std::endl;
-  	std::cout << "Average Iterations:\t" << (double)dat.total_iter/(time_steps+1) << std::endl;
-  	std::cout << "Complexity (ms):\t" << (time / CLOCKS_PER_SEC)/(double)(dat.total_iter+time_steps)*1000.0 << std::endl;
 	return success;
 }

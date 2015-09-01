@@ -6,360 +6,83 @@
 //----------------------------------------
 
 /*
-		LARK = Linear Algebra Residual Kernels
+ LARK = Linear Algebra Residual Kernels
  
-        The functions contained within are designed to solve generic linear and 
-        non-linear square systems of equations given a function argument and 
-        data from the user. Optionally, the user can also provide a function to
-        return a preconditioning result that will be applied to the system.
+ The functions contained within are designed to solve generic linear and
+ non-linear square systems of equations given a function argument and
+ data from the user. Optionally, the user can also provide a function to
+ return a preconditioning result that will be applied to the system.
  
-        Having the user define how the preconditioning is carried out provides
-        two major advantages: (1) we do not need to store and large, sparse
-        preconditioning matrices and instead only store the preconditioned
-        vector result and (2) this allows the user to use any kind of preconditioner
-        they see fit for their problem.
+ Having the user define how the preconditioning is carried out provides
+ two major advantages: (1) we do not need to store and large, sparse
+ preconditioning matrices and instead only store the preconditioned
+ vector result and (2) this allows the user to use any kind of preconditioner
+ they see fit for their problem.
  
-        The Krylov function is typically not called by the user, but can be if
-        desired. It accepts the function arguments and a residual vector to form
-        an orthonormal basis of the Krylov subspace using the Modified Gram-Schmidt
-        process. This function is called by GMRES to iteratively solve a linear
-        system of equations. Note that you can use this function to directly solve
-        the linear system as long as that system is not too large. Construction of
-        the basis is expensive, which is why this is used as a sub-function of an
-        iterative method.
+ The Arnoldi function is typically not called by the user, but can be if
+ desired. It accepts the function arguments and a residual vector to form
+ an orthonormal basis of the Krylov subspace using the Modified Gram-Schmidt
+ process (aka Arnoldi Iteration). This function is called by GMRES to iteratively
+ solve a linear system of equations. Note that you can use this function to
+ directly solve the linear system as long as that system is not too large.
+ Construction of the basis is expensive, which is why this is used as a sub-function
+ of an iterative method.
  
-        The Restarted GMRES function will accept function arguments for a linear system
-        and attempt to solve said system iteratively by constructing an orthonormal
-        basis from the Krylov function. Note that this GMRES function does support
-        restarting and will use restarting by default if the linear system is too
-        large.
+ The Restarted GMRES function will accept function arguments for a linear system
+ and attempt to solve said system iteratively by constructing an orthonormal
+ basis from the Krylov function. Note that this GMRES function does support
+ restarting and will use restarting by default if the linear system is too
+ large.
  
-        Also included is a GMRES algorithm without restarting. This will directly solve
-        the linear system within residual tolerance using a Full Orthogonal basis set
-        of that system. It is equivalent to calling the Krylov method with the k parameter 
-		equal to N (i.e. the number of equations). This method is nick-named the Full 
- 		Othogonalization Method (FOM), although the true FOM algorithm in literature is
- 		slightly different. 
+ Also included is a GMRES algorithm without restarting. This will directly solve
+ the linear system within residual tolerance using a Full Orthogonal basis set
+ of that system. It is equivalent to calling the Krylov method with the k parameter
+ equal to N (i.e. the number of equations). This method is nick-named the Full
+ Othogonalization Method (FOM), although the true FOM algorithm in literature is
+ slightly different.
  
-        The PJFNK function will accept function arguments for a square, non-linear
-        system of equations and attempt to solve it iteratively using both the 
-        GMRES and Krylov functions with Newton's method to convert the non-linear
-        system into a linear system.
+ The PJFNK function will accept function arguments for a square, non-linear
+ system of equations and attempt to solve it iteratively using both the
+ GMRES and Krylov functions with Newton's method to convert the non-linear
+ system into a linear system.
  
-        Also built here is a PCG implementation for solving symmetric linear systems.
-        Can also be called by PJFNK if we know that the linear system (i.e. the
-        Jacobian) is symmetric. This algorithm is significantly more efficient
-        than GMRES, but is only valid if the system of equations is symmetric.
+ Also built here is a PCG implementation for solving symmetric linear systems.
+ Can also be called by PJFNK if we know that the linear system (i.e. the
+ Jacobian) is symmetric. This algorithm is significantly more efficient
+ than GMRES, but is only valid if the system of equations is symmetric.
  
-		Other linear solvers implemented in this work are the BiCGSTAB and CGS algorithms
- 		for non-symmetric, positive definite matrices. These algorithms are significantly
- 		more computationally efficient than GMRES or FOM. However, they can both break down
- 		if the linear system is poorly conditioned. In general, you only want to use these
- 		methods if you have preconditioning available and your linear system is very, very
- 		large. Otherwise, you will be better suited to using GMRES or FOM. 
+ Other linear solvers implemented in this work are the BiCGSTAB and CGS algorithms
+ for non-symmetric, positive definite matrices. These algorithms are significantly
+ more computationally efficient than GMRES or FOM. However, they can both break down
+ if the linear system is poorly conditioned. In general, you only want to use these
+ methods if you have preconditioning available and your linear system is very, very
+ large. Otherwise, you will be better suited to using GMRES or FOM.
  
- 		There is also an implementation of the Generalized Conjugate Residual (GCR) method
- 		with and without restarting. This is a GMRES-like method that should give the 
- 		exact solution within N iterations, where N is the original size of the matrix.
+ There is also an implementation of the Generalized Conjugate Residual (GCR) method
+ with and without restarting. This is a GMRES-like method that should give the
+ exact solution within N iterations, where N is the original size of the matrix.
  
- 		NOTE: There are three GMRES implementations: (i) gmresLP, (ii) fom, and
- 		(iii) gmresRP. GMRESLP is a restarted GMRES implementation that is left
- 		preconditioned and only checks the residual on the outer loops. This may
- 		be less efficient than GMRESRP, which can check both outer and inner loop
- 		residuals. However, GMRESRP has to use right preconditioning, which also
- 		slightly changes the convergence behavior of the linear system. GMRES with
- 		left preconditioning and without restarting will just build the full 
- 		subspace by default, thus solving the system exactly, but may require too
- 		much memory. You can do a GMRESRP unrestarted by specifying that the
- 		restart parameter be equal to the size of the problem. 
+ NOTE: There are three GMRES implementations: (i) gmresLP, (ii) fom, and
+ (iii) gmresRP. GMRESLP is a restarted GMRES implementation that is left
+ preconditioned and only checks the residual on the outer loops. This may
+ be less efficient than GMRESRP, which can check both outer and inner loop
+ residuals. However, GMRESRP has to use right preconditioning, which also
+ slightly changes the convergence behavior of the linear system. GMRES with
+ left preconditioning and without restarting will just build the full
+ subspace by default, thus solving the system exactly, but may require too
+ much memory. You can do a GMRESRP unrestarted by specifying that the
+ restart parameter be equal to the size of the problem.
  */
 
 #include "lark.h"
 
-//Example matrix vector product function
-int matvec_ex01(const Matrix& v, Matrix& w, const void *data)
-{
-    int success = 0;
-    EX01_DATA *dat = (EX01_DATA *) data;
-    
-    w = dat->M * v;
-    
-    return success;
-}
-
-//Example for preconditioning
-int precon_ex01(const Matrix& b, Matrix& p, const void *data)
-{
-    int success = 0;
-    EX01_DATA *dat = (EX01_DATA *) data;
-  
-  	//Example 1.1: Symmetric Gauss-Siedel Preconditioning (Slowest, but improves convergence)
-  	//Matrix interim;
-  	//p.lowerTriangularSolve(dat->M, interim.upperTriangularSolve(dat->M, b));
-  
-  	//Example 1.2: Upper Triangular Preconditioning
-  	//p.upperTriangularSolve(dat->M, b);
-  
-  	//Example 1.3: Lower Triangular Precondtioning
-  	//p.lowerTriangularSolve(dat->M, b);
-  
-  	//Example 1.4: Jacobi Preconditioning (Fastest, but requires more iterations)
-  	p.diagonalSolve(dat->M, b);
-  
-  	//Example 1.5: Tridiagonal Preconditioning
-  	//p.ladshawSolve(dat->M, b);
-  
-    return success;
-}
-
-//Example matrix vector product function
-int matvec_ex02(const Matrix& v, Matrix& w, const void *data)
-{
-  int success = 0;
-  EX02_DATA *dat = (EX02_DATA *) data;
-  
-  w = dat->M * v;
-  
-  return success;
-}
-
-//Example matrix vector product function
-int matvec_ex04(const Matrix& v, Matrix& w, const void *data)
-{
-  	int success = 0;
-  	EX04_DATA *dat = (EX04_DATA *) data;
-  	w = dat->M * v;
-  	return success;
-}
-
-//Tridiagonal preconditioning for a 3D Laplacian
-int precon_ex04(const Matrix& b, Matrix& p, const void *data)
-{
-  	int success = 0;
-  	EX04_DATA *dat = (EX04_DATA *) data;
-	
-	//Example 1.1: Symmetric Gauss-Siedel Preconditioning (Slowest, but improves convergence)
-  	Matrix interim;
-  	p.lowerTriangularSolve(dat->M, interim.upperTriangularSolve(dat->M, b));
-	
-  	//Example 1.2: Upper Triangular Preconditioning
-  	//p.upperTriangularSolve(dat->M, b);
-	
-  	//Example 1.3: Lower Triangular Precondtioning
-  	//p.lowerTriangularSolve(dat->M, b);
-	
-  	//Example 1.4: Jacobi Preconditioning (Fastest, but requires more iterations)
-  	//p.diagonalSolve(dat->M, b);
-	
-  	//Example 1.5: Tridiagonal Preconditioning
-  	//p.ladshawSolve(dat->M, b);
-	
-  	return success;
-}
-
-//Function to approximate the solution to x for the Picard Iteration
-int evalx_ex09(const Matrix &x, Matrix& G, const void *data)
-{
-	int success = 0;
-	EX09_DATA *dat = (EX09_DATA *) data;
-	
-	if (G.rows() != dat->N)
-	{
-		mError(dim_mis_match);
-		return -1;
-	}
-	
-	for (int i=0; i<dat->N; i++)
-	{
-		if (i == 0)
-		{
-			G(i,0) = 0.5*x(i+1,0) + 0.5*dat->h*dat->h*dat->k*exp(x(i,0));
-		}
-		else if (i==dat->N-1)
-		{
-			G(i,0) = 0.5*x(i-1,0) + 0.5*dat->h*dat->h*dat->k*exp(x(i,0));
-		}
-		else
-		{
-			G(i,0) = 0.5*x(i+1,0) + 0.5*x(i-1,0) + 0.5*dat->h*dat->h*dat->k*exp(x(i,0));
-		}
-	}
-	
-	return success;
-}
-
-//Function evaluation for Picard example 9
-int funeval_ex09(const Matrix &x, Matrix& F, const void *data)
-{
-	int success = 0;
-	EX09_DATA *dat = (EX09_DATA *) data;
-	if (F.rows() != dat->N)
-	{
-		mError(dim_mis_match);
-		return -1;
-	}
-	
-	for (int i=0; i<dat->N; i++)
-	{
-		if (i == 0)
-		{
-			F(i,0) = -x(i+1,0) + 2*x(i,0) - dat->h*dat->h*dat->k*exp(x(i,0));
-		}
-		else if (i==dat->N-1)
-		{
-			F(i,0) = 2*x(i,0) - x(i-1,0) - dat->h*dat->h*dat->k*exp(x(i,0));
-		}
-		else
-		{
-			F(i,0) = -x(i+1,0) + 2*x(i,0) - x(i-1,0) - dat->h*dat->h*dat->k*exp(x(i,0));
-		}
-	}
-	
-	return success;
-}
-
-//Function evaluation for PJFNK method example 10
-int funeval_ex10(const Matrix &x, Matrix& F, const void *data)
-{
-	int success = 0;
-	EX09_DATA *dat = (EX09_DATA *) data;
-	if (F.rows() != dat->N)
-	{
-		mError(dim_mis_match);
-		return -1;
-	}
-	
-	for (int i=0; i<dat->N; i++)
-	{
-		if (i == 0)
-		{
-			F(i,0) = -x(i+1,0) + 2*x(i,0) - dat->h*dat->h*dat->k*exp(x(i,0));
-		}
-		else if (i==dat->N-1)
-		{
-			F(i,0) = 2*x(i,0) - x(i-1,0) - dat->h*dat->h*dat->k*exp(x(i,0));
-		}
-		else
-		{
-			F(i,0) = -x(i+1,0) + 2*x(i,0) - x(i-1,0) - dat->h*dat->h*dat->k*exp(x(i,0));
-		}
-	}
-	
-	return success;
-}
-
-//Preconditioner for the inner linear iterates for PJFNK example 10
-int precon_ex10(const Matrix &r, Matrix& p, const void *data)
-{
-	int success = 0;
-	EX09_DATA *dat = (EX09_DATA *) data;
-	p.ladshawSolve(dat->M, r);
-	return success;
-}
-
-int matvec_ex15(const Matrix& v, Matrix& w, const void *data)
-{
-	int success = 0;
-	EX15_DATA *dat = (EX15_DATA *) data;
-	int r = dat->m;
-	int r2 = dat->m*dat->m;
-	int r3 = r2;
-	int r4 = 0;
-	//Perform action A*v and store in vector w
-	if (dat->N != w.rows())
-	{
-		mError(matvec_mis_match);
-		return -1;
-	}
-	for (int i=0; i<dat->N; i++)
-	{
-		//If statements for tridiagonal portion
-		w.edit(i, 0, 6*v(i,0));
-		if (i == 0)
-		{
-			w.edit(i, 0, w(i,0)-1*v(i+1,0));
-		}
-		else if (i == dat->N-1)
-		{
-			w.edit(i, 0, w(i,0)-1*v(i-1,0));
-		}
-		else if (i == r-1)
-		{
-			w.edit(i, 0, w(i,0)-1*v(i-1,0));
-		}
-		else if (i == r)
-		{
-			w.edit(i, 0, w(i,0)-1*v(i+1,0));
-			r = r + dat->m;
-		}
-		else
-		{
-			w.edit(i, 0, w(i,0)-1*v(i-1,0));
-			w.edit(i, 0, w(i,0)-1*v(i+1,0));
-		}
-		
-		//If statements for 2nd diagonal bands
-		if (i > dat->m-1)
-		{
-			if (i <= r3-1)
-			{
-				w.edit(i, 0, w(i,0)-1*v(i-dat->m,0));
-			}
-			else if (i > r3-1)
-			{
-				r4 = r4+1;
-				if (r4 == dat->m-1)
-				{
-					r3 = r2;
-					r4 = 0;
-				}
-			}
-		}
-		if (i <= dat->N-dat->m-1 && i <= r2-dat->m-1)
-		{
-			w.edit(i, 0, w(i,0)-1*v(i+dat->m,0));
-		}
-		if (i == r2-1)
-		{
-			r2 = r2+(dat->m*dat->m);
-		}
-		
-		//If statements for 3rd diagonal bands
-		if (i > (dat->m*dat->m)-1)
-		{
-			w.edit(i, 0, w(i,0)-1*v(i-(dat->m*dat->m),0));
-		}
-		if (i <= dat->N-(dat->m*dat->m)-1)
-		{
-			w.edit(i, 0, w(i,0)-1*v(i+(dat->m*dat->m),0));
-		}
-	}
-	return success;
-}
-
-int precon_ex15(const Matrix& w, Matrix& p, const void *data)
-{
-	int success = 0;
-	EX15_DATA *dat = (EX15_DATA *) data;
-	if (dat->N != p.rows())
-	{
-		mError(matvec_mis_match);
-		return -1;
-	}
-	for (int i=0; i<dat->N; i++)
-	{
-		p.edit(i, 0, w(i,0)/6.0);
-	}
-	return success;
-}
-
 //Function to compute the updated solution given the matrix-vector arguments
-int update_krylov_solution(Matrix& x, Matrix& x0, std::vector<Matrix>& Vk, Matrix& yk)
+int update_arnoldi_solution(Matrix<double>& x, Matrix<double>& x0, ARNOLDI_DATA *arnoldi_dat)
 {
   	int success = 0;
 	
   	//Check for wrong matrix sizes
-  	if (Vk.size() == 0 || Vk.size() != yk.rows() || Vk[0].rows() != x0.rows())
+  	if (arnoldi_dat->Vk.size() == 0 || arnoldi_dat->Vk.size() != arnoldi_dat->yk.rows() || arnoldi_dat->Vk[0].rows() != x0.rows())
     {
       	mError(dim_mis_match);
       	return -1;
@@ -368,34 +91,40 @@ int update_krylov_solution(Matrix& x, Matrix& x0, std::vector<Matrix>& Vk, Matri
     {
       	x.set_size(x0.rows(), 1);
     }
-  
+	
+	//perform transformations to get the search direction yk
+	arnoldi_dat->Hkp1.upperHessenberg2Triangular(arnoldi_dat->e1);
+    arnoldi_dat->Hkp1.rowShrink();
+    arnoldi_dat->e1.rowShrink();
+  	arnoldi_dat->yk.upperTriangularSolve(arnoldi_dat->Hkp1, arnoldi_dat->e1);
+	
   	//Loop over all rows
   	double sum = 0.0;
   	for (int i=0; i<x.rows(); i++)
   	{
       	sum = 0.0;
-      	for (int k=0; k<Vk.size(); k++)
+      	for (int k=0; k<arnoldi_dat->Vk.size(); k++)
       	{
-          	sum = sum + (Vk[k](i,0) * yk(k,0));
+          	sum = sum + (arnoldi_dat->Vk[k](i,0) * arnoldi_dat->yk(k,0));
       	}
       	x.edit(i, 0, sum + x0(i,0));
   	}
-  
+	
   	return success;
 }
 
 //Function to construct the orthonormal basis with optional preconditioning
-int krylov( int (*matvec) (const Matrix& v, Matrix &w, const void *data),
-            int (*precon) (const Matrix& b, Matrix &p, const void *data),
-            Matrix &r0, KRYLOV_DATA *krylov_dat, const void *matvec_data,
+int arnoldi( int (*matvec) (const Matrix<double>& v, Matrix<double> &w, const void *data),
+            int (*precon) (const Matrix<double>& b, Matrix<double> &p, const void *data),
+            Matrix<double> &r0, ARNOLDI_DATA *arnoldi_dat, const void *matvec_data,
 		    const void *precon_data )
 {
     int success = 0;
 	double h = 0;
     
     //Initialize the krylov data
-    if (krylov_dat->k < 2 || krylov_dat->k > r0.rows())
-        krylov_dat->k = r0.rows();
+    if (arnoldi_dat->k < 2 || arnoldi_dat->k > r0.rows())
+        arnoldi_dat->k = r0.rows();
     if (r0.rows() < 2)
     {
         success = -1;
@@ -408,39 +137,39 @@ int krylov( int (*matvec) (const Matrix& v, Matrix &w, const void *data),
       	mError(nullptr_func);
       	return success;
     }
-  	if ( krylov_dat->Vk.size() != krylov_dat->k )
+  	if ( arnoldi_dat->Vk.size() != arnoldi_dat->k )
     {
-      	krylov_dat->Vk.resize(krylov_dat->k);
+      	arnoldi_dat->Vk.resize(arnoldi_dat->k);
     }
-  	if ( krylov_dat->w.rows() != r0.rows() )
+  	if ( arnoldi_dat->w.rows() != r0.rows() )
   	{
-		krylov_dat->w.set_size(r0.rows(), 1);
+		arnoldi_dat->w.set_size(r0.rows(), 1);
   	}
-  	if ( krylov_dat->v.rows() != r0.rows() )
+  	if ( arnoldi_dat->v.rows() != r0.rows() )
   	{
-		krylov_dat->v.set_size(r0.rows(), 1);
+		arnoldi_dat->v.set_size(r0.rows(), 1);
   	}
-  	if ( krylov_dat->sum.rows() != r0.rows() )
+  	if ( arnoldi_dat->sum.rows() != r0.rows() )
   	{
-		krylov_dat->sum.set_size(r0.rows(), 1);
+		arnoldi_dat->sum.set_size(r0.rows(), 1);
   	}
-  	if ( krylov_dat->Hkp1.rows() != krylov_dat->k+1 )
+  	if ( arnoldi_dat->Hkp1.rows() != arnoldi_dat->k+1 )
     {
-      	krylov_dat->Hkp1.set_size(krylov_dat->k+1, krylov_dat->k);
+      	arnoldi_dat->Hkp1.set_size(arnoldi_dat->k+1, arnoldi_dat->k);
     }
-  	if ( krylov_dat->e1.rows() != krylov_dat->k+1)
+  	if ( arnoldi_dat->e1.rows() != arnoldi_dat->k+1)
     {
-      	krylov_dat->e1.set_size(krylov_dat->k+1, 1);
+      	arnoldi_dat->e1.set_size(arnoldi_dat->k+1, 1);
     }
-  	if ( krylov_dat->yk.rows() != krylov_dat->k )
+  	if ( arnoldi_dat->yk.rows() != arnoldi_dat->k )
     {
-      	krylov_dat->yk.set_size(krylov_dat->k, 1);
+      	arnoldi_dat->yk.set_size(arnoldi_dat->k, 1);
     }
-  
+	
     //Check for and apply preconditioning
     if ( (*precon) != NULL)
     {
-      	success = (*precon) (r0, krylov_dat->v, precon_data);
+      	success = (*precon) (r0, arnoldi_dat->v, precon_data);
         if (success != 0)
         {
             mError(simulation_fail);
@@ -449,27 +178,27 @@ int krylov( int (*matvec) (const Matrix& v, Matrix &w, const void *data),
     }
     else
     {
-        krylov_dat->v = r0;
+        arnoldi_dat->v = r0;
     }
 	
   	//Initialize data before loop
-    krylov_dat->beta = krylov_dat->v.norm(); 
-    krylov_dat->e1.edit(0, 0, krylov_dat->beta);
-	if (krylov_dat->Vk[0].rows() != r0.rows())
-		krylov_dat->Vk[0].set_size(r0.rows(), 1);
+    arnoldi_dat->beta = arnoldi_dat->v.norm();
+    arnoldi_dat->e1.edit(0, 0, arnoldi_dat->beta);
+	if (arnoldi_dat->Vk[0].rows() != r0.rows())
+		arnoldi_dat->Vk[0].set_size(r0.rows(), 1);
 	for (int n=0; n<r0.rows(); n++)
-		krylov_dat->Vk[0].edit(n, 0, krylov_dat->v(n,0)/krylov_dat->beta);
+		arnoldi_dat->Vk[0].edit(n, 0, arnoldi_dat->v(n,0)/arnoldi_dat->beta);
 	
     //Begin looping for the size of the subspace
-    krylov_dat->iter = 0;
-    for (int j=0; j<krylov_dat->k; j++)
+    arnoldi_dat->iter = 0;
+    for (int j=0; j<arnoldi_dat->k; j++)
     {
-		if (krylov_dat->Output == true)
+		if (arnoldi_dat->Output == true)
 		{
-			std::cout << "Krylov vector " << j+1 << " being built..." << std::endl;
+			std::cout << "Arnoldi vector " << j+1 << " being built..." << std::endl;
 		}
-      	krylov_dat->sum.zeros();
-        success = (*matvec) (krylov_dat->Vk[j], krylov_dat->w, matvec_data);
+      	arnoldi_dat->sum.zeros();
+        success = (*matvec) (arnoldi_dat->Vk[j], arnoldi_dat->w, matvec_data);
         if (success != 0)
         {
             mError(simulation_fail);
@@ -477,8 +206,8 @@ int krylov( int (*matvec) (const Matrix& v, Matrix &w, const void *data),
         }
         if ( (*precon) != NULL)
         {
-          	krylov_dat->v = krylov_dat->w;
-          	success = (*precon) (krylov_dat->v, krylov_dat->w, precon_data);
+          	arnoldi_dat->v = arnoldi_dat->w;
+          	success = (*precon) (arnoldi_dat->v, arnoldi_dat->w, precon_data);
             if (success != 0)
             {
                 mError(simulation_fail);
@@ -490,66 +219,64 @@ int krylov( int (*matvec) (const Matrix& v, Matrix &w, const void *data),
         //Inner loop for formation of Hessenberg matrix
         for (int i=0; i<=j; i++)
         {
-			h = krylov_dat->w.inner_product(krylov_dat->Vk[i]);
-			krylov_dat->Hkp1.edit(i, j, h);
+			h = arnoldi_dat->w.inner_product(arnoldi_dat->Vk[i]);
+			arnoldi_dat->Hkp1.edit(i, j, h);
 			for (int n=0; n<r0.rows(); n++)
-				krylov_dat->sum.edit(n, 0, krylov_dat->sum(n,0) + (krylov_dat->Vk[i](n,0)*h));
-					
+				arnoldi_dat->sum.edit(n, 0, arnoldi_dat->sum(n,0) + (arnoldi_dat->Vk[i](n,0)*h));
+			
         } //END inner loop
         
-        krylov_dat->w = krylov_dat->w - krylov_dat->sum;
-        krylov_dat->hp1 = krylov_dat->w.norm();
-		krylov_dat->Hkp1.edit(j+1, j, krylov_dat->hp1);
-		if (j<krylov_dat->k-1 && krylov_dat->Vk[j+1].rows() != r0.rows())
-			krylov_dat->Vk[j+1].set_size(r0.rows(), 1);
+        arnoldi_dat->w = arnoldi_dat->w - arnoldi_dat->sum;
+        arnoldi_dat->hp1 = arnoldi_dat->w.norm();
+		arnoldi_dat->Hkp1.edit(j+1, j, arnoldi_dat->hp1);
+		if (j<arnoldi_dat->k-1 && arnoldi_dat->Vk[j+1].rows() != r0.rows())
+			arnoldi_dat->Vk[j+1].set_size(r0.rows(), 1);
 		
-        if (krylov_dat->hp1 == 0.0)
+        if (arnoldi_dat->hp1 == 0.0)
 		{
-			if (j==0 && krylov_dat->Hkp1(j,j)==0.0)
-				krylov_dat->Hkp1.edit(j, j, 1.0);
-			for (int i=j+1; i<krylov_dat->k; i++)
+			if (j==0 && arnoldi_dat->Hkp1(j,j)==0.0)
+				arnoldi_dat->Hkp1.edit(j, j, 1.0);
+			for (int i=j+1; i<arnoldi_dat->k; i++)
 			{
-				krylov_dat->Hkp1.edit(i, i, 1.0);
-				if (j<krylov_dat->k-1 && krylov_dat->Vk[j+1].rows() != r0.rows())
-					krylov_dat->Vk[j+1].set_size(r0.rows(), 1);
+				arnoldi_dat->Hkp1.edit(i, i, 1.0);
+				if (j<arnoldi_dat->k-1 && arnoldi_dat->Vk[j+1].rows() != r0.rows())
+					arnoldi_dat->Vk[j+1].set_size(r0.rows(), 1);
 			}
 			break;
 		}
         else
 		{
-        	if (j<krylov_dat->k-1)
+        	if (j<arnoldi_dat->k-1)
         	{
 				for (int n=0; n<r0.rows(); n++)
-					krylov_dat->Vk[j+1].edit(n, 0, krylov_dat->w(n,0)/krylov_dat->hp1);
+					arnoldi_dat->Vk[j+1].edit(n, 0, arnoldi_dat->w(n,0)/arnoldi_dat->hp1);
         	}
+			else
+				arnoldi_dat->v = arnoldi_dat->w/arnoldi_dat->hp1;
 		}
-      
-        krylov_dat->iter++;
+		
+        arnoldi_dat->iter++;
         
     } //END Subspace loop
     
     //Solve the resulting least squares problem
-	if (krylov_dat->Output == true)
+	if (arnoldi_dat->Output == true)
 	{
 		std::cout << "Krylov subspace construction complete!\n" << std::endl;
 	}
-    krylov_dat->Hkp1.upperHessenberg2Triangular(krylov_dat->e1);
-    krylov_dat->Hkp1.rowShrink();
-    krylov_dat->e1.rowShrink();
-  	krylov_dat->yk.upperTriangularSolve(krylov_dat->Hkp1, krylov_dat->e1);
     
     return success;
 }
 
 //Function to perform the Restarted GMRES algorithm for iteratively solving a linear system
-int gmresLeftPreconditioned( int (*matvec) (const Matrix& v, Matrix &w, const void *data),
-           int (*precon) (const Matrix& b, Matrix &P, const void *data),
-           Matrix &b, GMRESLP_DATA *gmreslp_dat, const void *matvec_data,
-		   const void *precon_data )
+int gmresLeftPreconditioned( int (*matvec) (const Matrix<double>& v, Matrix<double> &w, const void *data),
+							int (*precon) (const Matrix<double>& b, Matrix<double> &P, const void *data),
+							Matrix<double> &b, GMRESLP_DATA *gmreslp_dat, const void *matvec_data,
+							const void *precon_data )
 {
   	int success = 0;
 	double res_old;
-  
+	
   	//Check arguments
   	if ( (*matvec) == NULL)
     {
@@ -563,7 +290,7 @@ int gmresLeftPreconditioned( int (*matvec) (const Matrix& v, Matrix &w, const vo
       	mError(matrix_too_small);
       	return success;
     }
-  
+	
   	//Initialize Krylov Data and GMRES Data
   	if (gmreslp_dat->restart < 2 || gmreslp_dat->restart > b.rows())
     {
@@ -595,49 +322,49 @@ int gmresLeftPreconditioned( int (*matvec) (const Matrix& v, Matrix &w, const vo
     {
       	gmreslp_dat->tol_abs = 1.0e-6;
     }
-  	gmreslp_dat->krylov_dat.k = gmreslp_dat->restart;
-	gmreslp_dat->krylov_dat.Output = gmreslp_dat->Output;
-  
+  	gmreslp_dat->arnoldi_dat.k = gmreslp_dat->restart;
+	gmreslp_dat->arnoldi_dat.Output = gmreslp_dat->Output;
+	
   	//Check to see if the data has been properly initialized
-  	if (gmreslp_dat->krylov_dat.Vk.size() != gmreslp_dat->krylov_dat.k)
+  	if (gmreslp_dat->arnoldi_dat.Vk.size() != gmreslp_dat->arnoldi_dat.k)
     {
-      	gmreslp_dat->krylov_dat.Vk.resize(gmreslp_dat->krylov_dat.k);
+      	gmreslp_dat->arnoldi_dat.Vk.resize(gmreslp_dat->arnoldi_dat.k);
     }
-  	if ( gmreslp_dat->krylov_dat.w.rows() != b.rows() )
+  	if ( gmreslp_dat->arnoldi_dat.w.rows() != b.rows() )
   	{
-		gmreslp_dat->krylov_dat.w.set_size(b.rows(), 1);
+		gmreslp_dat->arnoldi_dat.w.set_size(b.rows(), 1);
   	}
-  	if ( gmreslp_dat->krylov_dat.v.rows() != b.rows() )
+  	if ( gmreslp_dat->arnoldi_dat.v.rows() != b.rows() )
   	{
-		gmreslp_dat->krylov_dat.v.set_size(b.rows(), 1);
+		gmreslp_dat->arnoldi_dat.v.set_size(b.rows(), 1);
   	}
-  	if ( gmreslp_dat->krylov_dat.sum.rows() != b.rows() )
+  	if ( gmreslp_dat->arnoldi_dat.sum.rows() != b.rows() )
   	{
-		gmreslp_dat->krylov_dat.sum.set_size(b.rows(), 1);
+		gmreslp_dat->arnoldi_dat.sum.set_size(b.rows(), 1);
   	}
-  	if ( gmreslp_dat->krylov_dat.Hkp1.rows() != gmreslp_dat->krylov_dat.k+1 )
+  	if ( gmreslp_dat->arnoldi_dat.Hkp1.rows() != gmreslp_dat->arnoldi_dat.k+1 )
   	{
-		gmreslp_dat->krylov_dat.Hkp1.set_size(gmreslp_dat->krylov_dat.k+1, gmreslp_dat->krylov_dat.k);
+		gmreslp_dat->arnoldi_dat.Hkp1.set_size(gmreslp_dat->arnoldi_dat.k+1, gmreslp_dat->arnoldi_dat.k);
   	}
-  	if ( gmreslp_dat->krylov_dat.e1.rows() != gmreslp_dat->krylov_dat.k+1)
+  	if ( gmreslp_dat->arnoldi_dat.e1.rows() != gmreslp_dat->arnoldi_dat.k+1)
   	{
-		gmreslp_dat->krylov_dat.e1.set_size(gmreslp_dat->krylov_dat.k+1, 1);
+		gmreslp_dat->arnoldi_dat.e1.set_size(gmreslp_dat->arnoldi_dat.k+1, 1);
   	}
-  	if ( gmreslp_dat->krylov_dat.yk.rows() != gmreslp_dat->krylov_dat.k )
+  	if ( gmreslp_dat->arnoldi_dat.yk.rows() != gmreslp_dat->arnoldi_dat.k )
   	{
-		gmreslp_dat->krylov_dat.yk.set_size(gmreslp_dat->krylov_dat.k, 1);
+		gmreslp_dat->arnoldi_dat.yk.set_size(gmreslp_dat->arnoldi_dat.k, 1);
   	}
   	gmreslp_dat->iter = 0;
   	gmreslp_dat->steps = 0;
-  
+	
   	//Form first matrix vector product
-  	success = (*matvec) (gmreslp_dat->x, gmreslp_dat->krylov_dat.w, matvec_data);
+  	success = (*matvec) (gmreslp_dat->x, gmreslp_dat->arnoldi_dat.w, matvec_data);
   	if (success != 0)
   	{
 		mError(simulation_fail);
 		return success;
   	}
-  	gmreslp_dat->r = b - gmreslp_dat->krylov_dat.w;
+  	gmreslp_dat->r = b - gmreslp_dat->arnoldi_dat.w;
   	gmreslp_dat->relres_base = gmreslp_dat->r.norm();
   	gmreslp_dat->res = gmreslp_dat->relres_base;
 	gmreslp_dat->bestres = gmreslp_dat->res;
@@ -646,7 +373,7 @@ int gmresLeftPreconditioned( int (*matvec) (const Matrix& v, Matrix &w, const vo
   	res_old = gmreslp_dat->res;
 	if (gmreslp_dat->Output == true)
 		std::cout << "\nRelRes[" << 0 << "] =\t" << gmreslp_dat->relres << std::endl;
-  
+	
   	//Check for imediate convergence
   	if (gmreslp_dat->res < gmreslp_dat->tol_abs)
     {
@@ -657,59 +384,59 @@ int gmresLeftPreconditioned( int (*matvec) (const Matrix& v, Matrix &w, const vo
 		}
       	return success;
     }
-  
+	
   	//If no solution found imediately, begin looping to search for solution
   	for (int m=0; m<gmreslp_dat->maxit; m++)
   	{
 		//Call the Krylov Function
-      	success = krylov(matvec,precon,gmreslp_dat->r,&gmreslp_dat->krylov_dat,matvec_data,precon_data);
+      	success = arnoldi(matvec,precon,gmreslp_dat->r,&gmreslp_dat->arnoldi_dat,matvec_data,precon_data);
       	if (success != 0)
       	{
 			mError(simulation_fail);
 			std::cout << "Vk = \n";
 			for (int n=0; n<b.rows(); n++)
 			{
-				for (int k=0; k<gmreslp_dat->krylov_dat.k; k++)
+				for (int k=0; k<gmreslp_dat->arnoldi_dat.k; k++)
 				{
-					std::cout << "\t" << gmreslp_dat->krylov_dat.Vk[k](n,0);
+					std::cout << "\t" << gmreslp_dat->arnoldi_dat.Vk[k](n,0);
 				}
 				std::cout << std::endl;
 			}
-			gmreslp_dat->krylov_dat.Hkp1.Display("H");
-			gmreslp_dat->krylov_dat.yk.Display("yk");
+			gmreslp_dat->arnoldi_dat.Hkp1.Display("H");
+			gmreslp_dat->arnoldi_dat.yk.Display("yk");
 			gmreslp_dat->x.Display("x0");
-			success = update_krylov_solution(gmreslp_dat->x, gmreslp_dat->x, gmreslp_dat->krylov_dat.Vk, gmreslp_dat->krylov_dat.yk);
+			success = update_arnoldi_solution(gmreslp_dat->x, gmreslp_dat->x, &gmreslp_dat->arnoldi_dat);
 			gmreslp_dat->x.Display("x");
-			success = (*matvec) (gmreslp_dat->x, gmreslp_dat->krylov_dat.w, matvec_data);
-			gmreslp_dat->r = b - gmreslp_dat->krylov_dat.w;
+			success = (*matvec) (gmreslp_dat->x, gmreslp_dat->arnoldi_dat.w, matvec_data);
+			gmreslp_dat->r = b - gmreslp_dat->arnoldi_dat.w;
 			gmreslp_dat->res = gmreslp_dat->r.norm();
 			std::cout << "RelRes at stop = \t" << gmreslp_dat->relres << std::endl;
 			std::cout << "AbsRes at stop = \t" << gmreslp_dat->res << std::endl << std::endl;
 			success = -1;
 			return success;
       	}
-      
+		
       	//From the new solution and residual vector
-      	success = update_krylov_solution(gmreslp_dat->x, gmreslp_dat->x, gmreslp_dat->krylov_dat.Vk, gmreslp_dat->krylov_dat.yk);
+      	success = update_arnoldi_solution(gmreslp_dat->x, gmreslp_dat->x, &gmreslp_dat->arnoldi_dat);
       	if (success != 0)
       	{
 			mError(simulation_fail);
 			return success;
 		}
-      	success = (*matvec) (gmreslp_dat->x, gmreslp_dat->krylov_dat.w, matvec_data);
+      	success = (*matvec) (gmreslp_dat->x, gmreslp_dat->arnoldi_dat.w, matvec_data);
       	if (success != 0)
       	{
 			mError(simulation_fail);
 			return success;
       	}
-      	gmreslp_dat->r = b - gmreslp_dat->krylov_dat.w;
+      	gmreslp_dat->r = b - gmreslp_dat->arnoldi_dat.w;
       	gmreslp_dat->res = gmreslp_dat->r.norm();
       	gmreslp_dat->relres = gmreslp_dat->res / gmreslp_dat->relres_base;
       	gmreslp_dat->iter++;
-      	gmreslp_dat->steps = gmreslp_dat->steps + gmreslp_dat->iter + gmreslp_dat->krylov_dat.iter;
+      	gmreslp_dat->steps = gmreslp_dat->steps + gmreslp_dat->iter + gmreslp_dat->arnoldi_dat.iter;
 		if (gmreslp_dat->Output == true)
 			std::cout << "RelRes[" << m+1 << "] =\t" << gmreslp_dat->relres << std::endl;
-	
+		
       	//Check residual for convergence
       	if (gmreslp_dat->res < gmreslp_dat->tol_abs)
         {
@@ -748,7 +475,7 @@ int gmresLeftPreconditioned( int (*matvec) (const Matrix& v, Matrix &w, const vo
 			break;
 		}
   	}
-  
+	
   	//Post Loop messages
   	if (gmreslp_dat->iter >= gmreslp_dat->maxit)
     {
@@ -778,25 +505,25 @@ int gmresLeftPreconditioned( int (*matvec) (const Matrix& v, Matrix &w, const vo
 }
 
 //Function to perform the Unrestarted GMRES for directly solving a linear system using krylov function
-int fom( int (*matvec) (const Matrix& v, Matrix &w, const void *data),
-		 int (*precon) (const Matrix& b, Matrix &P, const void *data),
-		 Matrix &b, GMRESLP_DATA *gmreslp_dat, const void *matvec_data,
-		 const void *precon_data )
+int fom( int (*matvec) (const Matrix<double>& v, Matrix<double> &w, const void *data),
+		int (*precon) (const Matrix<double>& b, Matrix<double> &P, const void *data),
+		Matrix<double> &b, GMRESLP_DATA *gmreslp_dat, const void *matvec_data,
+		const void *precon_data )
 {
   	/*
-  			NOTE: This implementation is the Restarted GMRES without any restarting. Thus, this
-			method is gaurenteed to converge to the exact (or machine precision) solution
-			to the linear system as long as (i) the linear system is non-singular and (ii)
-			there is enough computer memory available to construct the full space.
+	 NOTE: This implementation is the Restarted GMRES without any restarting. Thus, this
+	 method is gaurenteed to converge to the exact (or machine precision) solution
+	 to the linear system as long as (i) the linear system is non-singular and (ii)
+	 there is enough computer memory available to construct the full space.
 	 
-			If you find that the GMRES implementation with restarting is unable to solve
-			the linear system, then try using this method. If this method cannot solve the
-			system, then the system is too large or is singular.
+	 If you find that the GMRES implementation with restarting is unable to solve
+	 the linear system, then try using this method. If this method cannot solve the
+	 system, then the system is too large or is singular.
 	 
-	 		This is named FOM for Full Othogonalization Method. However, GMRES and FOM are actually
-	 		different algorithms all together. FOM and GMRES are the same only if the full orthogonal
-	 		subspace is constructed, as is the case here. 
-  	*/
+	 This is named FOM for Full Othogonalization Method. However, GMRES and FOM are actually
+	 different algorithms all together. FOM and GMRES are the same only if the full orthogonal
+	 subspace is constructed, as is the case here.
+	 */
   	int success = 0;
   	gmreslp_dat->restart = b.rows();
   	gmreslp_dat->maxit = 1;
@@ -806,10 +533,10 @@ int fom( int (*matvec) (const Matrix& v, Matrix &w, const void *data),
 }
 
 //Implementation of the Compact GMRES algorithm
-int gmresRightPreconditioned( int (*matvec) (const Matrix& v, Matrix &w, const void *data),
-		   int (*precon) (const Matrix& b, Matrix &p, const void *data),
-		   Matrix &b, GMRESRP_DATA *gmresrp_dat, const void *matvec_data,
-		   const void *precon_data )
+int gmresRightPreconditioned( int (*matvec) (const Matrix<double>& v, Matrix<double> &w, const void *data),
+							 int (*precon) (const Matrix<double>& b, Matrix<double> &p, const void *data),
+							 Matrix<double> &b, GMRESRP_DATA *gmresrp_dat, const void *matvec_data,
+							 const void *precon_data )
 {
 	int success = 0;
 	double res_old, beta, beta1, beta0 = 0.0, eta, h;
@@ -1128,7 +855,7 @@ int gmresRightPreconditioned( int (*matvec) (const Matrix& v, Matrix &w, const v
 				gmresrp_dat->y[i] = (gmresrp_dat->e0_bar[i] - sum) / gmresrp_dat->H_bar[i][i];
 			}
 		}
-				
+		
 		//Form the new solution vector (x = x0 + M^-1*Vk*y)
 		for (int n=0; n<b.rows(); n++)
 		{
@@ -1239,14 +966,14 @@ int gmresRightPreconditioned( int (*matvec) (const Matrix& v, Matrix &w, const v
 }
 
 //Implementation of the PCG algorithm for iteratively solving symmetric linear systems
-int pcg( int (*matvec) (const Matrix& p, Matrix &Ap, const void *data),
-         int (*precon) (const Matrix& r, Matrix &z, const void *data),
-         Matrix &b, PCG_DATA *pcg_dat, const void *matvec_data,
-		 const void *precon_data )
+int pcg( int (*matvec) (const Matrix<double>& p, Matrix<double> &Ap, const void *data),
+		int (*precon) (const Matrix<double>& r, Matrix<double> &z, const void *data),
+		Matrix<double> &b, PCG_DATA *pcg_dat, const void *matvec_data,
+		const void *precon_data )
 {
   	int success = 0;
 	double res_old;
-  
+	
   	//Check input arguments
   	if ( (*matvec) == NULL)
   	{
@@ -1454,15 +1181,15 @@ int pcg( int (*matvec) (const Matrix& p, Matrix &Ap, const void *data),
 		std::cout << "Best absolute residual =\t" << pcg_dat->res << std::endl << std::endl;
 		success = 0;
 	}
-  
+	
   	return success;
 }
 
 //Implementation of the BiCGSTAB iterative method with preconditioning
-int bicgstab( int (*matvec) (const Matrix& p, Matrix &Ap, const void *data),
-			  int (*precon) (const Matrix& r, Matrix &z, const void *data),
-			  Matrix &b, BiCGSTAB_DATA *bicg_dat, const void *matvec_data,
-			  const void *precon_data )
+int bicgstab( int (*matvec) (const Matrix<double>& p, Matrix<double> &Ap, const void *data),
+			 int (*precon) (const Matrix<double>& r, Matrix<double> &z, const void *data),
+			 Matrix<double> &b, BiCGSTAB_DATA *bicg_dat, const void *matvec_data,
+			 const void *precon_data )
 {
 	int success = 0;
 	
@@ -1716,10 +1443,10 @@ int bicgstab( int (*matvec) (const Matrix& p, Matrix &Ap, const void *data),
 }
 
 //Implementation of the CGS method for solving non-symmetric linear systems
-int cgs( int (*matvec) (const Matrix& p, Matrix &Ap, const void *data),
-		 int (*precon) (const Matrix& r, Matrix &z, const void *data),
-		 Matrix &b, CGS_DATA *cgs_dat, const void *matvec_data,
-		 const void *precon_data )
+int cgs( int (*matvec) (const Matrix<double>& p, Matrix<double> &Ap, const void *data),
+		int (*precon) (const Matrix<double>& r, Matrix<double> &z, const void *data),
+		Matrix<double> &b, CGS_DATA *cgs_dat, const void *matvec_data,
+		const void *precon_data )
 {
 	int success = 0;
 	
@@ -1967,9 +1694,9 @@ int cgs( int (*matvec) (const Matrix& p, Matrix &Ap, const void *data),
 }
 
 //Function for solving a non-symmetric linear system using GCR
-int gcr( int (*matvec) (const Matrix& x, Matrix &Ax, const void *data),
-		int (*precon) (const Matrix& r, Matrix &Mr, const void *data),
-		Matrix &b, GCR_DATA *gcr_dat, const void *matvec_data,
+int gcr( int (*matvec) (const Matrix<double>& x, Matrix<double> &Ax, const void *data),
+		int (*precon) (const Matrix<double>& r, Matrix<double> &Mr, const void *data),
+		Matrix<double> &b, GCR_DATA *gcr_dat, const void *matvec_data,
 		const void *precon_data )
 {
 	int success = 0;
@@ -2251,7 +1978,7 @@ int gcr( int (*matvec) (const Matrix& x, Matrix &Ax, const void *data),
 			gcr_dat->breakdown = true;
 			break;
 		}
-
+		
 	}// END outer iterations
 	
 	//Post loop messages
@@ -2279,7 +2006,7 @@ int gcr( int (*matvec) (const Matrix& x, Matrix &Ax, const void *data),
 }
 
 //Function for preconditioning GCR in the GMRESR application
-int gmresPreconditioner( const Matrix& r, Matrix &Mr, const void *data)
+int gmresPreconditioner( const Matrix<double>& r, Matrix<double> &Mr, const void *data)
 {
 	int success = 0;
 	GMRESR_DATA *dat = (GMRESR_DATA *) data;
@@ -2317,9 +2044,9 @@ int gmresPreconditioner( const Matrix& r, Matrix &Mr, const void *data)
 }
 
 //Function for the implementation of the GMRESR algorithm
-int gmresr( int (*matvec) (const Matrix& x, Matrix &Ax, const void *data),
-		   int (*terminal_precon) (const Matrix& r, Matrix &Mr, const void *data),
-		   Matrix &b, GMRESR_DATA *gmresr_dat, const void *matvec_data,
+int gmresr( int (*matvec) (const Matrix<double>& x, Matrix<double> &Ax, const void *data),
+		   int (*terminal_precon) (const Matrix<double>& r, Matrix<double> &Mr, const void *data),
+		   Matrix<double> &b, GMRESR_DATA *gmresr_dat, const void *matvec_data,
 		   const void *term_precon_data )
 {
 	int success = 0;
@@ -2408,15 +2135,15 @@ int gmresr( int (*matvec) (const Matrix& x, Matrix &Ax, const void *data),
 	if (success != 0) {mError(simulation_fail); return -1;}
 	gmresr_dat->iter_outer = gmresr_dat->gcr_dat.total_iter;
 	gmresr_dat->total_iter = gmresr_dat->iter_outer + gmresr_dat->iter_inner;
-
+	
 	return success;
 }
 
 //Function for solving a non-linear system using a Picard or Fixed-Point iteration
-int picard( int (*res) (const Matrix& x, Matrix &r, const void *data),
-		    int (*evalx) (const Matrix& x0, Matrix &x, const void *data),
-		    Matrix &x, PICARD_DATA *picard_dat, const void *res_data,
-		    const void *evalx_data )
+int picard( int (*res) (const Matrix<double>& x, Matrix<double> &r, const void *data),
+		   int (*evalx) (const Matrix<double>& x0, Matrix<double> &x, const void *data),
+		   Matrix<double> &x, PICARD_DATA *picard_dat, const void *res_data,
+		   const void *evalx_data )
 {
 	int success = 0;
 	double res_old;
@@ -2569,7 +2296,7 @@ int picard( int (*res) (const Matrix& x, Matrix &r, const void *data),
 }
 
 //Jacobian-Vector Product function used by the PJFNK implementation
-int jacvec(const Matrix& v, Matrix& Jv, const void *data)
+int jacvec(const Matrix<double>& v, Matrix<double>& Jv, const void *data)
 {
 	int success = 0;
 	PJFNK_DATA *dat = (PJFNK_DATA *) data;
@@ -2595,8 +2322,8 @@ int jacvec(const Matrix& v, Matrix& Jv, const void *data)
 }
 
 //Implementation of the Backtracking Linesearch Algorithm for Newton's Method
-int backtrackLineSearch( int (*feval) (const Matrix& x, Matrix &F, const void *data),
-						Matrix &Fkp1, Matrix &xkp1, Matrix &pk, double normFk,
+int backtrackLineSearch( int (*feval) (const Matrix<double>& x, Matrix<double> &F, const void *data),
+						Matrix<double> &Fkp1, Matrix<double> &xkp1, Matrix<double> &pk, double normFk,
 						BACKTRACK_DATA *backtrack_dat, const void *feval_data)
 {
 	int success = 0;
@@ -2655,17 +2382,17 @@ int backtrackLineSearch( int (*feval) (const Matrix& x, Matrix &F, const void *d
 	
 	/*
 	 
-			Important Note: The pk search vector being passed to this algorithm is the POSITIVE
-	 	gradient and therefore not the decent direction. To make the result into a decent direction
-	 	the scalar multiple, lambda, must be a negative number between -1.0 and -lambdaMin OR we
-	 	need to subtract pk from xk instead of adding it. 
+	 Important Note: The pk search vector being passed to this algorithm is the POSITIVE
+	 gradient and therefore not the decent direction. To make the result into a decent direction
+	 the scalar multiple, lambda, must be a negative number between -1.0 and -lambdaMin OR we
+	 need to subtract pk from xk instead of adding it.
 	 
-	 		This is an artifact of the PJFNK routine, which uses a Krylov subspace to solve the 
-	 	linear system (J*s = F) instead of (J*s = -F). The reason we solve for the positive gradient
-	 	with the linear system is that our residual vector F cannot be passed to the subspace methods
-	 	as -F. Therefore, we solve for the positive gradient to maintain efficiency, then just subtract
-	 	the positive gradient as opposed to adding the negative gradient. Mathematically, it is exactly
-	 	the same. 
+	 This is an artifact of the PJFNK routine, which uses a Krylov subspace to solve the
+	 linear system (J*s = F) instead of (J*s = -F). The reason we solve for the positive gradient
+	 with the linear system is that our residual vector F cannot be passed to the subspace methods
+	 as -F. Therefore, we solve for the positive gradient to maintain efficiency, then just subtract
+	 the positive gradient as opposed to adding the negative gradient. Mathematically, it is exactly
+	 the same.
 	 
 	 */
 	
@@ -2731,17 +2458,17 @@ int backtrackLineSearch( int (*feval) (const Matrix& x, Matrix &F, const void *d
 			if (backtrack_dat->constRho == false)
 			{
 				a = (1.0 / (lambda - lambda_old)) * ( (backtrack_dat->normFkp1/pow(lambda,2.0)) - (normFk/pow(lambda,2.0)) - (slope/lambda) - (norm_old/pow(lambda_old,2.0)) + (normFk/pow(lambda_old,2.0)) + (slope/lambda_old) );
-			
+				
 				b = (1.0 / (lambda - lambda_old)) * ( -((backtrack_dat->normFkp1*lambda_old)/pow(lambda,2.0)) + ((normFk*lambda_old)/pow(lambda,2.0)) + ((slope*lambda_old)/lambda) + ((norm_old*lambda)/pow(lambda_old,2.0)) - ((normFk*lambda)/pow(lambda_old,2.0)) - ((slope*lambda)/lambda_old) );
-			
+				
 				disc = pow(b,2.0) - (3.0*a*slope);
 				if (disc < 0.0)
-				disc = 0.0;
-			
+					disc = 0.0;
+				
 				//Prepare for next iteration
 				lambda_old = lambda;
 				norm_old = backtrack_dat->normFkp1;
-			
+				
 				//Check to see if form is cubic or quadratic
 				if (a == 0.0)
 					lambda_temp = -slope / (2.0*b);
@@ -2780,15 +2507,15 @@ int backtrackLineSearch( int (*feval) (const Matrix& x, Matrix &F, const void *d
 			backtrack_dat->normFkp1 = Fkp1.norm();
 		}
 	}
-
+	
 	return success;
 }
 
 //Implementation of the PJFNK method for soling non-linear systems of equations
-int pjfnk( int (*res) (const Matrix& x, Matrix &F, const void *data),
-		   int (*precon) (const Matrix& r, Matrix& p, const void *data),
-		   Matrix &x, PJFNK_DATA *pjfnk_dat, const void *res_data,
-		   const void *precon_data )
+int pjfnk( int (*res) (const Matrix<double>& x, Matrix<double> &F, const void *data),
+		  int (*precon) (const Matrix<double>& r, Matrix<double>& p, const void *data),
+		  Matrix<double> &x, PJFNK_DATA *pjfnk_dat, const void *res_data,
+		  const void *precon_data )
 {
 	int success = 0;
 	double res_old;
@@ -2866,7 +2593,7 @@ int pjfnk( int (*res) (const Matrix& x, Matrix &F, const void *data),
 		pjfnk_dat->LineSearch = true;
 	if (pjfnk_dat->LineSearch == true)
 		pjfnk_dat->lin_tol = 1e-10;
-		
+	
 	//Start the method by calling the users F(x) function to form an initial residual
 	success = (*pjfnk_dat->funeval) (pjfnk_dat->x,pjfnk_dat->F,pjfnk_dat->res_data);
 	if (success != 0) {mError(simulation_fail); return -1;}
@@ -3221,12 +2948,12 @@ int pjfnk( int (*res) (const Matrix& x, Matrix &F, const void *data),
 					bounce--;
 				}
 			}
-
+			
 		}
 		else
 		{
 			pjfnk_dat->nl_res = pjfnk_dat->backtrack_dat.normFkp1;
-						
+			
 			//Check for saddle point
 			if (success == 1 && res_old <= pjfnk_dat->nl_res + pjfnk_dat->nl_tol_abs)
 			{
@@ -3313,708 +3040,4 @@ int pjfnk( int (*res) (const Matrix& x, Matrix &F, const void *data),
 	}
 	
 	return success;
-}
-
-//Testing grounds for the LARK Functions
-int LARK_TESTS()
-{
-    int success = 0;
-    
-    //Example 1:------------------------------------------------------------------------
-    //Building Kyrlov Subspace from linear system
-  	std::cout << "------------------Begin Example 1------------------" << std::endl;
-    EX01_DATA ex01_dat;
-    int rows = 100;
-    int cols = 100;
-    int maxk = 50;
-    double bound = -1.0;
-    double time;
-    ex01_dat.M.set_size(rows, cols);
-    ex01_dat.b.set_size(rows, 1);
-    ex01_dat.M.tridiagonalFill(-1, 2, -1, true);
-    ex01_dat.b.dirichletBCFill(0, 1, bound);
-
-    Matrix solution(rows,1), guess;
-    guess.set_size(rows,1);
-    time = clock();
-    solution.ladshawSolve(ex01_dat.M,ex01_dat.b);
-    time = clock() - time;
-    std::cout << "Direct Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-    std::cout << "Norm =\t" << (ex01_dat.b - ex01_dat.M*solution).norm() << std::endl; //(PASS)
-    
-    Matrix r0(rows,1);
-    r0 = ex01_dat.b - ex01_dat.M*guess;
-    KRYLOV_DATA krylov_dat;
-    krylov_dat.k = maxk;
-    
-    time = clock();
-    success = krylov(matvec_ex01,precon_ex01,r0,&krylov_dat,(void *)&ex01_dat, (void *)&ex01_dat);
-    
-    Matrix x;
-    success = update_krylov_solution(x, guess, krylov_dat.Vk, krylov_dat.yk);
-    time = clock() - time;
-    std::cout << "Krylov Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;;
-    std::cout << "Norm =\t" << (ex01_dat.b - ex01_dat.M*x).norm() << std::endl; //(PASS)
-  	GMRESLP_DATA fom_dat;
-  	time = clock();
-  	success = fom(matvec_ex01,precon_ex01,ex01_dat.b,&fom_dat,(void *)&ex01_dat,(void *)&ex01_dat);
-  	time = clock() - time;
-  	std::cout << "FULL GMRES Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-  	std::cout << "FULL GMRES Norm: " << (ex01_dat.b - ex01_dat.M*fom_dat.x).norm() << std::endl;
-    std::cout << "------------------END Example 1------------------\n" << std::endl;
-    //END Example 1:-------------------------------------------------------------------
-  
-  	//Example 2: ----------------------------------------------------------------------
-    /*
-     Solve 2x2 system defined in Saad and Schultz (1986) paper
-     
-     		Ax = b -> A = |0  1|		b = |1|		x0 = |0|
-						  |-1 0|		    |1|			 |0|
-     
-     		Solution: x = |-1|
-						  | 1|
-     
-     		Any other solution technique will break down for this system because the diagonals
-     		of A are all zero. However, the system is not singular, it is just order strangely.
-     		This demonstrates that the Krylov method can be used to solve linear systems directly,
-     		where other methods may break down and fail to find a solution. 
-     
-     */
-  	std::cout << "------------------Begin Example 2------------------" << std::endl;
-  	EX02_DATA ex02_dat;
-  	ex02_dat.M.set_size(2, 2);
-  	ex02_dat.b.set_size(2, 1);
-  	Matrix x0(2,1);
-  	ex02_dat.M.edit(0, 0, 0); ex02_dat.M.edit(0, 1, 1);
-  	ex02_dat.M.edit(1, 0, -1); ex02_dat.M.edit(1, 1, 0);
-  	ex02_dat.b.ConstantICFill(1);
-  	x0.ConstantICFill(0);
-  	r0 = ex02_dat.b - ex02_dat.M*x0;
-  	krylov_dat.k = 2;
-  	krylov_dat.iter = 0;
-  	time = clock();
-  	success = krylov(matvec_ex02,NULL,r0,&krylov_dat,(void *)&ex02_dat,(void *)&ex02_dat);
-	std::cout << "Krylov Exit Code: " << success << std::endl;
-	success = update_krylov_solution(x, x0, krylov_dat.Vk, krylov_dat.yk);
-  	time = clock() - time;
-  	std::cout << "Krylov Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-  	x.Display("x");
-  	std::cout << "Norm =\t" << (ex02_dat.b - ex02_dat.M*x).norm() << std::endl; //(PASS)
-  	std::cout << "------------------END Example 2------------------\n" << std::endl;
-  	//END Example 2:-------------------------------------------------------------------
-  
-  	//Example 3:-------------------------------------------------------------------------
- 		 /*
-   
-   			Solve Example 1 iteratively using the default settings for GMRES
-   
-   	*/
-  	std::cout << "------------------Begin Example 3------------------" << std::endl;
-  	std::cout << "Solving Example 1 with default GMRES arguments" << std::endl;
-  	GMRESLP_DATA gmres_dat;
-  	gmres_dat.restart = 20;
-  	time = clock();
-  	success = gmresLeftPreconditioned(matvec_ex01,precon_ex01,ex01_dat.b,&gmres_dat,(void *)&ex01_dat,(void *)&ex01_dat); //(PASS)
-	//success = gmresr(matvec_ex01,NULL,ex01_dat.b,&gmres_dat,(void *)&ex01_dat,(void *)&ex01_dat);
-  	//gmres_dat.x.Display("x");
-  	time = clock() - time;
-  	std::cout << "GMRES Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-  	std::cout << "GMRES Norm: " << (ex01_dat.b - ex01_dat.M*gmres_dat.x).norm() << std::endl;
-  	std::cout << "GMRES Total Evaluations: " << gmres_dat.steps << std::endl;
-  	std::cout << "------------------END Example 3------------------\n" << std::endl;
-  	//END Example 3:-------------------------------------------------------------------------
-  
-  
-  	//Example 4: -------------------------------------------------------------------------------
-  	/*
-     			We want to see how well the GMRES implementation does at solving a more complex, sparse
-     			system of equations. One in which none of our current methods, aside from FOM, would be
-     			able to solve directly. 
-     
-     			NOTE: if I am going to use DENSE matrices with these codes, I should not use a size 
-     			greater than 1000x1000. For sizes larger than this, you must use either Sparse matrices
-     			or some kind of matrix free format for evaluating the functions. 
-     */
-  	std::cout << "------------------Begin Example 4------------------" << std::endl;
-  	std::cout << "Solving a 3D Laplacian function with default GMRES" << std::endl;
-  	EX04_DATA ex04_dat;
-  	int m = 5;
-  	ex04_dat.M.naturalLaplacian3D(m); //Creates a mxmxm matrix for a 3D Laplacian function
-  	ex04_dat.b.set_size(m*m*m, 1);
-  	ex04_dat.b.edit(0, 0, -1);
-  	ex04_dat.b.edit(m*m-1, 0, -1);
-  	ex04_dat.b.edit(m*m*m-1, 0, -1);
-  	GMRESLP_DATA gmres_dat4;
-  	gmres_dat4.restart = 20;
-  
-  	time = clock();
-  	success = gmresLeftPreconditioned(matvec_ex04,precon_ex04,ex04_dat.b,&gmres_dat4,(void *)&ex04_dat,(void *)&ex04_dat);
-  	time = clock() - time;
-  	x.ladshawSolve(ex04_dat.M, ex04_dat.b);
-  	std::cout << "Precon Norm: " << (ex04_dat.b - ex04_dat.M*x).norm() << std::endl;
-  	std::cout << "GMRES Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-  	std::cout << "GMRES Norm: " << (ex04_dat.b - ex04_dat.M*gmres_dat4.x).norm() << std::endl;
-  	std::cout << "GMRES Total Evaluations: " << gmres_dat4.steps << std::endl;
-  	std::cout << "------------------END Example 4------------------\n" << std::endl;
-  
-  	//END Example 4:----------------------------------------------------------------------------
-	
-	
-	//Example 5: --------------------------------------------------------------------------------
-	/*
-	 		Solve example 4 using PCG algorithm and compare computation time to that of GMRES.
-			Note that example 4 was solving a symmetric system with GMRES and performed very
-			well. Here, we expect PCG to perform better because it requires much less memory
-			and fewer matrix-vector multiplications
-	 
-			This method did indeed outperform GMRES for the same symmetric problem!
-	 */
-	std::cout << "------------------Begin Example 5------------------" << std::endl;
-  	std::cout << "Solving a 3D Laplacian function with default PCG" << std::endl;
-	PCG_DATA pcg_dat5;
-	time = clock();
-	success = pcg(matvec_ex04,precon_ex04,ex04_dat.b,&pcg_dat5,(void *)&ex04_dat,(void *)&ex04_dat);
-	//success = pcg(matvec_ex04,NULL,ex04_dat.b,&pcg_dat5,(void *)&ex04_dat,(void *)&ex04_dat);
-	time = clock() - time;
-	std::cout << "PCG Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-  	std::cout << "PCG Norm: " << (ex04_dat.b - ex04_dat.M*pcg_dat5.x).norm() << std::endl;
-  	std::cout << "PCG Iterations: " << pcg_dat5.iter << std::endl;
-	std::cout << "------------------END Example 5------------------\n" << std::endl;
-	
-	//END Example 5:----------------------------------------------------------------------------
-	
-	//Example 6: --------------------------------------------------------------------------------
-	/*
-	 		Attempt to solve example 1 with PCG. Example 1 is a non-symmetric matrix, so we do
-			not anticipate this to converge to a reasonable solution. However, we want to see
-			what happens in the method when the matrix is non-symmetric. Does the residual 
-			improve? What is the behavior like?
-	 
-	 		The norm was reduced, but it never converged! The behavior of the norm was not
-	 		very good. Was noisy and unstable, which may contribute to non-convergence. For
-	 		examples 7 and 8, we will try to solve this same problem, but using BiCGSTAB.
-	 */
-	std::cout << "------------------Begin Example 6------------------" << std::endl;
-  	std::cout << "Solving a 1D Non-symmetric Laplacian function with default PCG" << std::endl;
-	PCG_DATA pcg_dat6;
-	time = clock();
-	success = pcg(matvec_ex01,precon_ex01,ex01_dat.b,&pcg_dat6,(void *)&ex01_dat,(void *)&ex01_dat);
-	time = clock() - time;
-	std::cout << "PCG Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-  	std::cout << "PCG Norm: " << (ex01_dat.b - ex01_dat.M*pcg_dat6.x).norm() << std::endl;
-  	std::cout << "PCG Iterations: " << pcg_dat6.iter << std::endl;
-	std::cout << "------------------END Example 6------------------\n" << std::endl;
-	
-	//END Example 6:----------------------------------------------------------------------------
-	
-	
-	//Example 7: --------------------------------------------------------------------------------
-	/*
-			Solve the non-symmetric 1-D Laplacian with BiCGSTAB algorithm. Previous example tried
-	 		and failed to solve this system with PCG. Example 3 demonstrated the the GMRES
-	 		implementation was able to solve this problem and reduce the residual monotonically.
-	 		Here, we expect BiCGSTAB to be able to solve the problem, but expect the residuals
-	 		to not decrease monotonically. Whether or not this is more computationally efficient
-	 		than GMRES will really depend on the problem we are solving. 
-	 
-			For this particular problem, BiCGSTAB too more iterations to converge than GMRES, but 
-	 		solved the system faster than GMRES. This is because BiCGSTAB is a much more 
-	 		computationally efficient algorithm that GMRES due to the recurrences in the code. 
-	 */
-	std::cout << "------------------Begin Example 7------------------" << std::endl;
-  	std::cout << "Solving a 1D Non-symmetric Laplacian function with default BiCGSTAB" << std::endl;
-	BiCGSTAB_DATA bicg_dat7;
-	time = clock();
-	success = bicgstab(matvec_ex01,precon_ex01,ex01_dat.b,&bicg_dat7,(void *)&ex01_dat,(void *)&ex01_dat);
-	time = clock() - time;
-	std::cout << "BiCGSTAB Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-  	std::cout << "BiCGSTAB Norm: " << (ex01_dat.b - ex01_dat.M*bicg_dat7.x).norm() << std::endl;
-  	std::cout << "BiCGSTAB Iterations: " << bicg_dat7.iter << std::endl;
-	std::cout << "------------------END Example 7------------------\n" << std::endl;
-	
-	//END Example 7:----------------------------------------------------------------------------
-	
-	
-	//Example 8: --------------------------------------------------------------------------------
-	/*
-	 		Solve the non-symmetric 1-D Laplacian with the CGS algorithm. This is another
-			iterative method for solving non-symmetric linear systems that has often been
-	 		implemented by engineers and scientists. In theory, BiCGSTAB should be more
-	 		stable than CGS, but for some problems CGS will converge faster than BiCGSTAB.
-	 
-	 		Case in point, for this example, CGS converged in 100 iterations whereas 
-	 		BiCGSTAB converged in 110. However, the convergence behavior of BiCGSTAB was
-	 		much, much smoother than that of this CGS implementation. 
-	 
-	 		That is of course if we consider using preconditioning. Without preconditioning,
-	 		CGS for this problem diverges and will not converge in 200 iterations, while
-	 		BiCGSTAB still converges, but takes 159 iterations. 
-	 
-	 		The take away from this is that if a preconditioner is available, use CGS over
-	 		BiCGSTAB. However, if no preconditioner is available, then use BiCGSTAB. If the
-	 		linear system is not well conditioned, or if CGS and BiCGSTAB fail, then use
-	 		GMRES. If the system is small enough, just use FOM. For any symmetric matrix,
-	 		always use PCG. This will be a convention we adopt moving forward to developing
-	 		our implementation of PJFNK for non-linear systems. 
-	 */
-	std::cout << "------------------Begin Example 8------------------" << std::endl;
-	
-	//NOTE: This also demonstrates use of pointers to data structures embeded in other structures
-	PJFNK_DATA test;
-	test.res_data = (void *)&ex01_dat;
-	
-  	std::cout << "Solving a 1D Non-symmetric Laplacian function with default CGS" << std::endl;
-	CGS_DATA cgs_dat8;
-	time = clock();
-	success = cgs(matvec_ex01,precon_ex01,ex01_dat.b,&cgs_dat8,test.res_data,(void *)&ex01_dat);
-	time = clock() - time;
-	std::cout << "CGS Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-  	std::cout << "CGS Norm: " << (ex01_dat.b - ex01_dat.M*cgs_dat8.x).norm() << std::endl;
-  	std::cout << "CGS Iterations: " << cgs_dat8.iter << std::endl;
-	std::cout << "------------------END Example 8------------------\n" << std::endl;
-	
-	//END Example 8:----------------------------------------------------------------------------
-	
-	
-	//Example 9 and 10: ------------------------------------------------------------------------
-	
-	/*
-	 		This example shows the use of both Picard and PJFNK methods for solving non-linear
-			systems of equations. In this example, the non-linear system arises from a non-linear
-	 		PDE of a 1-D Laplacian with a non-linear term k*exp(u);
-	 
-	 		Solve: 		-d^2u/dx^x - k*exp(u) = 0
-	 		
-	 			F(u) = 0 = -u(i+1) + 2*u(i) - u(i-1) - h^2*k*exp(u(i))
-	 			BCs:	u(0) = u(1) = 0
-	 
-	 		Split into linear and non-linear parts for both the Picard iteration and as a 
-	 		preconditioner for the PJFNK method and compare the results.
-	 
-	 		Note: Picard could not converge for this problem. May be too strongly non-linear...
-	 
-	 		Was able to get Picard to converge after 291 Non-linear iterations, but problem size
-	 		is of order 10. Very poor convergence for this problem. 
-	 		
-	 */
-	
-	std::cout << "------------------Begin Example 9------------------" << std::endl;
-	
-	EX09_DATA ex09_dat;
-	ex09_dat.k = 1.0;
-	ex09_dat.N = 12;
-	ex09_dat.h = 1.0/ex09_dat.N;
-	ex09_dat.N = ex09_dat.N-2;
-	ex09_dat.x.set_size(ex09_dat.N, 1);
-	ex09_dat.s.set_size(ex09_dat.N, 1);
-	ex09_dat.p.set_size(ex09_dat.N, 1);
-	ex09_dat.M.set_size(ex09_dat.N, ex09_dat.N);
-	ex09_dat.M.tridiagonalFill(-1, 2, -1, false);
-	
-	//First try to solve with Picard's Method
-	PICARD_DATA picard_dat09;
-	picard_dat09.maxit = 300;
-	time = clock();
-	success = picard(funeval_ex09, evalx_ex09, ex09_dat.x, &picard_dat09, (void *)&ex09_dat, (void *)&ex09_dat);
-	time = clock() - time;
-	success = funeval_ex09(ex09_dat.x, ex09_dat.p, (void *)&ex09_dat);
-	std::cout << "PICARD Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-  	std::cout << "PICARD Norm: " << ex09_dat.p.norm() << std::endl;
-  	std::cout << "PICARD Iterations: " << picard_dat09.iter << std::endl;
-	
-	//std::cout << std::endl;
-	//ex09_dat.x.Display("x");
-	
-	std::cout << "------------------END Example 9------------------\n" << std::endl;
-	
-	std::cout << "------------------Begin Example 10------------------" << std::endl;
-	
-	ex09_dat.k = 1.0;
-	ex09_dat.N = 102;
-	ex09_dat.h = 1.0/ex09_dat.N;
-	ex09_dat.N = ex09_dat.N-2;
-	ex09_dat.x.set_size(ex09_dat.N, 1);
-	ex09_dat.s.set_size(ex09_dat.N, 1);
-	ex09_dat.p.set_size(ex09_dat.N, 1);
-	ex09_dat.M.set_size(ex09_dat.N, ex09_dat.N);
-	ex09_dat.M.tridiagonalFill(-1, 2, -1, false);
-	
-	//Next try to solve with PJFNK method
-	ex09_dat.x.ConstantICFill(0.0);
-	PJFNK_DATA pjfnk_dat10;
-	pjfnk_dat10.linear_solver = GMRESRP;
-	//pjfnk_dat10.L_Output = true;
-	//pjfnk_dat10.gmres_dat.Expand = true;
-	
-	//NOTE: You do not have to set these, they will be automatically set when PJFNK is called
-	//pjfnk_dat10.linear_solver = GMRESLP;
-	//pjfnk_dat10.lin_tol = 1e-4;
-	//pjfnk_dat10.res_data = (void *)&ex09_dat;		//Required if your functions need your data
-	//pjfnk_dat10.precon_data = (void *)&ex09_dat;	//Required if your preconditioner needs data
-	//pjfnk_dat10.funeval = (*funeval_ex10);			//Always required
-	//pjfnk_dat10.precon = (*precon_ex10);			//Optional, but recommended
-	
-	time = clock();
-	//success = pjfnk(funeval_ex10, precon_ex10, ex09_dat.x, &pjfnk_dat10, (void *)&ex09_dat, (void *)&ex09_dat);
-	success = pjfnk(funeval_ex10, NULL, ex09_dat.x, &pjfnk_dat10, (void *)&ex09_dat, NULL);
-	time = clock() - time;
-	success = funeval_ex10(ex09_dat.x, ex09_dat.p, (void *)&ex09_dat);
-	std::cout << "PJFNK Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-  	std::cout << "PJFNK Norm: " << ex09_dat.p.norm() << std::endl;
-  	std::cout << "PJFNK Iterations: " << pjfnk_dat10.nl_iter << std::endl;
-	
-	//std::cout << std::endl;
-	//ex09_dat.x.Display("x");
-	
-	std::cout << "------------------END Example 10------------------\n" << std::endl;
-	
-	//END Example 9 and 10: --------------------------------------------------------------------
-	
-	//Example 11: ----------------------------------------------------------------------
-	/*
-	 Solve 2x2 system defined in Saad and Schultz (1986) paper
-	 
-	 Ax = b -> A = |0  1|		b = |1|		x0 = |0|
-	 |-1 0|		    |1|			 |0|
-	 
-	 Solution: x = |-1|
-	 | 1|
-	 
-	 Any other solution technique will break down for this system because the diagonals
-	 of A are all zero. However, the system is not singular, it is just order strangely.
-	 This demonstrates that the Krylov method can be used to solve linear systems directly,
-	 where other methods may break down and fail to find a solution.
-	 
-	 */
-	std::cout << "------------------Begin Example 11------------------" << std::endl;
-	std::cout << "Solving a 2x2 indefinite system with default Right-Preconditioned GMRES" << std::endl;
-	ex02_dat.M.set_size(2, 2);
-	ex02_dat.b.set_size(2, 1);
-	ex02_dat.M.edit(0, 0, 0); ex02_dat.M.edit(0, 1, 1);
-	ex02_dat.M.edit(1, 0, -1); ex02_dat.M.edit(1, 1, 0);
-	ex02_dat.b.ConstantICFill(1);
-	x0.ConstantICFill(0);
-	r0 = ex02_dat.b - ex02_dat.M*x0;
-	
-	GMRESRP_DATA cgmres_dat;
-	//cgmres_dat.restart = 2;
-	//cgmres_dat.maxit = 1;
-	time = clock();
-	
-	success = gmresRightPreconditioned(matvec_ex02,NULL,ex02_dat.b,&cgmres_dat,(void *)&ex02_dat,(void *)&ex02_dat);
-	std::cout << "GMRES Exit Code: " << success << std::endl;
-	
-	time = clock() - time;
-	std::cout << "GMRES Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-	cgmres_dat.x.Display("gmres_x");
-	std::cout << "Norm =\t" << (ex02_dat.b - ex02_dat.M*cgmres_dat.x).norm() << std::endl; //(PASS)
-	
-	std::cout << "\nSolving a 2x2 indefinite system with default GCR" << std::endl;
-	GCR_DATA gcr11;
-	
-	time = clock();
-	
-	success = gcr(matvec_ex02,NULL,ex02_dat.b,&gcr11,(void *)&ex02_dat,(void *)&ex02_dat);
-	std::cout << "GCR Exit Code: " << success << std::endl;
-	
-	time = clock() - time;
-	std::cout << "GCR Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-	std::cout << "GCR inner iterations: " << gcr11.iter_inner << std::endl;
-	std::cout << "GCR outer iterations: " << gcr11.iter_outer << std::endl;
-	std::cout << "GCR total iterations: " << gcr11.total_iter << std::endl;
-	gcr11.x.Display("gcr_x");
-	std::cout << "Norm =\t" << (ex02_dat.b - ex02_dat.M*gcr11.x).norm() << std::endl; //FAIL!!!
-	
-	
-	std::cout << "\nSolving a 2x2 indefinite system with default GMRESR" << std::endl;
-	
-	GMRESR_DATA gmresr11;
-	
-	time = clock();
-	
-	success = gmresr(matvec_ex02,NULL,ex02_dat.b,&gmresr11,(void *)&ex02_dat,(void *)&ex02_dat);
-	std::cout << "GCR Exit Code: " << success << std::endl;
-	
-	time = clock() - time;
-	std::cout << "GCR Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-	std::cout << "GCR inner iterations: " << gmresr11.gcr_dat.iter_inner << std::endl;
-	std::cout << "GCR outer iterations: " << gmresr11.gcr_dat.iter_outer << std::endl;
-	std::cout << "GCR total iterations: " << gmresr11.gcr_dat.total_iter << std::endl;
-	gmresr11.gcr_dat.x.Display("gmresr_x");
-	std::cout << "Norm =\t" << (ex02_dat.b - ex02_dat.M*gmresr11.gcr_dat.x).norm() << std::endl; //FAIL!!!
-	
-	std::cout << "------------------END Example 11------------------\n" << std::endl;
-	//END Example 11:-------------------------------------------------------------------
-	
-	//Example 12: -------------------------------------------------------------------------------
-	/*
-	 We want to see how well the Compact GMRES implementation does at solving a more complex, sparse
-	 system of equations. One in which none of our current methods, aside from FOM, would be
-	 able to solve directly.
-	 
-	 NOTE: if I am going to use DENSE matrices with these codes, I should not use a size
-	 greater than 1000x1000. For sizes larger than this, you must use either Sparse matrices
-	 or some kind of matrix free format for evaluating the functions.
-	 */
-	std::cout << "------------------Begin Example 12------------------" << std::endl;
-	std::cout << "Solving a 3D Laplacian function with default Right-Preconditioned GMRES" << std::endl;
-	m = 5;
-	ex04_dat.M.naturalLaplacian3D(m); //Creates a mxmxm matrix for a 3D Laplacian function
-	ex04_dat.b.set_size(m*m*m, 1);
-	ex04_dat.b.edit(0, 0, -1);
-	ex04_dat.b.edit(m*m-1, 0, -1);
-	ex04_dat.b.edit(m*m*m-1, 0, -1);
-	GMRESRP_DATA cgmres_dat4;
-	//cgmres_dat4.restart = 5;
-	
-	time = clock();
-	success = gmresRightPreconditioned(matvec_ex04,precon_ex04,ex04_dat.b,&cgmres_dat4,(void *)&ex04_dat,(void *)&ex04_dat);
-	//success = gmresRightPreconditioned(matvec_ex04,NULL,ex04_dat.b,&cgmres_dat4,(void *)&ex04_dat,(void *)&ex04_dat);
-	time = clock() - time;
-	x.ladshawSolve(ex04_dat.M, ex04_dat.b);
-	std::cout << "Precon Norm: " << (ex04_dat.b - ex04_dat.M*x).norm() << std::endl;
-	std::cout << "GMRES Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-	std::cout << "GMRES Norm: " << (ex04_dat.b - ex04_dat.M*cgmres_dat4.x).norm() << std::endl;
-	std::cout << "GMRES Total Evaluations: " << cgmres_dat4.iter_total << std::endl;
-	std::cout << "GMRES Restarts: " << cgmres_dat4.iter_outer << std::endl;
-	
-	std::cout << "\nSolving a 3D Laplacian function with default GCR" << std::endl;
-	GCR_DATA gcr12;
-	//gcr12.restart = 5;
-	time = clock();
-	success = gcr(matvec_ex04,precon_ex04,ex04_dat.b,&gcr12,(void *)&ex04_dat,(void *)&ex04_dat);
-	//success = gcr(matvec_ex04,NULL,ex04_dat.b,&gcr12,(void *)&ex04_dat,(void *)&ex04_dat);
-	time = clock() - time;
-	std::cout << "GCR Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-	std::cout << "GCR Norm: " << (ex04_dat.b - ex04_dat.M*gcr12.x).norm() << std::endl; //PASS
-	std::cout << "GCR inner iterations: " << gcr12.iter_inner << std::endl;
-	std::cout << "GCR outer iterations: " << gcr12.iter_outer << std::endl;
-	std::cout << "GCR total iterations: " << gcr12.total_iter << std::endl;
-	
-	std::cout << "------------------END Example 12------------------\n" << std::endl;
-	
-	//END Example 12:----------------------------------------------------------------------------
-	
-	//Example 13: --------------------------------------------------------------------------------
-	/*
-	 Solve the non-symmetric 1-D Laplacian with CGMRES algorithm. Previous example tried
-	 and failed to solve this system with PCG. Example 3 demonstrated the the GMRES
-	 implementation was able to solve this problem and reduce the residual monotonically.
-	 Here, we expect BiCGSTAB to be able to solve the problem, but expect the residuals
-	 to not decrease monotonically. Whether or not this is more computationally efficient
-	 than GMRES will really depend on the problem we are solving.
-	 
-	 For this particular problem, BiCGSTAB too more iterations to converge than GMRES, but
-	 solved the system faster than GMRES. This is because BiCGSTAB is a much more
-	 computationally efficient algorithm that GMRES due to the recurrences in the code.
-	 */
-	std::cout << "------------------Begin Example 13------------------" << std::endl;
-	std::cout << "Solving a 1D Non-symmetric Laplacian function with default Right-Preconditioned GMRES" << std::endl;
-	GMRESRP_DATA cgmres_dat13;
-	cgmres_dat13.restart = ex01_dat.b.rows();
-	cgmres_dat13.x.set_size(ex01_dat.b.rows(), 1);
-	cgmres_dat13.restart = 100;
-	time = clock();
-	success = gmresRightPreconditioned(matvec_ex01,precon_ex01,ex01_dat.b,&cgmres_dat13,(void *)&ex01_dat,(void *)&ex01_dat);
-	//success = gmresRightPreconditioned(matvec_ex01,NULL,ex01_dat.b,&cgmres_dat13,(void *)&ex01_dat,(void *)&ex01_dat);
-	time = clock() - time;
-	std::cout << "GMRES Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-	std::cout << "GMRES Norm: " << (ex01_dat.b - ex01_dat.M*cgmres_dat13.x).norm() << std::endl;
-	std::cout << "GMRES Iterations: " << cgmres_dat13.iter_total << std::endl;
-	std::cout << "GMRES Restarts: " << cgmres_dat13.iter_outer << std::endl;
-	std::cout << "------------------END Example 13------------------\n" << std::endl;
-	
-	std::cout << "\nSolving a 1D Non-symmetric Laplacian function with default GCR" << std::endl;
-	
-	GCR_DATA gcr13;
-	gcr13.restart = 100;
-	gcr13.x.set_size(ex01_dat.b.rows(), 1);
-	time = clock();
-	success = gcr(matvec_ex01,precon_ex01,ex01_dat.b,&gcr13,(void *)&ex01_dat,(void *)&ex01_dat);
-	//success = gcr(matvec_ex01,NULL,ex01_dat.b,&gcr13,(void *)&ex01_dat,(void *)&ex01_dat);
-	time = clock() - time;
-	std::cout << "GCR Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-	std::cout << "GCR Norm: " << (ex01_dat.b - ex01_dat.M*gcr13.x).norm() << std::endl; //PASS
-	std::cout << "GCR inner iterations: " << gcr13.iter_inner << std::endl;
-	std::cout << "GCR outer iterations: " << gcr13.iter_outer << std::endl;
-	std::cout << "GCR total iterations: " << gcr13.total_iter << std::endl;
-	
-	std::cout << "\nSolving a 1D Non-symmetric Laplacian function with default GMRESR" << std::endl;
-	
-	GMRESR_DATA gmresr13;
-	//gmresr13.gmres_restart = 10;
-	time = clock();
-	success = gmresr(matvec_ex01,precon_ex01,ex01_dat.b,&gmresr13,(void *)&ex01_dat,(void *)&ex01_dat);
-	time = clock() - time;
-	std::cout << "GMRESR Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-	std::cout << "GMRESR Norm: " << (ex01_dat.b - ex01_dat.M*gmresr13.gcr_dat.x).norm() << std::endl; //PASS
-	std::cout << "GMRESR inner iterations: " << gmresr13.gcr_dat.iter_inner << std::endl;
-	std::cout << "GMRESR outer iterations: " << gmresr13.gcr_dat.iter_outer << std::endl;
-	std::cout << "GMRESR total iterations: " << gmresr13.gcr_dat.total_iter << std::endl;
-	
-	//END Example 13:----------------------------------------------------------------------------
-	
-	std::cout << "------------------Begin Example 14------------------" << std::endl;
-	
-	ex09_dat.k = 4.0;
-	ex09_dat.N = 102;
-	ex09_dat.h = 1.0/ex09_dat.N;
-	ex09_dat.N = ex09_dat.N-2;
-	ex09_dat.x.set_size(ex09_dat.N, 1);
-	ex09_dat.s.set_size(ex09_dat.N, 1);
-	ex09_dat.p.set_size(ex09_dat.N, 1);
-	ex09_dat.M.set_size(ex09_dat.N, ex09_dat.N);
-	ex09_dat.M.tridiagonalFill(-1, 2, -1, false);
-	
-	//Next try to solve with PJFNK method
-	ex09_dat.x.ConstantICFill(0.0);
-	PJFNK_DATA pjfnk_dat14;
-	
-	//NOTE: You do not have to set these, they will be automatically set when PJFNK is called
-	//pjfnk_dat14.L_Output = true;
-	pjfnk_dat14.linear_solver = GMRESR; //Choice 1 (PCG) and 4 (GMRES_FULL) are not choosen by PJFNK
-	pjfnk_dat14.LineSearch = true;
-	//pjfnk_dat14.Bounce = true;
-	//pjfnk_dat14.backtrack_dat.constRho = true;
-	
-	time = clock();
-	success = pjfnk(funeval_ex10, precon_ex10, ex09_dat.x, &pjfnk_dat14, (void *)&ex09_dat, (void *)&ex09_dat);
-	//success = pjfnk(funeval_ex10, NULL, ex09_dat.x, &pjfnk_dat14, (void *)&ex09_dat, (void *)&ex09_dat);
-	time = clock() - time;
-	success = funeval_ex10(ex09_dat.x, ex09_dat.p, (void *)&ex09_dat);
-	std::cout << "PJFNK Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-  	std::cout << "PJFNK Norm: " << ex09_dat.p.norm() << std::endl;
-  	std::cout << "PJFNK Iterations: " << pjfnk_dat14.nl_iter << std::endl;
-	
-	//std::cout << std::endl;
-	//ex09_dat.x.Display("x");
-	
-	std::cout << "------------------END Example 14------------------\n" << std::endl;
-	
-	
-	
-	
-	
-	std::cout << "------------------Begin Example 15------------------" << std::endl;
-	
-	/*
-	 *			SOLVE a 3D Laplacian without using matrices... Sparse System Handling
-	 */
-	
-	std::cout << "Solving a 125,000 Linear Equations with default Right-Preconditioned GMRES, PCG, BiCGSTAB, and CGS" << std::endl;
-	
-	//Setup Data Structure for Sparse Laplacian
-	EX15_DATA ex15_dat;
-	ex15_dat.m = 50;
-	ex15_dat.N = ex15_dat.m*ex15_dat.m*ex15_dat.m;
-	ex15_dat.b.set_size(ex15_dat.N, 1);
-	ex15_dat.b.edit(0, 0, -1);
-	ex15_dat.b.edit(ex15_dat.m*ex15_dat.m-1, 0, -1);
-	ex15_dat.b.edit(ex15_dat.m*ex15_dat.m*ex15_dat.m-1, 0, -1);
-	x.set_size(ex15_dat.N, 1);
-	
-
-	std::cout << "\n------------------START GMRES------------------" << std::endl;
-	
-	//Setup GMRES
-	GMRESRP_DATA gmres_dat15;
-	
-	time = clock();
-	success = gmresRightPreconditioned(matvec_ex15,NULL,ex15_dat.b,&gmres_dat15,(void *)&ex15_dat,(void *)&ex15_dat);
-	time = clock() - time;
-	std::cout << "GMRES Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-	success = matvec_ex15(gmres_dat15.x, x, (void *)&ex15_dat);
-	std::cout << "GMRES Norm: " << (ex15_dat.b - x).norm() << std::endl;
-	std::cout << "GMRES Total Evaluations: " << gmres_dat15.iter_total << std::endl;
-	std::cout << "GMRES Restarts: " << gmres_dat15.iter_outer << std::endl;
-		
-	//Setup PCG
-	PCG_DATA pcg_dat15;
-	
-	std::cout << "\n------------------START PCG------------------" << std::endl;
-	
-	time = clock();
-	success = pcg(matvec_ex15, NULL, ex15_dat.b, &pcg_dat15, (void *)&ex15_dat, (void *)&ex15_dat);
-	time = clock() - time;
-	std::cout << "PCG Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-	success = matvec_ex15(pcg_dat15.x, x, (void *)&ex15_dat);
-	std::cout << "PCG Norm: " << (ex15_dat.b - x).norm() << std::endl;
-	std::cout << "PCG Total Evaluations: " << pcg_dat15.iter << std::endl;
-	
-	//Setup BiCGSTAB
-	BiCGSTAB_DATA bicg_dat15;
-	
-	std::cout << "\n------------------START BiCGSTAB------------------" << std::endl;
-	
-	time = clock();
-	success = bicgstab(matvec_ex15, NULL, ex15_dat.b, &bicg_dat15, (void *)&ex15_dat, (void *)&ex15_dat);
-	time = clock() - time;
-	std::cout << "BiCGSTAB Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-	success = matvec_ex15(bicg_dat15.x, x, (void *)&ex15_dat);
-	std::cout << "BiCGSTAB Norm: " << (ex15_dat.b - x).norm() << std::endl;
-	std::cout << "BiCGSTAB Total Evaluations: " << bicg_dat15.iter << std::endl;
-	
-	//Setup CGS
-	CGS_DATA cgs_dat15;
-	
-	std::cout << "\n------------------START CGS------------------" << std::endl;
-	
-	time = clock();
-	success = cgs(matvec_ex15, NULL, ex15_dat.b, &cgs_dat15, (void *)&ex15_dat, (void *)&ex15_dat);
-	time = clock() - time;
-	std::cout << "CGS Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-	success = matvec_ex15(cgs_dat15.x, x, (void *)&ex15_dat);
-	std::cout << "CGS Norm: " << (ex15_dat.b - x).norm() << std::endl;
-	std::cout << "CGS Total Evaluations: " << cgs_dat15.iter << std::endl;
-	
-	
-	std::cout << "\n------------------START Left Preconditioned GMRES-------------------" << std::endl;
-	
-	GMRESLP_DATA gmres_rec15;
-	
-	time = clock();
-	success = gmresLeftPreconditioned(matvec_ex15,NULL,ex15_dat.b,&gmres_rec15,(void *)&ex15_dat,NULL);
-	time = clock() - time;
-	std::cout << "GMRES Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-	success = matvec_ex15(gmres_rec15.x, x, (void *)&ex15_dat);
-	std::cout << "GMRES Norm: " << (ex15_dat.b - x).norm() << std::endl;
-	std::cout << "GMRES Total Evaluations: " << gmres_rec15.steps << std::endl;
-	std::cout << "GMRES Restarts: " << gmres_rec15.iter << std::endl;
-	
-	std::cout << "\n------------------START GCR-------------------" << std::endl;
-	
-	GCR_DATA gcr15;
-	
-	time = clock();
-	success = gcr(matvec_ex15,NULL,ex15_dat.b,&gcr15,(void *)&ex15_dat,(void *)&ex15_dat);
-	time = clock() - time;
-	std::cout << "GCR Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-	success = matvec_ex15(gcr15.x, x, (void *)&ex15_dat);
-	std::cout << "GCR Norm: " << (ex15_dat.b - x).norm() << std::endl; //PASS
-	std::cout << "GCR inner iterations: " << gcr15.iter_inner << std::endl;
-	std::cout << "GCR outer iterations: " << gcr15.iter_outer << std::endl;
-	std::cout << "GCR total iterations: " << gcr15.total_iter << std::endl;
-	
-	 
-	std::cout << "\n------------------START GMRESR-------------------" << std::endl;
-	
-	GMRESR_DATA gmresr15;
-	//gmresr15.GMRES_Output = true;
-	//gmresr15.gmres_restart = 10;
-	
-	time = clock();
-	success = gmresr(matvec_ex15,NULL,ex15_dat.b,&gmresr15,(void *)&ex15_dat,(void *)&ex15_dat);
-	time = clock() - time;
-	std::cout << "GMRESR Solve (s):\t" << (time / CLOCKS_PER_SEC) << std::endl;
-	success = matvec_ex15(gmresr15.gcr_dat.x, x, (void *)&ex15_dat);
-	std::cout << "GMRESR Norm: " << (ex15_dat.b - x).norm() << std::endl; //PASS
-	std::cout << "GMRESR inner iterations: " << gmresr15.iter_inner << std::endl;
-	std::cout << "GMRESR outer iterations: " << gmresr15.iter_outer	<< std::endl;
-	std::cout << "GMRESR total iterations: " << gmresr15.total_iter << std::endl;
-	
-	
-	std::cout << "------------------END Example 15------------------\n" << std::endl;
-	 
-	
-    return success;
 }

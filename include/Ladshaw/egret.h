@@ -75,7 +75,7 @@
 #endif
 
 typedef struct
-{	
+{
 	//Constants
 	double molecular_weight;				//Given: molecular weights (g/mol)
 	double Sutherland_Temp;					//Given: Sutherland's Reference Temperature (K)
@@ -88,7 +88,7 @@ typedef struct
 	double dynamic_viscosity;				//Calculated: dynamic viscosities (g/cm/s)
 	double density;							//Calculated: gas densities (g/cm^3) {use RE3}
 	double Schmidt;							//Calculated: Value of the Schmidt number (-)
-		
+	
 }PURE_GAS;
 
 typedef struct
@@ -111,7 +111,7 @@ typedef struct
 	double total_molecular_weight;			//Calculated: Total molecular weight (g/mol)
 	double total_specific_heat;				//Calculated: Total specific heat (J/g/K)
 	double Reynolds;						//Calculated: Value of the Reynold's number	(-)
-	Matrix binary_diffusion;				//Calculated: Tensor matrix of binary gas diffusivities (cm^2/s)
+	Matrix<double> binary_diffusion;		//Calculated: Tensor matrix of binary gas diffusivities (cm^2/s)
 	
 	//All Species Info
 	std::vector<PURE_GAS> species_dat;		//Vector of the pure gas info of all species

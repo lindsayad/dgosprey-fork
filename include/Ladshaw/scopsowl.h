@@ -25,13 +25,13 @@
 
 typedef struct
 {
-	Matrix qAvg;								//Average adsorbed amount for a species at each node (mol/kg)
-	Matrix qAvg_old;							//Old Average adsorbed amount for a species at each node (mol/kg)
+	Matrix<double> qAvg;								//Average adsorbed amount for a species at each node (mol/kg)
+	Matrix<double> qAvg_old;							//Old Average adsorbed amount for a species at each node (mol/kg)
 	
-	Matrix Qst;									//Heat of adsorption for all nodes (J/mol)
-	Matrix Qst_old;								//Old Heat of adsorption for all nodes (J/mol)
+	Matrix<double> Qst;									//Heat of adsorption for all nodes (J/mol)
+	Matrix<double> Qst_old;								//Old Heat of adsorption for all nodes (J/mol)
 	
-	Matrix dq_dc;							//Storage vector for current adsorption slope (dq/dc) (L/kg)
+	Matrix<double> dq_dc;							//Storage vector for current adsorption slope (dq/dc) (L/kg)
 	
 	double xIC;									//Initial conditions for adsorbed molefractions
 	
@@ -160,19 +160,5 @@ int SCOPSOWL_postprocesses(SCOPSOWL_DATA *owl_dat);
 int SCOPSOWL_reset(SCOPSOWL_DATA *owl_dat);
 
 int SCOPSOWL(SCOPSOWL_DATA *owl_dat);
-
-int LARGE_CYCLE_TEST01(SCOPSOWL_DATA *owl_dat);
-
-int SMALL_CYCLE_TEST02(SCOPSOWL_DATA *owl_dat);
-
-int CURVE_TEST03(SCOPSOWL_DATA *owl_dat);
-
-int CURVE_TEST04(SCOPSOWL_DATA *owl_dat);
-
-int CURVE_TEST05(SCOPSOWL_DATA *owl_dat);
-
-int SCOPSOWL_SCENARIOS(const char *scene, const char *sorbent, const char *comp, const char *sorbate);
-
-int SCOPSOWL_TESTS();
 
 #endif

@@ -164,6 +164,4 @@ void eval_GPAST(const double *par, int m_dat, const void *data, double *fvec, in
 
 int MAGPIE(const void *data);
 
-int MAGPIE_SCENARIOS(const char *inputFileName, const char *sceneFileName);
-
 #endif /* MAGPIE_HPP_ */
