@@ -431,20 +431,20 @@
  	type = Transient
 	scheme = bdf2
 
+	# NOTE: The default tolerances are far to strict and cause the program to crawl
  	nl_rel_tol = 1e-6
- 	picard_abs_tol = 1e-6
  	nl_abs_tol = 1e-6
  	nl_rel_step_tol = 1e-6
- 	picard_rel_tol = 1e-6
  	nl_abs_step_tol = 1e-6
  	l_tol = 1e-4
  	l_max_its = 100
 
- 	solve_type = PJFNK
+	solve_type = pjfnk  # Note: we can also do a linear solver, which will have 1st order accuracy and be much faster
+    line_search = bt    # This specifies use of backtracking line search
 	start_time = 0.0
 	end_time = 60.0
-	petsc_options_iname = '-pc_type -pc_hypre_type'
-	petsc_options_value = 'hypre boomeramg'
+    petsc_options_iname = '-pc_type -pc_hypre_type'  # I don't know what these do, but it runs a little faster with them
+    petsc_options_value = 'hypre boomeramg'
 
 	[./TimeStepper]
 		type = SolutionTimeAdaptiveDT
@@ -459,5 +459,6 @@
  exodus = true
  csv = true
  print_perf_log = true
+ print_linear_residuals = true
 
  [] #END Outputs
