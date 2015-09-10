@@ -5,11 +5,11 @@
 //	All rights reserved
 //----------------------------------------
 
-#include "AdsorbateProperties.h"
+#include "MagpieAdsorbateProperties.h"
 
 template<>
 // input parameters are the parameters that are constant and not calculated from other parameters
-InputParameters validParams<AdsorbateProperties>()
+InputParameters validParams<MagpieAdsorbateProperties>()
 {
 	InputParameters params = validParams<Material>();
 
@@ -17,7 +17,6 @@ InputParameters validParams<AdsorbateProperties>()
 	params.addCoupledVar("total_pressure","Coupled variable for total pressure");
 	params.addCoupledVar("coupled_gases", "Gas concentrations variables being coupled");
 	
-	params.addParam<int>("adsorption_type",0,"The type of adsorption function to use (0 = Equilibria, 1 = Surface Diffusion, 2 = Pore and Surface Diffsuion");
 	params.addParam<std::vector<int> >("number_sites","The number of adsorption sites for each species in GSTA isotherm");
 	params.addParam<std::vector<Real> >("maximum_capacity","The adsorption capacity for each species in the GSTA isotherm (mol/kg)");
 	params.addParam<std::vector<Real> >("molar_volume","The van der Waals molar volume of each species (mol/cm^3)");
@@ -39,12 +38,11 @@ InputParameters validParams<AdsorbateProperties>()
 	return params;
 }
 
-AdsorbateProperties::AdsorbateProperties(const InputParameters & parameters)
+MagpieAdsorbateProperties::MagpieAdsorbateProperties(const InputParameters & parameters)
 :Material(parameters),
 
 _temperature(coupledValue("temperature")),
 _total_pressure(coupledValue("total_pressure")),
-_adsorption_type(getParam<int>("adsorption_type")),
 _num_sites(getParam<std::vector<int> >("number_sites")),
 _max_capacity(getParam<std::vector<Real> >("maximum_capacity")),
 _molar_volume(getParam<std::vector<Real> >("molar_volume")),
@@ -62,7 +60,8 @@ _entropy_4(getParam<std::vector<Real> >("entropy_site_4")),
 _entropy_5(getParam<std::vector<Real> >("entropy_site_5")),
 _entropy_6(getParam<std::vector<Real> >("entropy_site_6")),
 
-_magpie_dat(declareProperty< MAGPIE_DATA >("magpie_data"))
+_magpie_dat(declareProperty< MAGPIE_DATA >("magpie_data")),
+_magpie_perturbation(declareProperty< MAGPIE_DATA >("magpie_perturbation"))
 
 {
 	unsigned int n = coupledComponents("coupled_gases");
@@ -74,14 +73,22 @@ _magpie_dat(declareProperty< MAGPIE_DATA >("magpie_data"))
 		_index[i] = coupled("coupled_gases",i);
 		_gas_conc[i] = &coupledValue("coupled_gases",i);
 	}
+	
+	//Loop over _qp (Note: wanted to do this for initialization, but this didn't work)
+	/*
+	for (unsigned int _qp=0; _qp<_qrule->n_points(); _qp++)
+	{
+	
+	}
+	 */
 }
 
 void
-AdsorbateProperties::computeQpProperties()
+MagpieAdsorbateProperties::computeQpProperties()
 {	
-	//Only setup working space if this is the first run
-	//if (_t == 0.0)
-	//{
+	//Only setup working space if it has not yet been set up
+	if (_magpie_dat[_qp].sys_dat.N != _gas_conc.size())
+	{
 		_magpie_dat[_qp].sys_dat.N = _gas_conc.size();
 		_magpie_dat[_qp].gpast_dat.resize(_magpie_dat[_qp].sys_dat.N);
 		_magpie_dat[_qp].gsta_dat.resize(_magpie_dat[_qp].sys_dat.N);
@@ -160,7 +167,13 @@ AdsorbateProperties::computeQpProperties()
 				}
 			}
 		}
-	//}// END if _t == 0.0
+	}// END if Not Initialized
+	
+	//Initialized perturbation object
+	if (_magpie_perturbation[_qp].sys_dat.N != _gas_conc.size())
+	{
+		_magpie_perturbation[_qp] = _magpie_dat[_qp];
+	}
 	
 	_magpie_dat[_qp].sys_dat.total_eval = 0;
 	_magpie_dat[_qp].sys_dat.avg_norm = 0;
@@ -173,6 +186,17 @@ AdsorbateProperties::computeQpProperties()
 	_magpie_dat[_qp].sys_dat.PT = _total_pressure[_qp];
 	_magpie_dat[_qp].sys_dat.T = _temperature[_qp];
 	
+	_magpie_perturbation[_qp].sys_dat.total_eval = 0;
+	_magpie_perturbation[_qp].sys_dat.avg_norm = 0;
+	_magpie_perturbation[_qp].sys_dat.max_norm = 0;
+	_magpie_perturbation[_qp].sys_dat.Recover = false;
+	_magpie_perturbation[_qp].sys_dat.Carrier = false;
+	_magpie_perturbation[_qp].sys_dat.Ideal = false;
+	_magpie_perturbation[_qp].sys_dat.Output = false;
+	
+	_magpie_perturbation[_qp].sys_dat.PT = _total_pressure[_qp];
+	_magpie_perturbation[_qp].sys_dat.T = _temperature[_qp];
+	
 	double tempPT = 0.0;
 	
 	//Loop over all gas species
@@ -184,6 +208,7 @@ AdsorbateProperties::computeQpProperties()
 		tempPT = pi + tempPT;	
 	}
 	_magpie_dat[_qp].sys_dat.PT = tempPT;
+	_magpie_perturbation[_qp].sys_dat.PT = tempPT;
 	
 	for (int i=0; i<_magpie_dat[_qp].sys_dat.N; i++)
 	{
@@ -203,12 +228,39 @@ AdsorbateProperties::computeQpProperties()
 		
 		if (_magpie_dat[_qp].gpast_dat[i].y < 0.0)
 			_magpie_dat[_qp].gpast_dat[i].y = 0.0;
+		
+		_magpie_perturbation[_qp].gpast_dat[i].y = _magpie_dat[_qp].gpast_dat[i].y;
+		_magpie_perturbation[_qp].sys_dat.Carrier = _magpie_dat[_qp].sys_dat.Carrier;
 	}
 	
+	//Call MAGPIE Simulation for Unperturbed data
 	int success = 0;
 	success = MAGPIE( (void *)&_magpie_dat[_qp] );
 	if (success < 0 || success > 3) {mError(simulation_fail);}
 	else success = 0;
+	
+	//Call MAGPIE Simulations for perturbations in each adsorbing species
+	for (int i=0; i<_magpie_perturbation[_qp].sys_dat.N; i++)
+	{
+		if (_magpie_perturbation[_qp].gsta_dat[i].qmax > 0.0)
+		{
+			double yi_temp = Pstd( ((*_gas_conc[i])[_qp]+sqrt(DBL_EPSILON)), _temperature[_qp] ) / _total_pressure[_qp];
+			if (yi_temp < 0.0)
+				yi_temp = 0.0;
+			
+			_magpie_perturbation[_qp].gpast_dat[i].y = yi_temp;
+			
+			success = MAGPIE( (void *)&_magpie_perturbation[_qp] );
+			if (success < 0 || success > 3) {mError(simulation_fail);}
+			else success = 0;
+			
+			_magpie_perturbation[_qp].gpast_dat[i].y = _magpie_dat[_qp].gpast_dat[i].y;
+		}
+		else
+		{
+			_magpie_perturbation[_qp].gpast_dat[i].q = _magpie_dat[_qp].gpast_dat[i].q;
+		}
+	}
 	
 }
 

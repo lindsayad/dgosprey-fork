@@ -6,7 +6,6 @@
 #include "LinearDrivingForce.h"
 #include "BedProperties.h"
 #include "AdsorbentProperties.h"
-#include "AdsorbateProperties.h"
 #include "FlowProperties.h"
 #include "RetardedTimeDerivative.h"
 #include "Dispersion.h"
@@ -44,7 +43,9 @@
 #include "DGColumnWallHeatFluxBC.h"
 #include "DGColumnWallHeatFluxLimitedBC.h"
 
+#include "MagpieAdsorbateProperties.h"
 #include "MAGPIE_Adsorption.h"
+#include "MAGPIE_Perturbation.h"
 
 
 template<>
@@ -85,7 +86,7 @@ DgospreyApp::registerObjects(Factory & factory)
 	registerMaterial(BedProperties);
 	registerMaterial(AdsorbentProperties);
 	registerMaterial(FlowProperties);
-	registerMaterial(AdsorbateProperties);
+	registerMaterial(MagpieAdsorbateProperties);
 	registerKernel(RetardedTimeDerivative);
 	registerKernel(Dispersion);
 	registerKernel(BedWallHeatTransfer);
@@ -97,6 +98,8 @@ DgospreyApp::registerObjects(Factory & factory)
 
 	registerAux(TotalColumnPressure);
 	registerAux(MAGPIE_Adsorption);
+	registerAux(MAGPIE_Perturbation);
+	
 	registerInitialCondition(TotalPressureIC);
 	registerInitialCondition(ColumnTemperatureIC);
 	registerInitialCondition(ConcentrationIC);

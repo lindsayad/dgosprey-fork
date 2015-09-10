@@ -71,6 +71,36 @@
 		family = MONOMIAL
 		initial_condition = 0.0
 	[../]
+	
+	[./N2_Adsorbed]
+		order = CONSTANT
+		family = MONOMIAL
+		initial_condition = 0.0
+	[../]
+	
+	[./O2_Adsorbed]
+		order = CONSTANT
+		family = MONOMIAL
+		initial_condition = 0.0
+	[../]
+	
+	[./H2O_Perturb]
+		order = CONSTANT
+		family = MONOMIAL
+		initial_condition = 0.0
+	[../]
+	
+	[./N2_Perturb]
+		order = CONSTANT
+		family = MONOMIAL
+		initial_condition = 0.0
+	[../]
+	
+	[./O2_Perturb]
+		order = CONSTANT
+		family = MONOMIAL
+		initial_condition = 0.0
+	[../]
 
  [] #END AuxVariables
 
@@ -139,11 +169,11 @@
 	[../]
 
  	[./accumH2O]
- 		#type = RetardedTimeDerivative
-		type = CoefTimeDerivative
+ 		type = RetardedTimeDerivative
+		#type = CoefTimeDerivative
  		variable = H2O
-		Coefficient = 121448.3707 #This is temporary as a surrogate for the adsorption strength = dq/dc * eb
- 		#index = 2
+		#Coefficient = 121448.3707 #This is temporary as a surrogate for the adsorption strength = dq/dc * eb
+ 		index = 2
  	[../]
 
 	[./diffH2O]
@@ -243,10 +273,40 @@
 		temperature = column_temp
 		coupled_gases = 'N2 O2 H2O'
 	[../]
+	
+	[./nitrogen_adsorption]
+		type = MAGPIE_Adsorption
+		variable = N2_Adsorbed
+		index = 0
+	[../]
+	
+	[./oxygen_adsorption]
+		type = MAGPIE_Adsorption
+		variable = O2_Adsorbed
+		index = 1
+	[../]
  
 	[./water_adsorption]
 		type = MAGPIE_Adsorption
 		variable = H2O_Adsorbed
+		index = 2
+	[../]
+	
+	[./nitrogen_perturbation]
+		type = MAGPIE_Perturbation
+		variable = N2_Perturb
+		index = 0
+	[../]
+	
+	[./oxygen_perturbation]
+		type = MAGPIE_Perturbation
+		variable = O2_Perturb
+		index = 1
+	[../]
+ 
+	[./water_perturbation]
+		type = MAGPIE_Perturbation
+		variable = H2O_Perturb
 		index = 2
 	[../]
 
@@ -331,6 +391,8 @@
 		temperature = column_temp
  		total_pressure = total_pressure
 		coupled_gases = 'N2 O2 H2O'
+		coupled_adsorption = 'N2_Adsorbed O2_Adsorbed H2O_Adsorbed'
+		coupled_perturbation = 'N2_Perturb O2_Perturb H2O_Perturb'
 	[../]
 
 	[./AdsorbentMaterials]
@@ -348,9 +410,8 @@
 	[../]
 	
 	[./AdsorbateMaterials]
-		type = AdsorbateProperties
+		type = MagpieAdsorbateProperties
 		block = 0
-		adsorption_type = 0
 		temperature = column_temp
 		total_pressure = total_pressure
 		coupled_gases = 'N2 O2 H2O'
@@ -437,9 +498,9 @@
  	nl_rel_step_tol = 1e-6
  	nl_abs_step_tol = 1e-6
  	l_tol = 1e-4
- 	l_max_its = 100
+ 	l_max_its = 20
 
-	solve_type = pjfnk  # Note: we can also do a linear solver, which will have 1st order accuracy and be much faster
+	solve_type = pjfnk  
     line_search = bt    # This specifies use of backtracking line search
 	start_time = 0.0
 	end_time = 60.0

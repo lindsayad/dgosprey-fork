@@ -4,6 +4,10 @@
 #ifndef FLOWPROPERTIES_H
 #define FLOWPROPERTIES_H
 
+#ifndef _gas_const
+#define _gas_const 8.3144621
+#endif
+
 //Forward Declarations
 class FlowProperties;
 
@@ -47,6 +51,8 @@ private:
 	VariableValue & _total_pressure;
 	std::vector<unsigned int> _index;
 	std::vector<VariableValue *> _gas_conc;
+	std::vector<VariableValue *> _solid_conc;
+	std::vector<VariableValue *> _solid_perturb;
 	
 };
 

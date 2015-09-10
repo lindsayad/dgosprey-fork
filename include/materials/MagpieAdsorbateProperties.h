@@ -8,19 +8,19 @@
 #include "Material.h"
 #include "flock.h"
 
-#ifndef ADSORBATEPROPERTIES_H
-#define ADSORBATEPROPERTIES_H
+#ifndef MAGPIEADSORBATEPROPERTIES_H
+#define MAGPIEADSORBATEPROPERTIES_H
 
 //Forward Declarations
-class AdsorbateProperties;
+class MagpieAdsorbateProperties;
 
 template<>
-InputParameters validParams<AdsorbateProperties>();
+InputParameters validParams<MagpieAdsorbateProperties>();
 
-class AdsorbateProperties : public Material
+class MagpieAdsorbateProperties : public Material
 {
 public:
-	AdsorbateProperties(const InputParameters & parameters);
+	MagpieAdsorbateProperties(const InputParameters & parameters);
 	
 protected:
 	virtual void computeQpProperties();
@@ -32,7 +32,6 @@ private:
 	VariableValue & _total_pressure;
 	std::vector<VariableValue *> _gas_conc;
 	
-	int _adsorption_type;
 	std::vector<int> _num_sites;
 	std::vector<Real> _max_capacity;
 	std::vector<Real> _molar_volume;
@@ -52,6 +51,7 @@ private:
 	std::vector<Real> _entropy_6;
 	
 	MaterialProperty< MAGPIE_DATA > & _magpie_dat;
+	MaterialProperty< MAGPIE_DATA > & _magpie_perturbation;
 };
 
-#endif //ADSORBATEPROPERTIES_H
+#endif //MAGPIEADSORBATEPROPERTIES_H

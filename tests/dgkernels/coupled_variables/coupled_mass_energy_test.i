@@ -65,6 +65,42 @@
  		family = L2_LAGRANGE
  		initial_condition = 298.15
  	[../]
+	
+	[./H2O_Adsorbed]
+		order = CONSTANT
+		family = MONOMIAL
+		initial_condition = 0.0
+	[../]
+	
+	[./N2_Adsorbed]
+		order = CONSTANT
+		family = MONOMIAL
+		initial_condition = 0.0
+	[../]
+	
+	[./O2_Adsorbed]
+		order = CONSTANT
+		family = MONOMIAL
+		initial_condition = 0.0
+	[../]
+	
+	[./H2O_Perturb]
+		order = CONSTANT
+		family = MONOMIAL
+		initial_condition = 0.0
+	[../]
+	
+	[./N2_Perturb]
+		order = CONSTANT
+		family = MONOMIAL
+		initial_condition = 0.0
+	[../]
+	
+	[./O2_Perturb]
+		order = CONSTANT
+		family = MONOMIAL
+		initial_condition = 0.0
+	[../]
 
  [] #END AuxVariables
 
@@ -98,12 +134,6 @@
 
 [Kernels]
 
- 	#[./accumN2]
- 		#type = RetardedTimeDerivative
- 		#variable = N2
- 		#index = 0
- 	#[../]
-
 	[./diffN2]
 		type = GColumnMassDispersion
 		variable = N2
@@ -114,12 +144,6 @@
 		type = GColumnMassAdvection
 		variable = N2
 	[../]
-
- 	#[./accumO2]
- 		#type = RetardedTimeDerivative
- 		#variable = O2
- 		#index = 1
- 	#[../]
 
 	[./diffO2]
 		type = GColumnMassDispersion
@@ -132,12 +156,6 @@
 		variable = O2
 	[../]
 
- 	#[./accumH2O]
- 		#type = RetardedTimeDerivative
- 		#variable = H2O
- 		#index = 2
- 	#[../]
-
 	[./diffH2O]
 		type = GColumnMassDispersion
 		variable = H2O
@@ -149,10 +167,6 @@
 		variable = H2O
 	[../]
 
- 	#[./wallAccum]
- 		#type = WallHeatAccumulation
- 		#variable = wall_temp
- 	#[../]
  	[./wall_bed_trans]
  		type = BedWallHeatTransfer
  		variable = wall_temp
@@ -164,10 +178,6 @@
  		coupled = ambient_temp
  	[../]
 
-	#[./columnAccum]
-		#type = BedHeatAccumulation
-		#variable = column_temp
-	#[../]
 	[./columnConduction]
 		type = GColumnHeatDispersion
 		variable =column_temp
@@ -317,6 +327,8 @@
 		temperature = column_temp
  		total_pressure = total_pressure
 		coupled_gases = 'N2 O2 H2O'
+		coupled_adsorption = 'N2_Adsorbed O2_Adsorbed H2O_Adsorbed'
+		coupled_perturbation = 'N2_Perturb O2_Perturb H2O_Perturb'
 	[../]
 
 	[./AdsorbentMaterials]
@@ -377,11 +389,9 @@
 
 [Executioner]
 
- 	#type = Transient
  	type = Steady
  	scheme = bdf2
- 	#scheme = implicit-euler
-
+	
  	nl_rel_tol = 1e-6
  	picard_abs_tol = 1e-6
  	nl_abs_tol = 1e-6
@@ -392,7 +402,6 @@
  	l_max_its = 100
 
  	solve_type = PJFNK
- 	#solve_type = JFNK
 	start_time = 0.0
 	end_time = 60.0
 	petsc_options_iname = '-pc_type -pc_hypre_type'
