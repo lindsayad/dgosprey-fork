@@ -25,6 +25,30 @@ _magpie_perturbation(getMaterialProperty< MAGPIE_DATA >("magpie_perturbation"))
 Real
 MAGPIE_Perturbation::computeValue()
 {
-	return _magpie_perturbation[_qp].gpast_dat[_index].q;
+	MAGPIE_DATA magpie_copy;
+	magpie_copy = _magpie_perturbation[_qp];
+	
+	
+	//Check for adsorption
+	if (_magpie_perturbation[_qp].gsta_dat[_index].qmax > 0.0)
+	{
+		//perturn the copy's _index y
+		double pi = _magpie_perturbation[_qp].gpast_dat[_index].y * _magpie_perturbation[_qp].sys_dat.PT;
+		double ci = Cstd(pi,_magpie_perturbation[_qp].sys_dat.T) + sqrt(DBL_EPSILON);
+		double yi = Pstd(ci,_magpie_perturbation[_qp].sys_dat.T) / _magpie_perturbation[_qp].sys_dat.PT;
+		magpie_copy.gpast_dat[_index].y = yi;
+	
+	
+		int success = 0;
+		success = MAGPIE( (void *)&magpie_copy );
+		if (success < 0 || success > 3) {mError(simulation_fail);}
+		else success = 0;
+		
+		return magpie_copy.gpast_dat[_index].q;
+	}
+	else
+	{
+		return 0.0;
+	}
 }
 

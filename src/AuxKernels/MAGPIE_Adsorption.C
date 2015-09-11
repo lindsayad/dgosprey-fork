@@ -25,5 +25,21 @@ _magpie_dat(getMaterialProperty< MAGPIE_DATA >("magpie_data"))
 Real
 MAGPIE_Adsorption::computeValue()
 {
-	return _magpie_dat[_qp].gpast_dat[_index].q;
+	MAGPIE_DATA magpie_copy;
+	magpie_copy = _magpie_dat[_qp];
+	
+	//Call MAGPIE Simulation for Unperturbed data
+	if (_magpie_dat[_qp].gsta_dat[_index].qmax > 0.0)
+	{
+		int success = 0;
+		success = MAGPIE( (void *)&magpie_copy );
+		if (success < 0 || success > 3) {mError(simulation_fail);}
+		else success = 0;
+	
+		return magpie_copy.gpast_dat[_index].q;
+	}
+	else
+	{
+		return 0.0;
+	}
 }

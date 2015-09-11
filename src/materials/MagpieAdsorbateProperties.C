@@ -233,34 +233,5 @@ MagpieAdsorbateProperties::computeQpProperties()
 		_magpie_perturbation[_qp].sys_dat.Carrier = _magpie_dat[_qp].sys_dat.Carrier;
 	}
 	
-	//Call MAGPIE Simulation for Unperturbed data
-	int success = 0;
-	success = MAGPIE( (void *)&_magpie_dat[_qp] );
-	if (success < 0 || success > 3) {mError(simulation_fail);}
-	else success = 0;
-	
-	//Call MAGPIE Simulations for perturbations in each adsorbing species
-	for (int i=0; i<_magpie_perturbation[_qp].sys_dat.N; i++)
-	{
-		if (_magpie_perturbation[_qp].gsta_dat[i].qmax > 0.0)
-		{
-			double yi_temp = Pstd( ((*_gas_conc[i])[_qp]+sqrt(DBL_EPSILON)), _temperature[_qp] ) / _total_pressure[_qp];
-			if (yi_temp < 0.0)
-				yi_temp = 0.0;
-			
-			_magpie_perturbation[_qp].gpast_dat[i].y = yi_temp;
-			
-			success = MAGPIE( (void *)&_magpie_perturbation[_qp] );
-			if (success < 0 || success > 3) {mError(simulation_fail);}
-			else success = 0;
-			
-			_magpie_perturbation[_qp].gpast_dat[i].y = _magpie_dat[_qp].gpast_dat[i].y;
-		}
-		else
-		{
-			_magpie_perturbation[_qp].gpast_dat[i].q = _magpie_dat[_qp].gpast_dat[i].q;
-		}
-	}
-	
 }
 
