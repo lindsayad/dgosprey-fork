@@ -37,6 +37,11 @@ MAGPIE_Adsorption::computeValue()
 		else success = 0;
 	
 		return magpie_copy.gpast_dat[_index].q;
+		
+		//Temporary override to demonstrate LDF kinetics
+		//double k = magpie_copy.gpast_dat[_index].q * 0.008;
+		//double qe = magpie_copy.gpast_dat[_index].q;
+		//return (_u_old[_qp] + (_dt*k*qe))/(1.0+(_dt*k));
 	}
 	else
 	{

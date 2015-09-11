@@ -509,7 +509,7 @@
 
 	[./TimeStepper]
 		type = SolutionTimeAdaptiveDT
-		dt = 0.001
+		dt = 0.0001
 	[../]
 
  [] #END Executioner
