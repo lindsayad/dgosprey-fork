@@ -25,7 +25,7 @@ protected:
 	virtual Real computeValue();
 private:
 	unsigned int _index;
-	const MaterialProperty< MAGPIE_DATA > & _magpie_perturbation;
+	const MaterialProperty< MAGPIE_DATA > & _magpie_dat;
 	
 };
 

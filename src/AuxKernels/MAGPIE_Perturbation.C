@@ -18,7 +18,7 @@ InputParameters validParams<MAGPIE_Perturbation>()
 MAGPIE_Perturbation::MAGPIE_Perturbation(const InputParameters & parameters) :
 AuxKernel(parameters),
 _index(getParam<unsigned int>("index")),
-_magpie_perturbation(getMaterialProperty< MAGPIE_DATA >("magpie_perturbation"))
+_magpie_dat(getMaterialProperty< MAGPIE_DATA >("magpie_data"))
 {
 }
 
@@ -26,16 +26,16 @@ Real
 MAGPIE_Perturbation::computeValue()
 {
 	MAGPIE_DATA magpie_copy;
-	magpie_copy = _magpie_perturbation[_qp];
+	magpie_copy = _magpie_dat[_qp];
 	
 	
 	//Check for adsorption
-	if (_magpie_perturbation[_qp].gsta_dat[_index].qmax > 0.0)
+	if (_magpie_dat[_qp].gsta_dat[_index].qmax > 0.0)
 	{
 		//perturn the copy's _index y
-		double pi = _magpie_perturbation[_qp].gpast_dat[_index].y * _magpie_perturbation[_qp].sys_dat.PT;
-		double ci = Cstd(pi,_magpie_perturbation[_qp].sys_dat.T) + sqrt(DBL_EPSILON);
-		double yi = Pstd(ci,_magpie_perturbation[_qp].sys_dat.T) / _magpie_perturbation[_qp].sys_dat.PT;
+		double pi = _magpie_dat[_qp].gpast_dat[_index].y * _magpie_dat[_qp].sys_dat.PT;
+		double ci = Cstd(pi,_magpie_dat[_qp].sys_dat.T) + sqrt(DBL_EPSILON);
+		double yi = Pstd(ci,_magpie_dat[_qp].sys_dat.T) / _magpie_dat[_qp].sys_dat.PT;
 		magpie_copy.gpast_dat[_index].y = yi;
 	
 	

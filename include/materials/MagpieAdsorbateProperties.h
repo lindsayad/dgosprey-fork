@@ -51,7 +51,6 @@ private:
 	std::vector<Real> _entropy_6;
 	
 	MaterialProperty< MAGPIE_DATA > & _magpie_dat;
-	MaterialProperty< MAGPIE_DATA > & _magpie_perturbation;
 };
 
 #endif //MAGPIEADSORBATEPROPERTIES_H

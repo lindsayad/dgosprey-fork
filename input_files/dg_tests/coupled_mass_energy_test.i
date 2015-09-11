@@ -403,7 +403,7 @@
 		crystal_radius = 1.5
 		pellet_diameter = 0.236
 		macropore_radius = 3.5e-6
-		rhos = 1.41
+		rhos = 1.69
 		hs = 1.045
 		temperature = column_temp
 		coupled_gases = 'N2 O2 H2O'
@@ -509,7 +509,7 @@
 
 	[./TimeStepper]
 		type = SolutionTimeAdaptiveDT
-		dt = 0.1
+		dt = 0.001
 	[../]
 
  [] #END Executioner
