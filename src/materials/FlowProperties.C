@@ -100,9 +100,6 @@ FlowProperties::computeQpProperties()
 	  
 	  Real _phi = 0.873143 + (0.000072375 * _temperature[_qp]);
 	  
-	  Real _adsorption_heat_i;
-	  _adsorption_heat_i = 0.0 * _pellet_density[_qp]*(1.0-_porosity[_qp]); //add adsorption heat here
-	  
 	  for (unsigned int j = 0; j<_gas_conc.size(); j++)
 	  {
 		  if ( j != i)
@@ -138,9 +135,7 @@ FlowProperties::computeQpProperties()
 	  
 	  _gas_molecular_wieght[_qp] = _gas_molecular_wieght[_qp] + (_yi * _molecular_wieght[i]);
 	  _gas_heat_capacity[_qp] = _gas_heat_capacity[_qp] + (_yi * _comp_heat_capacity[i]);
-	  
-	  _heat_retardation[_qp] = _heat_retardation[_qp] + _adsorption_heat_i;
-	  
+	  	  
   } //ith Loop
 	
 	_gas_density[_qp] = (_total_pressure[_qp] * _gas_molecular_wieght[_qp]) / (8.3144621 * _temperature[_qp]);

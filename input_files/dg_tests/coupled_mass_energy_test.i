@@ -101,6 +101,24 @@
 		family = MONOMIAL
 		initial_condition = 0.0
 	[../]
+	
+	[./N2_AdsorbedHeat]
+		order = CONSTANT
+		family = MONOMIAL
+		initial_condition = 0.0
+	[../]
+	
+	[./O2_AdsorbedHeat]
+		order = CONSTANT
+		family = MONOMIAL
+		initial_condition = 0.0
+	[../]
+	
+	[./H2O_AdsorbedHeat]
+		order = CONSTANT
+		family = MONOMIAL
+		initial_condition = 0.0
+	[../]
 
  [] #END AuxVariables
 
@@ -214,6 +232,11 @@
 		type = GColumnHeatAdvection
 		variable =column_temp
 	[../]
+	[./columnAdsHeat]
+		type = MAGPIE_HeatAccumulation
+		variable = column_temp
+		solid_heat = H2O_AdsorbedHeat
+	[../]
 
 
  [] #END Kernels
@@ -309,13 +332,35 @@
 		variable = H2O_Perturb
 		index = 2
 	[../]
+	
+	[./nitrogen_adsorption_heat]
+		type = MAGPIE_AdsorptionHeat
+		variable = N2_AdsorbedHeat
+		solid_conc = N2_Adsorbed
+		index = 0
+	[../]
+	
+	[./oxygen_adsorption_heat]
+		type = MAGPIE_AdsorptionHeat
+		variable = O2_AdsorbedHeat
+		solid_conc = O2_Adsorbed
+		index = 1
+	[../]
+ 
+	[./water_adsorption_heat]
+		type = MAGPIE_AdsorptionHeat
+		variable = H2O_AdsorbedHeat
+		solid_conc = H2O_Adsorbed
+		index = 2
+	[../]
 
  [] #END AuxKernels
 
 [BCs]
 
  	[./N2_Flux]
- 		type = DGMassFluxLimitedBC
+		type = DGMassFluxLimitedBC
+		#type = DGMassFluxBC
  		variable = N2
  		boundary = 'top bottom'
  		input_temperature = 298.15
@@ -325,7 +370,8 @@
  	[../]
 
  	[./O2_Flux]
- 		type = DGMassFluxLimitedBC
+		type = DGMassFluxLimitedBC
+		#type = DGMassFluxBC
  		variable = O2
  		boundary = 'top bottom'
  		input_temperature = 298.15
@@ -335,7 +381,8 @@
  	[../]
 
  	[./H2O_Flux]
- 		type = DGMassFluxLimitedBC
+		type = DGMassFluxLimitedBC
+		#type = DGMassFluxBC
  		variable = H2O
  		boundary = 'top bottom'
  		input_temperature = 298.15
@@ -479,9 +526,15 @@
 		execute_on = timestep_end
  	[../]
  
-	[./H2O_avg_sorption]
+	[./H2O_solid]
 		type = ElementAverageValue
 		variable = H2O_Adsorbed
+		execute_on = timestep_end
+	[../]
+	
+	[./H2O_heat]
+		type = ElementAverageValue
+		variable = H2O_AdsorbedHeat
 		execute_on = timestep_end
 	[../]
 
@@ -497,7 +550,7 @@
  	nl_abs_tol = 1e-6
  	nl_rel_step_tol = 1e-6
  	nl_abs_step_tol = 1e-6
- 	l_tol = 1e-4
+ 	l_tol = 1e-6
  	l_max_its = 20
 
 	solve_type = pjfnk  
@@ -508,8 +561,9 @@
     petsc_options_value = 'hypre boomeramg'
 
 	[./TimeStepper]
+		#Need to write a custom TimeStepper to enforce a maximum allowable dt
 		type = SolutionTimeAdaptiveDT
-		dt = 0.0001
+		dt = 0.1
 	[../]
 
  [] #END Executioner

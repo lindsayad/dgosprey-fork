@@ -46,6 +46,8 @@
 #include "MagpieAdsorbateProperties.h"
 #include "MAGPIE_Adsorption.h"
 #include "MAGPIE_Perturbation.h"
+#include "MAGPIE_AdsorptionHeat.h"
+#include "MAGPIE_HeatAccumulation.h"
 
 
 template<>
@@ -99,6 +101,7 @@ DgospreyApp::registerObjects(Factory & factory)
 	registerAux(TotalColumnPressure);
 	registerAux(MAGPIE_Adsorption);
 	registerAux(MAGPIE_Perturbation);
+	registerAux(MAGPIE_AdsorptionHeat);
 	
 	registerInitialCondition(TotalPressureIC);
 	registerInitialCondition(ColumnTemperatureIC);
@@ -123,6 +126,7 @@ DgospreyApp::registerObjects(Factory & factory)
 	registerKernel(GColumnHeatAdvection);
 	registerDGKernel(DGColumnHeatDispersion);
 	registerKernel(GColumnHeatDispersion);
+	registerKernel(MAGPIE_HeatAccumulation);
 	registerBoundaryCondition(DGHeatFluxBC);
 	registerBoundaryCondition(DGHeatFluxLimitedBC);
 	registerBoundaryCondition(DGColumnWallHeatFluxBC);
