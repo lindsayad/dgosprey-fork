@@ -29,9 +29,8 @@ protected:
 private:
 	const MaterialProperty<Real> & _porosity;
 	const MaterialProperty<Real> & _pellet_density;
-	VariableValue & _solid_heat;
-	VariableValue & _solid_heat_old;
-	VariableValue & _solid_heat_older;
+	std::vector<VariableValue *> _solid_heat;
+	std::vector<VariableValue *> _solid_heat_old;
 };
 
 #endif

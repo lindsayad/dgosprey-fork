@@ -235,7 +235,7 @@
 	[./columnAdsHeat]
 		type = MAGPIE_HeatAccumulation
 		variable = column_temp
-		solid_heat = H2O_AdsorbedHeat
+		solid_heats = 'N2_AdsorbedHeat O2_AdsorbedHeat H2O_AdsorbedHeat'
 	[../]
 
 
@@ -543,30 +543,34 @@
 [Executioner]
 
  	type = Transient
-	scheme = bdf2
+	scheme = implicit-euler
 
 	# NOTE: The default tolerances are far to strict and cause the program to crawl
  	nl_rel_tol = 1e-6
  	nl_abs_tol = 1e-6
  	nl_rel_step_tol = 1e-6
  	nl_abs_step_tol = 1e-6
- 	l_tol = 1e-6
+ 	l_tol = 1e-4
  	l_max_its = 20
 
 	solve_type = pjfnk  
-    line_search = bt    # This specifies use of backtracking line search
+    line_search = bt    # Options: default shell none basic l2 bt cp
 	start_time = 0.0
 	end_time = 60.0
-    petsc_options_iname = '-pc_type -pc_hypre_type'  # I don't know what these do, but it runs a little faster with them
-    petsc_options_value = 'hypre boomeramg'
+    petsc_options_iname = '-pc_type -pc_hypre_type -ksp_gmres_restart'
+    petsc_options_value = 'hypre boomeramg 100'
 
 	[./TimeStepper]
 		#Need to write a custom TimeStepper to enforce a maximum allowable dt
 		type = SolutionTimeAdaptiveDT
-		dt = 0.1
+		dt = 0.01
 	[../]
 
  [] #END Executioner
+ 
+[Preconditioning]
+
+[] #END Preconditioning
 
 [Outputs]
 
