@@ -15,9 +15,9 @@
 	nx = 10
  	ny = 40
  	xmin = 0.0
-	xmax = 2.54
+	xmax = 2.54 #cm
  	ymin = 0.0
- 	ymax = 12.7
+	ymax = 12.7 #cm
 
  [] # END Mesh
 
@@ -401,7 +401,7 @@
 	[./Heat_Wall_Flux]
  		type = DGColumnWallHeatFluxLimitedBC
  		variable = column_temp
- 		boundary = 'right'
+ 		boundary = 'right left'
  		wall_temp = wall_temp
  	[../]
 
@@ -463,8 +463,8 @@
 		total_pressure = total_pressure
 		coupled_gases = 'N2 O2 H2O'
 		number_sites = '0 0 4'
-		maximum_capacity = '0 0 11.67'
-		molar_volume = '0 0 13.91'
+		maximum_capacity = '0 0 11.67' #mol/kg
+		molar_volume = '0 0 13.91' #cm^3/mol
 		enthalpy_site_1 = '0 0 -46597.5'
 		enthalpy_site_2 = '0 0 -125024'
 		enthalpy_site_3 = '0 0 -193619'
@@ -548,10 +548,10 @@
 	# NOTE: The default tolerances are far to strict and cause the program to crawl
  	nl_rel_tol = 1e-6
  	nl_abs_tol = 1e-6
- 	nl_rel_step_tol = 1e-6
- 	nl_abs_step_tol = 1e-6
- 	l_tol = 1e-4
- 	l_max_its = 20
+ 	nl_rel_step_tol = 1e-16
+ 	nl_abs_step_tol = 1e-16
+ 	l_tol = 1e-6
+ 	l_max_its = 100
 
 	solve_type = pjfnk  
     line_search = bt    # Options: default shell none basic l2 bt cp
