@@ -449,10 +449,8 @@
  [] #END Adaptivity
 
 [Outputs]
+  execute_on = 'timestep_end'
 
- output_initial = false
  exodus = true
  csv = true
- print_linear_residuals = true
- print_perf_log = true
  [] #END Outputs

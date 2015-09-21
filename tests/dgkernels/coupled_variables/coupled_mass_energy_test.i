@@ -65,37 +65,37 @@
  		family = L2_LAGRANGE
  		initial_condition = 298.15
  	[../]
-	
+
 	[./H2O_Adsorbed]
 		order = CONSTANT
 		family = MONOMIAL
 		initial_condition = 0.0
 	[../]
-	
+
 	[./N2_Adsorbed]
 		order = CONSTANT
 		family = MONOMIAL
 		initial_condition = 0.0
 	[../]
-	
+
 	[./O2_Adsorbed]
 		order = CONSTANT
 		family = MONOMIAL
 		initial_condition = 0.0
 	[../]
-	
+
 	[./H2O_Perturb]
 		order = CONSTANT
 		family = MONOMIAL
 		initial_condition = 0.0
 	[../]
-	
+
 	[./N2_Perturb]
 		order = CONSTANT
 		family = MONOMIAL
 		initial_condition = 0.0
 	[../]
-	
+
 	[./O2_Perturb]
 		order = CONSTANT
 		family = MONOMIAL
@@ -391,7 +391,7 @@
 
  	type = Steady
  	scheme = bdf2
-	
+
  	nl_rel_tol = 1e-6
  	picard_abs_tol = 1e-6
  	nl_abs_tol = 1e-6
@@ -458,9 +458,8 @@
  [] #END Adaptivity
 
 [Outputs]
+  execute_on = 'timestep_end'
 
- output_initial = false
  exodus = true
  csv = true
- print_perf_log = true
  [] #END Outputs
