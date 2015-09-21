@@ -65,55 +65,55 @@
  		family = MONOMIAL
  		initial_condition = 298.15
  	[../]
- 
+
 	[./H2O_Adsorbed]
 		order = CONSTANT
 		family = MONOMIAL
 		initial_condition = 0.0
 	[../]
-	
+
 	[./N2_Adsorbed]
 		order = CONSTANT
 		family = MONOMIAL
 		initial_condition = 0.0
 	[../]
-	
+
 	[./O2_Adsorbed]
 		order = CONSTANT
 		family = MONOMIAL
 		initial_condition = 0.0
 	[../]
-	
+
 	[./H2O_Perturb]
 		order = CONSTANT
 		family = MONOMIAL
 		initial_condition = 0.0
 	[../]
-	
+
 	[./N2_Perturb]
 		order = CONSTANT
 		family = MONOMIAL
 		initial_condition = 0.0
 	[../]
-	
+
 	[./O2_Perturb]
 		order = CONSTANT
 		family = MONOMIAL
 		initial_condition = 0.0
 	[../]
-	
+
 	[./N2_AdsorbedHeat]
 		order = CONSTANT
 		family = MONOMIAL
 		initial_condition = 0.0
 	[../]
-	
+
 	[./O2_AdsorbedHeat]
 		order = CONSTANT
 		family = MONOMIAL
 		initial_condition = 0.0
 	[../]
-	
+
 	[./H2O_AdsorbedHeat]
 		order = CONSTANT
 		family = MONOMIAL
@@ -296,57 +296,57 @@
 		temperature = column_temp
 		coupled_gases = 'N2 O2 H2O'
 	[../]
-	
+
 	[./nitrogen_adsorption]
 		type = MAGPIE_Adsorption
 		variable = N2_Adsorbed
 		index = 0
 	[../]
-	
+
 	[./oxygen_adsorption]
 		type = MAGPIE_Adsorption
 		variable = O2_Adsorbed
 		index = 1
 	[../]
- 
+
 	[./water_adsorption]
 		type = MAGPIE_Adsorption
 		variable = H2O_Adsorbed
 		index = 2
 	[../]
-	
+
 	[./nitrogen_perturbation]
 		type = MAGPIE_Perturbation
 		variable = N2_Perturb
 		index = 0
 	[../]
-	
+
 	[./oxygen_perturbation]
 		type = MAGPIE_Perturbation
 		variable = O2_Perturb
 		index = 1
 	[../]
- 
+
 	[./water_perturbation]
 		type = MAGPIE_Perturbation
 		variable = H2O_Perturb
 		index = 2
 	[../]
-	
+
 	[./nitrogen_adsorption_heat]
 		type = MAGPIE_AdsorptionHeat
 		variable = N2_AdsorbedHeat
 		solid_conc = N2_Adsorbed
 		index = 0
 	[../]
-	
+
 	[./oxygen_adsorption_heat]
 		type = MAGPIE_AdsorptionHeat
 		variable = O2_AdsorbedHeat
 		solid_conc = O2_Adsorbed
 		index = 1
 	[../]
- 
+
 	[./water_adsorption_heat]
 		type = MAGPIE_AdsorptionHeat
 		variable = H2O_AdsorbedHeat
@@ -455,7 +455,7 @@
 		temperature = column_temp
 		coupled_gases = 'N2 O2 H2O'
 	[../]
-	
+
 	[./AdsorbateMaterials]
 		type = MagpieAdsorbateProperties
 		block = 0
@@ -471,7 +471,7 @@
 		enthalpy_site_4 = '0 0 -272228'
 		enthalpy_site_5 = '0 0 0'
 		enthalpy_site_6 = '0 0 0'
-		
+
 		entropy_site_1 = '0 0 -53.6994'
 		entropy_site_2 = '0 0 -221.073'
 		entropy_site_3 = '0 0 -356.728'
@@ -525,13 +525,13 @@
  		variable = wall_temp
 		execute_on = timestep_end
  	[../]
- 
+
 	[./H2O_solid]
 		type = ElementAverageValue
 		variable = H2O_Adsorbed
 		execute_on = timestep_end
 	[../]
-	
+
 	[./H2O_heat]
 		type = ElementAverageValue
 		variable = H2O_AdsorbedHeat
@@ -553,7 +553,7 @@
  	l_tol = 1e-6
  	l_max_its = 100
 
-	solve_type = pjfnk  
+	solve_type = pjfnk
     line_search = bt    # Options: default shell none basic l2 bt cp
 	start_time = 0.0
 	end_time = 60.0
@@ -567,17 +567,16 @@
 	[../]
 
  [] #END Executioner
- 
+
 [Preconditioning]
 
 [] #END Preconditioning
 
 [Outputs]
+  execute_on = 'timestep_end'
 
- output_initial = false
  exodus = true
  csv = true
- print_perf_log = true
  print_linear_residuals = true
 
  [] #END Outputs
